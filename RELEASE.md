@@ -4,17 +4,21 @@
 
 See the [README.md](./README.md) for a complete description of the command console library.
 
-## Changelog
-
-### v1.0.0
-
-- This is the first version of the Command Console Library for Mbed OS and AnyCloud. 
-
 ## Known Issues
 | Problem | Workaround |
 | ------- | ---------- |
-| With IAR toolchain, the commands typed are not echoed to the console, until the return key is pressed. There is no impact in functionality. | No workaround. Will be fixed in a future release. |
 | Intermitently LE RX data may not be recieved when the LE COC connection is initated by the PSoC6 kit | Disconnect and reconnect from the peer device to resume RX data. Will be fixed in a future release.| 
+
+## Changelog
+
+### v1.0.1
+
+* Documentation updates.
+* Added fix to echo the commands as they are typed, for IAR toolchain.
+
+### v1.0.0
+
+* This is the first version of the Command Console Library for Mbed OS and AnyCloud. 
 
 ## Supported Software and Tools
 The current version of the library was validated for compatibility with the following Software and Tools:

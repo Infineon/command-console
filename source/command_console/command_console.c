@@ -420,9 +420,7 @@ static uint32_t history_get_num_lines( void )
 static void send_char( char c )
 {
     putchar(c);
-#ifndef __ICCARM__
     fflush(stdout);
-#endif
 }
 
 /*!
@@ -440,9 +438,7 @@ static void send_str( const char* s )
     if ( length > 0 )
     {
         printf("%s",s);
-#ifndef __ICCARM__
-       fflush(stdout);
-#endif
+        fflush(stdout);
 	}
 }
 
@@ -462,9 +458,7 @@ static void send_charstr( const char* s )
     	putchar(*s);
 		s++;
 	}
-#ifndef __ICCARM__
     fflush(stdout);
-#endif
 }
 
 void console_thread_func( cy_thread_arg_t arg )

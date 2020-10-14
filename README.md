@@ -3,7 +3,7 @@
 ## Introduction
 This library provides a framework to add command console support to your application. Support for Wi-Fi iPerf and Bluetooth BLE commands is  bundled with this library.
 
-[Mbed OS Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mtb-anycloud-wifi-bluetooth-tester) and [ModusToolbox AnyCloud Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mbed-os-wifi-bluetooth-tester) applications are built over this library.
+[Mbed OS Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mbed-os-wifi-bluetooth-tester) and [ModusToolbox AnyCloud Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mtb-anycloud-wifi-bluetooth-tester) applications are built over this library.
 
 ## Features
 - Integrates iPerf 2.0 commands. iPerf is a tool for active measurements of the maximum achievable bandwidth on IP networks. 
