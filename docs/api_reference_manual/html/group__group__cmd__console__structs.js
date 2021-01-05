@@ -21,7 +21,7 @@ var group__group__cmd__console__structs =
       [ "history_len", "structcy__command__console__cfg__t.html#a0679da9fc3c21e363cd5da1f31c8707e", null ],
       [ "history_buffer_ptr", "structcy__command__console__cfg__t.html#a783411e7f8f46a70ff1e1c5199ec3d81", null ],
       [ "delimiter_string", "structcy__command__console__cfg__t.html#a48e516eb829b329ac8e11e68305a974a", null ],
-      [ "thread_priority", "structcy__command__console__cfg__t.html#a2e43bb1402ae25d3535b8e016532ef38", null ],
+      [ "thread_priority", "structcy__command__console__cfg__t.html#ad42ec3e890f32c15e5b8bd0afb03e77e", null ],
       [ "params_num", "structcy__command__console__cfg__t.html#aa5d4b8a5ac2a44bc70224fb919003bf8", null ]
     ] ]
 ];

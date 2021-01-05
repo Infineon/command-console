@@ -68,10 +68,10 @@ extern "C" {
 void sockets_layer_init(void);
 void iperf_network_init( void * networkInterface );
 int iperf_socket( int protocolFamily, int type, int protocol );
-int  iperf_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
-int  iperf_close( int sockID);
-int  iperf_write( int sockID, const char *msg, size_t msgLength );
-int  iperf_read(int s, void *mem, size_t len);
+int iperf_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
+int iperf_close( int sockID);
+int iperf_write( int sockID, const char *msg, size_t msgLength );
+int iperf_read(int s, void *mem, size_t len);
 bool iperf_setsock_blocking (int fd, bool blocking);
 int iperf_send(int sockID, const char *msg, size_t msgLength, int flags);
 
@@ -87,7 +87,6 @@ int iperf_setsockopt(int sockID, int option_level, int option_name, const void *
 int iperf_getsockopt(int sockID, int option_level, int option_name, void *option_value,uint32_t *option_length);
 int iperf_sendto(int sockID, char *msg, size_t msgLength, int flags, struct sockaddr *destAddr, uint32_t destAddrLen);
 struct hostent* iperf_gethostbyname(const char *name);
-bool iperf_setsock_blocking (int fd, bool blocking);
 #ifdef __cplusplus
 } /*extern "C" */
 #endif

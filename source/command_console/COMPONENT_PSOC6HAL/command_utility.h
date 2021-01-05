@@ -31,6 +31,8 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
+#pragma once
+
 #include <stdbool.h>
 
 #ifdef __cplusplus

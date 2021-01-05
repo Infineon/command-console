@@ -91,13 +91,13 @@ $(document).ready(function(){initNavTree('group__group__cmd__console__functions.
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ga909d4161978c1057335ba8d85b0c0ac5"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__cmd__console__functions.html#ga909d4161978c1057335ba8d85b0c0ac5">cy_command_console_init</a> (<a class="el" href="structcy__command__console__cfg__t.html">cy_command_console_cfg_t</a> *cfg)</td></tr>
-<tr class="memdesc:ga909d4161978c1057335ba8d85b0c0ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Command console framework and spawns off a thread that listens on the console for commands.  <a href="#ga909d4161978c1057335ba8d85b0c0ac5">More...</a><br /></td></tr>
+<tr class="memdesc:ga909d4161978c1057335ba8d85b0c0ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the Command console framework and spawns a thread that listens on the console for commands.  <a href="#ga909d4161978c1057335ba8d85b0c0ac5">More...</a><br /></td></tr>
 <tr class="separator:ga909d4161978c1057335ba8d85b0c0ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga19f8db6a06d9266b95b844a6d68a9ba1"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__cmd__console__functions.html#ga19f8db6a06d9266b95b844a6d68a9ba1">cy_command_console_deinit</a> (void)</td></tr>
 <tr class="memdesc:ga19f8db6a06d9266b95b844a6d68a9ba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-initializes the command console framework and terminates the thread.  <a href="#ga19f8db6a06d9266b95b844a6d68a9ba1">More...</a><br /></td></tr>
 <tr class="separator:ga19f8db6a06d9266b95b844a6d68a9ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga30c6e3560b462c15f07c7703ff91fa42"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__cmd__console__functions.html#ga30c6e3560b462c15f07c7703ff91fa42">cy_command_console_add_table</a> (const <a class="el" href="structcy__command__console__cmd__t.html">cy_command_console_cmd_t</a> *commands)</td></tr>
-<tr class="memdesc:ga30c6e3560b462c15f07c7703ff91fa42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoked to register a Table of <a class="el" href="structcy__command__console__cmd__t.html" title="Structure to hold the information for each console command. ">cy_command_console_cmd_t</a> entries.  <a href="#ga30c6e3560b462c15f07c7703ff91fa42">More...</a><br /></td></tr>
+<tr class="memdesc:ga30c6e3560b462c15f07c7703ff91fa42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoked to register a table of <a class="el" href="structcy__command__console__cmd__t.html" title="Structure to hold the information for each console command. ">cy_command_console_cmd_t</a> entries.  <a href="#ga30c6e3560b462c15f07c7703ff91fa42">More...</a><br /></td></tr>
 <tr class="separator:ga30c6e3560b462c15f07c7703ff91fa42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga006b1ed9970984e8ecc1b7b54e6018e9"><td class="memItemLeft" align="right" valign="top">cy_rslt_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__cmd__console__functions.html#ga006b1ed9970984e8ecc1b7b54e6018e9">cy_command_console_delete_table</a> (const <a class="el" href="structcy__command__console__cmd__t.html">cy_command_console_cmd_t</a> *commands)</td></tr>
 <tr class="memdesc:ga006b1ed9970984e8ecc1b7b54e6018e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-registers the <a class="el" href="structcy__command__console__cmd__t.html" title="Structure to hold the information for each console command. ">cy_command_console_cmd_t</a> table.  <a href="#ga006b1ed9970984e8ecc1b7b54e6018e9">More...</a><br /></td></tr>
@@ -120,15 +120,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize the Command console framework and spawns off a thread that listens on the console for commands. </p>
-<p>To be called by the application once</p>
+<p>Initializes the Command console framework and spawns a thread that listens on the console for commands. </p>
+<p>To be called by the application once.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">cfg</td><td>: Pointer to the command console configuration.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initiatlization was successful; returns command console specific error codes. See above. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initialization was successful; returns command-console-specific error codes. See above. </dd></dl>
 
 </div>
 </div>
@@ -149,7 +149,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>De-initializes the command console framework and terminates the thread. </p>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initiatlization was successful; returns command console specific error codes. See above. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initialization was successful; returns command-console-specific error codes. See above. </dd></dl>
 
 </div>
 </div>
@@ -169,14 +169,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Invoked to register a Table of <a class="el" href="structcy__command__console__cmd__t.html" title="Structure to hold the information for each console command. ">cy_command_console_cmd_t</a> entries. </p>
+<p>Invoked to register a table of <a class="el" href="structcy__command__console__cmd__t.html" title="Structure to hold the information for each console command. ">cy_command_console_cmd_t</a> entries. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">commands</td><td>: Pointer to the commands.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initiatlization was successful; returns command console specific error codes. See above. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initialization was successful; returns command-console-specific error codes. See above. </dd></dl>
 
 </div>
 </div>
@@ -203,7 +203,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initiatlization was successful; returns command console specific error codes. See above. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>CY_RSLT_SUCCESS if the initialization was successful; returns command-console-specific error codes. See above. </dd></dl>
 
 </div>
 </div>

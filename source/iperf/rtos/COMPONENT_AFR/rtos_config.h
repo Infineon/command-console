@@ -60,8 +60,8 @@
 typedef unsigned long useconds_t;
 
 #define HAVE_STRINGS_H
-
 #if !(defined (__GNUC__) && (__GNUC__ >= 6))
+
 struct timeval
 {
     long     tv_sec;             /* Seconds      */

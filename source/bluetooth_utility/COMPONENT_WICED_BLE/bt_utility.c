@@ -37,19 +37,11 @@
 #include "command_console.h"
 #include "bt_cfg.h"
 #include "wiced_bt_stack.h"
-#include "cybsp.h"
-#include "cy_retarget_io.h"
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#include <string.h>
 #include "cybt_platform_trace.h"
 #include "wiced_memory.h"
-#include "cyhal.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "wiced_bt_dev.h"
-#include "bt_utils.h"
 #include "cyabs_rtos.h"
 #include "wiced_bt_l2c.h"
 #include "wiced_data_types.h"
@@ -61,7 +53,8 @@
 /******************************************************
  *                      Macros
  ******************************************************/
-#define BLE_WORKER_THREAD_PRIORITY      (CY_RTOS_PRIORITY_BELOWNORMAL)
+/* BLE thread priority should be at par with iperf thread priority to ensure the CPU cycles are equally available b/w both BT and Wi-Fi for coex use cases */
+#define BLE_WORKER_THREAD_PRIORITY      ((cy_thread_priority_t)(CY_RTOS_PRIORITY_HIGH - 1))
 #define BLE_WORKER_THREAD_STACK_SIZE    (2 * 1024)
 #define SEND_DATA_LE                    (1)
 #define STOP_DATA_SEND                  (2)
@@ -71,7 +64,7 @@
 #define DEFAULT_LE_COC_MTU              (100)
 #define LE_COC_PSM                      (19)
 #define MAX_SEMA_COUNT                  (1)
-#define MAX_MUTEX_WAIT_TIME_MS   (0xFFFFFFFF)
+#define MAX_MUTEX_WAIT_TIME_MS          (0xFFFFFFFF)
 
 /**
  * Macro to verify that BT is on
@@ -97,22 +90,24 @@ int handle_ble_coc_send_start                  (int argc, char *argv[], tlv_buff
 int handle_ble_coc_disconnect                  (int argc, char *argv[], tlv_buffer_t** data);
 int handle_ble_coc_send_stop                   (int argc, char *argv[], tlv_buffer_t** data);
 int handle_ble_get_throughput                  (int argc, char *argv[], tlv_buffer_t** data);
+int handle_bt_get_device_address               (int argc, char *argv[], tlv_buffer_t** data);
 
 /* all the definitions here */
 #define TEST_BT_COMMANDS \
-        { (char*) "bt_on",                    handle_bt_on,                       0, NULL, NULL, (char*) "",         (char*) "Turn On  Bluetooth"}, \
-        { (char*) "bt_off",                   handle_bt_off,                      0, NULL, NULL, (char*) "",         (char*) "Turn Off Bluetooth"}, \
-        { (char*) "ble_start_adv",            handle_ble_start_adv,               0, NULL, NULL, (char*) "",         (char*) "start BLE advertisement."}, \
-        { (char*) "ble_stop_adv",             handle_ble_stop_adv,                0, NULL, NULL, (char*) "",         (char*) "stop advertisement "}, \
-        { (char*) "ble_start_scan",           handle_ble_start_scan,              0, NULL, NULL, (char*) "",         (char*) "start LE Scan and connect to hello sensor"}, \
-        { (char*) "ble_stop_scan",            handle_ble_stop_scan,               0, NULL, NULL, (char*) "",         (char*) "stop LE Scan"}, \
-        { (char*) "ble_coc_init",             handle_ble_coc_init,                0, NULL, NULL, (char*) "",         (char*) "Initalize LE COC" }, \
-        { (char*) "ble_coc_adv",              handle_ble_coc_adv,                 0, NULL, NULL, (char*) "",         (char*) "le_coc_adv" }, \
-        { (char*) "ble_coc_scan_connect",     handle_ble_coc_scan_connect,        0, NULL, NULL, (char*) "",         (char*) "le_coc_scan and connect to a COC server" }, \
-        { (char*) "ble_coc_disconnect",       handle_ble_coc_disconnect,          0, NULL, NULL, (char*) "",         (char*) "le coc disconnect" }, \
-        { (char*) "ble_coc_send_start",       handle_ble_coc_send_start,          0, NULL, NULL, (char*) "",         (char*) "le coc send data" }, \
-        { (char*) "ble_coc_send_stop",        handle_ble_coc_send_stop,           0, NULL, NULL, (char*) "",         (char*) "stop data send" }, \
-        { (char*) "ble_get_throughput",       handle_ble_get_throughput,          0, NULL, NULL, (char*) "",         (char*) "get_throughput" }, \
+    { (char*) "bt_on",                    handle_bt_on,                       0, NULL, NULL, (char*) "",         (char*) "Turn On  Bluetooth"}, \
+    { (char*) "bt_off",                   handle_bt_off,                      0, NULL, NULL, (char*) "",         (char*) "Turn Off Bluetooth"}, \
+    { (char*) "bt_get_device_address",    handle_bt_get_device_address,       0, NULL, NULL, (char*) "",         (char*) "Get Bluetooth Device Address" }, \
+    { (char*) "ble_start_adv",            handle_ble_start_adv,               0, NULL, NULL, (char*) "",         (char*) "Start BLE Advertisement."}, \
+    { (char*) "ble_stop_adv",             handle_ble_stop_adv,                0, NULL, NULL, (char*) "",         (char*) "Stop BLE Advertisement."}, \
+    { (char*) "ble_start_scan",           handle_ble_start_scan,              0, NULL, NULL, (char*) "",         (char*) "Start BLE Scan"}, \
+    { (char*) "ble_stop_scan",            handle_ble_stop_scan,               0, NULL, NULL, (char*) "",         (char*) "Stop BLE Scan"}, \
+    { (char*) "ble_coc_init",             handle_ble_coc_init,                0, NULL, NULL, (char*) "",         (char*) "Initializes LE COC with PSM 19 and MTU 100" }, \
+    { (char*) "ble_coc_adv",              handle_ble_coc_adv,                 0, NULL, NULL, (char*) "",         (char*) "Start LE COC advertisements" }, \
+    { (char*) "ble_coc_scan_connect",     handle_ble_coc_scan_connect,        0, NULL, NULL, (char*) "",         (char*) "Scan and Connect to a LE COC server" }, \
+    { (char*) "ble_coc_disconnect",       handle_ble_coc_disconnect,          0, NULL, NULL, (char*) "",         (char*) "Disconnect LE COC" }, \
+    { (char*) "ble_coc_send_start",       handle_ble_coc_send_start,          0, NULL, NULL, (char*) "",         (char*) "Start Sending LE COC data" }, \
+    { (char*) "ble_coc_send_stop",        handle_ble_coc_send_stop,           0, NULL, NULL, (char*) "",         (char*) "Stop Sending LE COC data" }, \
+    { (char*) "ble_get_throughput",       handle_ble_get_throughput,          0, NULL, NULL, (char*) "",         (char*) "Get LE COC Throughput" }, \
 
 /******************************************************
  *               Static Function Declarations
@@ -128,6 +123,7 @@ static void le_coc_tx_complete_cback(uint16_t local_cid, void *p_data);
 static void le_coc_scan_result_cback(wiced_bt_ble_scan_results_t *p_scan_result, uint8_t *p_adv_data);
 static void l2cap_test_release_drb (tDRB *p_drb);
 static void send_data_thread(cy_thread_arg_t thread_input);
+static void scan_result_cback(wiced_bt_ble_scan_results_t *p_scan_result, uint8_t *p_adv_data);
 
 /******************************************************
  *                    Structures
@@ -158,8 +154,8 @@ wiced_bt_l2cap_le_appl_information_t l2c_appl_info =
 bool bt_state         = WICED_FALSE;
 cy_thread_t           ble_thread;
 static volatile bool  send_data;
-static uint32_t       data_le_tx_counter;
-static uint32_t       data_le_rx_counter;
+static uint64_t       data_le_tx_counter;
+static uint64_t       data_le_rx_counter;
 static bool           le_coc_data_rx_flag;
 static cy_time_t      start_time;
 static cy_time_t      end_time;
@@ -180,14 +176,15 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
     int result = 0;
     if (bt_state == WICED_TRUE)
     {
-        BT_LE_DEBUG( ("BT is already ON \n"));
+        BT_LE_DEBUG(("BT is already ON \n"));
         return result;
     }
     cybt_platform_config_init(&bt_platform_cfg_settings);
     wiced_bt_stack_init(bt_management_cback, &wiced_bt_cfg_settings);
     // create application heap for BT
-    wiced_bt_create_heap ("app", NULL, 0x1000, NULL, WICED_TRUE);
-    BT_LE_INFO(("executed BT ON , please wait to get Bluetooth enabled event \n"));
+    wiced_bt_create_heap ("app", NULL, 0x1000, NULL, WICED_TRUE);\
+
+    BT_LE_INFO(("Executed BT ON , please wait to get Bluetooth enabled event \n"));
     return result;
 }
 
@@ -195,18 +192,24 @@ int handle_bt_off(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
     BT_LE_DEBUG(("bt_off\n"));
+
     wiced_bt_stack_deinit( );
     bt_state = WICED_FALSE;
+
     return result;
 }
 
 int handle_ble_start_adv(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
+
     IS_BT_ON();
     le_coc_set_advertisement_data( );
+
+    BT_LE_INFO(("Starting advertisement \n"));
     result = wiced_bt_start_advertisements(BTM_BLE_ADVERT_UNDIRECTED_HIGH, 0, NULL);
-    BT_LE_DEBUG(("Start advertisement,  result =  %d\n", result));
+    BT_LE_INFO(("Start advertisement,  result =  %d\n", result));
+
     return result;
 }
 
@@ -214,8 +217,11 @@ int handle_ble_stop_adv(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
     IS_BT_ON();
+
+    BT_LE_INFO(("Stopping advertisement \n"));
     result = wiced_bt_start_advertisements(BTM_BLE_ADVERT_OFF, 0, NULL);
-    BT_LE_DEBUG(("Stop BLE Advertisements , result = %d\n", result));
+    BT_LE_INFO(("Stop advertisement, result = %d\n", result));
+
     return result;
 }
 
@@ -223,9 +229,11 @@ int handle_ble_start_scan(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
     IS_BT_ON();
-    BT_LE_DEBUG( ("Start BLE Scan\n") );
-    result = wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_HIGH_DUTY, WICED_TRUE, NULL);
-    BT_LE_DEBUG(("Start Scan result = %d\n", result));
+
+    BT_LE_INFO(("Starting scan operation \n"));
+    result = wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_HIGH_DUTY, WICED_TRUE, scan_result_cback);
+    BT_LE_INFO(("Start Scan, result = %d\n", result));
+
     return result;
 }
 
@@ -250,27 +258,28 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
         BT_LE_INFO(("Throughput details for DATA RX ..\n"));
         cy_rtos_get_time(&end_time);
         elapsed_time = (float)(end_time - start_time)/1000;
-        data_rate = (float)(data_le_rx_counter * 8)/elapsed_time;
-        BT_LE_INFO(("start Time = %lu ...\n",start_time));
-        BT_LE_INFO(("END Time = %lu ...\n",end_time));
+        data_rate = (((float)data_le_rx_counter * 8)/elapsed_time);
+        BT_LE_INFO(("start Time = %lu ...\n", start_time));
+        BT_LE_INFO(("END Time = %lu ...\n", end_time));
         BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
-        BT_LE_INFO(("total le bytes recieved  = %lu \n", data_le_rx_counter));
-        BT_LE_INFO(("RX throughput =  %f bps\n",data_rate));
+        BT_LE_INFO(("total le bytes recieved  = %llu \n", data_le_rx_counter));
+        BT_LE_INFO(("RX throughput =  %f bps\n", data_rate));
         le_coc_data_rx_flag = false;
         data_le_rx_counter = 0;
         start_time = 0;
         end_time = 0;
     }
-    if( data_le_tx_counter != 0 )
+
+    if(data_le_tx_counter != 0)
     {
         BT_LE_INFO(("Throughput details for DATA TX ..\n"));
         elapsed_time = (float)(end_time - start_time)/1000;
-        data_rate = (float)(data_le_tx_counter * 8)/elapsed_time;
-        BT_LE_INFO(("start Time = %lu ...\n",start_time));
-        BT_LE_INFO(("END Time = %lu ...\n",end_time));
+        data_rate = (((float)data_le_tx_counter * 8)/elapsed_time);
+        BT_LE_INFO(("start Time = %lu ...\n", start_time));
+        BT_LE_INFO(("END Time = %lu ...\n", end_time));
         BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
-        BT_LE_INFO(("total le bytes transferred  = %lu \n", data_le_tx_counter));
-        BT_LE_INFO(("TX throughput =  %f bps\n",data_rate));
+        BT_LE_INFO(("total le bytes transferred  = %llu \n", data_le_tx_counter));
+        BT_LE_INFO(("TX throughput =  %f bps\n", data_rate));
         data_le_tx_counter = 0;
         start_time = 0;
         end_time = 0;
@@ -296,7 +305,7 @@ wiced_bt_dev_status_t bt_management_cback( wiced_bt_management_evt_t event, wice
     wiced_bt_device_address_t bda;
     wiced_bt_ble_advert_mode_t *p_mode;
 
-    BT_LE_DEBUG( ( "Bluetooth Management Event: 0x%x\n", event ) );
+    BT_LE_DEBUG(("Bluetooth Management Event: 0x%x\n", event));
 
     wiced_bt_dev_status_t status = WICED_BT_SUCCESS;
     switch ( event )
@@ -389,7 +398,7 @@ static void le_coc_data_cback(uint16_t local_cid, tDRB *p_drb)
         cy_rtos_get_time(&start_time);
     }
     data_le_rx_counter += rcvd_len;
-    BT_LE_INFO(("[%s] received %ld bytes\n", __func__, data_le_rx_counter));
+    BT_LE_INFO(("[%s] received %llu bytes\n", __func__, data_le_rx_counter));
     return;
 }
 
@@ -493,7 +502,7 @@ static void l2cap_test_release_drb (tDRB *p_drb)
 int handle_ble_coc_disconnect(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
-    BT_LE_INFO( ("[%s] \n" , __func__) );
+    BT_LE_INFO(("[%s] \n" , __func__));
     le_coc_data_rx_flag = FALSE;
     if ( le_coc_cb.local_cid )
     {
@@ -549,7 +558,7 @@ int handle_ble_coc_init(int argc, char *argv[], tlv_buffer_t** data)
         lec_coc_data[i] = 0x41;
     }
 
-    BT_LE_INFO((" LE COC initalized local device MTU = %d and PSM = %d \n", our_mtu, LE_COC_PSM));
+    BT_LE_INFO(("LE COC initalized local device MTU = %d and PSM = %d \n", our_mtu, LE_COC_PSM));
 
     return result;
 }
@@ -558,7 +567,7 @@ int handle_ble_coc_adv(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
     IS_BT_ON();
-    le_coc_set_advertisement_data( );
+    le_coc_set_advertisement_data();
     wiced_bt_start_advertisements( BTM_BLE_ADVERT_UNDIRECTED_HIGH, 0, NULL );
     return result;
 }
@@ -566,8 +575,10 @@ int handle_ble_coc_adv(int argc, char *argv[], tlv_buffer_t** data)
 int handle_ble_coc_scan_connect(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
+
     IS_BT_ON();
     result = wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_HIGH_DUTY, 0, le_coc_scan_result_cback );
+
     return result;
 }
 
@@ -645,7 +656,7 @@ static void le_coc_scan_result_cback( wiced_bt_ble_scan_results_t *p_scan_result
         p_data = wiced_bt_ble_check_advertising_data(p_adv_data, BTM_BLE_ADVERT_TYPE_NAME_SHORT, &length);
         if (memcmp(p_data, wiced_bt_cfg_settings.device_name, strlen( (const char *) wiced_bt_cfg_settings.device_name ) ) == 0 )
         {
-            BT_LE_INFO( ("LE COC device found, device name = [%s] , issuing COC Connect \n" , p_data) );
+            BT_LE_INFO( ("Found LE COC Server \n") );
             uint8_t req_security = 0;
             uint8_t req_encr_key_size = 0;
             /* Initiate the connection L2CAP connection */
@@ -679,17 +690,43 @@ static void send_data_thread(cy_thread_arg_t thread_input)
         {
             BT_LE_INFO((" DATA SEND STOPPED \n"));
             cy_rtos_get_time(&end_time);
-            BT_LE_INFO(("start Time = %lu ...\n",start_time));
-            BT_LE_INFO(("END Time = %lu ...\n",end_time));
+            BT_LE_INFO(("start Time = %lu ...\n", start_time));
+            BT_LE_INFO(("END Time = %lu ...\n", end_time));
             BT_LE_INFO(("elapsed time = %lu \n", (end_time - start_time)));
-            BT_LE_INFO(("total le bytes transmitted = %lu \n", data_le_tx_counter));
+            BT_LE_INFO(("total le bytes transmitted = %llu \n", data_le_tx_counter));
         }
 
         if (cy_rtos_set_mutex(&bt_mutex) != CY_RSLT_SUCCESS)
         {
             BT_LE_ERROR(("Unable to release mutex \n"));
         }
-    }while(1);
+    } while(1);
+}
+
+int handle_bt_get_device_address(int argc, char *argv[], tlv_buffer_t** data)
+{
+    wiced_bt_device_address_t bda;
+    IS_BT_ON();
+    wiced_bt_dev_read_local_addr(bda);
+    BT_LE_INFO(("Local Bluetooth Address: [%02X:%02X:%02X:%02X:%02X:%02X]\n", bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]));
+    return 0;
+}
+
+/*
+ * This function handles the scan results
+ */
+void scan_result_cback(wiced_bt_ble_scan_results_t *p_scan_result, uint8_t *p_adv_data)
+{
+    (void)(p_adv_data);
+    if (p_scan_result)
+    {
+        BT_LE_INFO(("Found Device: %02X:%02X:%02X:%02X:%02X:%02X \t RSSI: %d\n", p_scan_result->remote_bd_addr[0], p_scan_result->remote_bd_addr[1], p_scan_result->remote_bd_addr[2],
+                p_scan_result->remote_bd_addr[3], p_scan_result->remote_bd_addr[4], p_scan_result->remote_bd_addr[5], p_scan_result->rssi));
+    }
+    else
+    {
+        BT_LE_INFO(( "Scan completed.\n" ));
+    }
 }
 
 void bt_utility_init(void)

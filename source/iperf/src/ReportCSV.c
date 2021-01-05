@@ -100,11 +100,15 @@ void CSV_stats( Transfer_Info *stats ) {
 #ifdef HAVE_CLOCK_GETTIME
     struct timespec t1;
     clock_gettime(CLOCK_REALTIME, &t1);
-    milliseconds = t1.tv_nsec / 1e6;
+    /* IPERF_MODIFIED_Start */
+    milliseconds = (int)(t1.tv_nsec / 1e6);
+    /* IPERF_MODIFIED_End */
 #else
     struct timeval t1;
     gettimeofday( &t1, NULL );
-    milliseconds = t1.tv_usec / 1e3;
+    /* IPERF_MODIFIED_Start */
+    milliseconds = (int)(t1.tv_usec / 1e3);
+    /* IPERF_MODIFIED_End */
 #endif
 
    // localtime is not thread safe.  It's only used by the reporter thread.  Use localtime_r if thread safe is ever needed.

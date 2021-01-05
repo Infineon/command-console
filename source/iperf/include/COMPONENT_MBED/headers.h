@@ -89,19 +89,11 @@
 #ifndef HEADERS_H
 #define HEADERS_H
 
-/* IPERF_MODIFIED Start */
-#if defined(ANYCLOUD)
-#define HAVE_INET_NTOP 1
-#define HAVE_INET_PTON 1
-#endif
-/* IPERF_MODIFIED End */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* IPERF_MODIFIED Start */
-#ifdef MBEDOS
 struct hostent {
     char  *h_name;      /* Official name of the host. */
     char **h_aliases;   /* A pointer to an array of pointers to alternative host names,
@@ -114,10 +106,6 @@ struct hostent {
 };
 
 struct hostent* gethostbyname(const char *name);
-#elif defined(AFR) || defined(ANYCLOUD)
-#include "netdb.h"
-#include "iperf_sockets.h"
-#endif
 
 #ifdef __cplusplus
 }
@@ -171,8 +159,7 @@ struct hostent* gethostbyname(const char *name);
 /* usleep is in unistd.h, but that would conflict with the
 close/read/write redefinitin above */
 int usleep(useconds_t usec);
-
-#elif defined(MBEDOS) || defined(AFR) || defined(ANYCLOUD)
+#else
     /* RTOS configuration file */
     #include "rtos_config.h"
     /* Disable some unneeded/unimplemented features */
@@ -226,44 +213,7 @@ int usleep(useconds_t usec);
 
     typedef uint32_t      socklen_t;
     typedef socklen_t     Socklen_t;
-
-#else
-    /* required on AIX for FD_SET (requires bzero).
-     * often this is the same as <string.h> */
-    #ifdef HAVE_STRINGS_H
-        #include <strings.h>
-    #endif /* HAVE_STRINGS_H */
-
-    /* Unix headers */
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <sys/time.h>
-    #include <signal.h>
-    #include <unistd.h>
-
-    /* Added for daemonizing the process */
-    #include <syslog.h>
-
-    SPECIAL_OSF1_EXTERN_C_START
-    #include <netdb.h>
-    SPECIAL_OSF1_EXTERN_C_STOP
-    #include <netinet/in.h>
-    #include <netinet/tcp.h>
-
-    SPECIAL_OSF1_EXTERN_C_START
-    #include <arpa/inet.h>   /* netinet/in.h must be before this on SunOS */
-    SPECIAL_OSF1_EXTERN_C_STOP
-
-    #ifdef HAVE_POSIX_THREAD
-        #include <pthread.h>
-    #endif /* HAVE_POSIX_THREAD */
-
-    /* used in Win32 for error checking,
-     * rather than checking rc < 0 as unix usually does */
-    #define SOCKET_ERROR   -1
-    #define INVALID_SOCKET -1
-
-#endif /* not defined WIN32 */
+#endif
 
 #ifndef INET6_ADDRSTRLEN
     #define INET6_ADDRSTRLEN 40
@@ -283,19 +233,9 @@ typedef struct sockaddr_in iperf_sockaddr;
 //#endif
 
 /* On MBEDOS, we don't want the main function to be called "main" */
-#if !defined(MBEDOS) && !defined(AFR) && !defined(ANYCLOUD)
-    #define IPERF_MAIN main
-#else
-    #define IPERF_MAIN iperf
-#endif /* MBEDOS */
+#define IPERF_MAIN iperf
 
-// Rationalize stdint definitions and sizeof, thanks to ac_create_stdint_h.m4
-// from the gnu archive
-#if !defined(MBEDOS) && !defined(AFR) && !defined(ANYCLOUD)
-    #include <iperf-int.h>
-#else
-    #include <stdint.h>
-#endif /* MBEDOS */
+#include <stdint.h>
 typedef uint64_t max_size_t;
 
 // inttypes.h is already included
@@ -310,9 +250,7 @@ typedef uint64_t max_size_t;
 
 /* in case the OS doesn't have these, we provide our own implementations */
 #include "gettimeofday.h"
-#ifdef MBEDOS
 #include "inet_aton.h"
-#endif
 #include "snprintf.h"
 
 #ifndef SHUT_RD
@@ -321,16 +259,9 @@ typedef uint64_t max_size_t;
     #define SHUT_RDWR 2
 #endif /* SHUT_RD */
 
-#if defined(MBEDOS) || defined(AFR) || defined(ANYCLOUD)
 #define IPERF_BUFFERLEN             (2 * 1024)
 #define NUM_REPORT_STRUCTS          (10)
 #define NUM_MULTI_SLOTS             (5)
-#else
-/* Default values */
-//#define IPERF_BUFFERLEN             (128 * 1024)
-#define NUM_REPORT_STRUCTS          (700)
-#define NUM_MULTI_SLOTS             (5)
-#endif
 
 #include "header_version.h"
 #define HEADER_VERSION              HEADER_VERSION1

@@ -31,29 +31,72 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#ifndef CY_IPERF_RTC_H
-#define CY_IPERF_RTC_H
+/**
+ * @file command_utility.cpp
+ * @brief This file contains the command console framework implementation for Amazon FreeRTOS.
+ *
+ */
 
+#include "command_console.h"
 
-#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "cyhal_uart.h"
+#include "cyhal_hw_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void rtc_init(void);
+/******************************************************
+ *                      Macros
+ ******************************************************/
 
-void rtc_free(void);
+/******************************************************
+ *                    Constants
+ ******************************************************/
 
-int rtc_isenabled(void);
+/******************************************************
+ *                   Enumerations
+ ******************************************************/
 
-time_t rtc_read(void);
+/******************************************************
+ *                 Type Definitions
+ ******************************************************/
 
-void rtc_write(time_t t);
+/******************************************************
+ *                    Structures
+ ******************************************************/
 
+/******************************************************
+ *               Function Declarations
+ ******************************************************/
+
+/******************************************************
+ *               Variables Definitions
+ ******************************************************/
+
+/******************************************************
+ *               Function Definitions
+ ******************************************************/
+
+bool cy_isreadable( void* serial )
+{
+    cyhal_uart_t *uart = (cyhal_uart_t *)serial;
+    bool is_readable = cyhal_uart_readable(uart) > 0;
+    return is_readable;
+}
+
+int cy_read( void* serial )
+{
+	cyhal_uart_t *uart = (cyhal_uart_t *)serial;
+	uint8_t value;
+	cyhal_uart_getc( uart, &value, 0);
+    return value;
+}
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

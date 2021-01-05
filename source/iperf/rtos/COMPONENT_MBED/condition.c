@@ -38,7 +38,7 @@
  *
  */
 
-#if defined(MBEDOS) && defined(HAVE_THREADS)
+#if defined(HAVE_THREADS)
 
 #include "headers.h"
 #include "Condition.h"

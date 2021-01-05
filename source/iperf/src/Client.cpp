@@ -588,7 +588,9 @@ void Client::RunRateLimitedTCP ( void ) {
         if (isVaryLoad(mSettings)) {
 	    static Timestamp time3;
 	    if (time2.subSec(time3) >= VARYLOAD_PERIOD) {
-		var_rate = lognormal(mSettings->mUDPRate,mSettings->mVariance);
+        /* IPERF_MODIFIED_Start */
+		var_rate = (int)lognormal(mSettings->mUDPRate,mSettings->mVariance);
+        /* IPERF_MODIFIED_End */
 		time3 = time2;
 		if (var_rate < 0)
 		    var_rate = 0;
@@ -704,7 +706,9 @@ void Client::RunUDP( void ) {
         if (isVaryLoad(mSettings) && mSettings->mUDPRateUnits == kRate_BW) {
 	    static Timestamp time3;
 	    if (now.subSec(time3) >= VARYLOAD_PERIOD) {
-		int var_rate = lognormal(mSettings->mUDPRate,variance);
+        /* IPERF_MODIFIED_Start */
+		int var_rate = (int)lognormal(mSettings->mUDPRate,variance);
+        /* IPERF_MODIFIED_End */
 		if (var_rate < 0)
 		    var_rate = 0;
 
@@ -1149,7 +1153,9 @@ void Client::write_UDP_FIN (void) {
             rc = iperf_read( mSettings->mSock, mBuf, MAXUDPBUF);
             /* IPERF_MODIFIED End */
 	    if ( rc < 0 ) {
-                break;
+                /* IPERF_MODIFIED Start */
+                continue;
+                /* IPERF_MODIFIED End */
             } else if ( rc >= (int) (sizeof(UDP_datagram) + sizeof(server_hdr)) ) {
                 /* IPERF_MODIFIED Start */
                 IPERF_DEBUGF( CLIENT_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Client will generate a report of the UDP statistics as reported by the server.\n" ) );
@@ -1246,7 +1252,9 @@ void Client::HdrXchange(int flags) {
 	if ( currLen < 0 ) {
 	    WARN_errno( currLen < 0, "send_hdr_v2" );
 	} else {
-	    int n;
+	    /* IPERF_MODIFIED Start */
+//	    int n;
+	    /* IPERF_MODIFIED End */
 	    client_hdr_ack ack;
 	    int sotimer = 0;
 	    // sotimer units microseconds convert
@@ -1276,7 +1284,9 @@ void Client::HdrXchange(int flags) {
 	    /*
 	     * Hang a TCP or UDP read and see if this is a header ack message
 	     */
-	    if ((n = recvn(mSettings->mSock, (char *)&ack, sizeof(client_hdr_ack), 0)) == sizeof(client_hdr_ack)) {
+		/* IPERF_MODIFIED Start */
+	    if (recvn(mSettings->mSock, (char *)&ack, sizeof(client_hdr_ack), 0) == sizeof(client_hdr_ack)) {
+		/* IPERF_MODIFIED End */
 		if (ntohl(ack.typelen.type) == CLIENTHDRACK && ntohl(ack.typelen.length) == sizeof(client_hdr_ack)) {
 		    reporter_peerversion (mSettings, ntohl(ack.version_u), ntohl(ack.version_l));
 		} else {

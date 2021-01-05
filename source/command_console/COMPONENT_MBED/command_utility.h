@@ -31,6 +31,8 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
+#pragma once
+
 #include "mbed_toolchain.h"
 #include <stdbool.h>
 

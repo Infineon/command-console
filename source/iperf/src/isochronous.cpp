@@ -94,7 +94,9 @@ unsigned int FrameCounter::period_us(void) {
 }
 
 void FrameCounter::reset(void) {
-    period = (1000000 / frequency);
+    /* IPERF_MODIFIED_Start */
+    period = (int)(1000000 / frequency);
+    /* IPERF_MODIFIED_End */
     startTime.setnow();
 }
 

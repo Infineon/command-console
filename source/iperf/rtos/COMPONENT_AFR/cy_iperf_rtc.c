@@ -31,10 +31,12 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
+#include "cy_rtc.h"
 #include "cy_iperf_rtc.h"
 #include "cyhal_rtc.h"
 #include "mktime.h"
 #include <time.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {

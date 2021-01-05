@@ -46,13 +46,14 @@
 #define IPERF_SOCKET_ERROR(x) //printf x
 
 #ifndef MAX_BSD_SOCKETS
-#define MAX_BSD_SOCKETS             (5)
+#define MAX_BSD_SOCKETS                      (5)
 #endif
 
-#define BUFFER_LENGTH               (100)
-#define UDP_RECEIVE_TIMEOUT         (10000)
+#define BUFFER_LENGTH                        (100)
+#define UDP_RECEIVE_TIMEOUT                  (10000)
 /* convert into ms */
-#define CONVERT_TO_MS               (1000)
+#define CONVERT_TO_MS                        (1000)
+#define ANYCLOUD_RECV_SOCKET_TIMEOUT_ERROR   (-3)
 /******************************************************
  *                 Type Definitions
  ******************************************************/
@@ -75,6 +76,7 @@ typedef struct
     cy_socket_t       socket;
     char              rcv_buffer[BUFFER_LENGTH];
     int               rcv_buffer_len;
+    int               id;
 } bsd_socket_t;
 
 static bsd_socket_t   sockets[MAX_BSD_SOCKETS];
@@ -101,6 +103,7 @@ void sockets_layer_init( void )
     {
         sockets[a].available = true;
         sockets[a].select_timeout = 0;
+        sockets[a].id = a;
     }
 
     socket_layer_inited = true;
@@ -120,6 +123,7 @@ bsd_socket_t* find_free_socket()
             memset(free_socket, 0, sizeof(bsd_socket_t));
             free_socket->available        = false;
             free_socket->select_timeout   = 0;
+            free_socket->id = a;
             break;
         }
     }
@@ -153,7 +157,7 @@ void convert_from_lwip_to_secure_sockets(int protocolfamily, int type, int* doma
 int iperf_socket( int protocolFamily, int type, int protocol )
 {
     cy_rslt_t result;
-    int a=0;
+    int id=0;
     bsd_socket_t* free_socket;
     int domain, stream_type;
     IPERF_SOCKET_DEBUG(("iperf_socket : Creating sockets \n"));
@@ -166,6 +170,8 @@ int iperf_socket( int protocolFamily, int type, int protocol )
         return -1;
     }
 
+    id = free_socket->id;
+
     convert_from_lwip_to_secure_sockets(protocolFamily, type, &domain, &stream_type);
 
     switch ( type )
@@ -173,7 +179,7 @@ int iperf_socket( int protocolFamily, int type, int protocol )
         case SOCK_DGRAM:
             free_socket->protocol_type = CY_SOCKET_IPPROTO_UDP;
 
-            result = cy_socket_create(domain, stream_type, free_socket->protocol_type, &sockets[a].socket);
+            result = cy_socket_create(domain, stream_type, free_socket->protocol_type, &free_socket->socket);
             if(result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_DEBUG(("cy_socket_create failed with error %d\r\n", result));
@@ -184,7 +190,7 @@ int iperf_socket( int protocolFamily, int type, int protocol )
         case SOCK_STREAM:
             free_socket->protocol_type = CY_SOCKET_IPPROTO_TCP;
 
-            result = cy_socket_create(domain, stream_type, free_socket->protocol_type, &sockets[a].socket);
+            result = cy_socket_create(domain, stream_type, free_socket->protocol_type, &free_socket->socket);
             if(result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_DEBUG(("cy_socket_create failed with error %d\r\n", result));
@@ -193,13 +199,13 @@ int iperf_socket( int protocolFamily, int type, int protocol )
             break;
         default:
             IPERF_SOCKET_DEBUG(("Invalid socket type \n"));
-            a = -1;
+            id = -1;
             break;
     }
 
     IPERF_SOCKET_DEBUG(("iperf_socket : Done \n"));
 
-    return a;
+    return id;
 }
 
 
@@ -438,10 +444,18 @@ int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags)
                 while(received_data_length < bufferLength)
                 {
                     result = cy_socket_recvfrom(sockets[sockID].socket, ((char*)rcvBuffer) + received_data_length, remaining_data_length, CY_SOCKET_FLAGS_RECVFROM_SRC_FILTER, &src_addr, &address_length, &bytes_received);
-                    if(result != CY_RSLT_SUCCESS)
+
+                    if(result == CY_RSLT_MODULE_SECURE_SOCKETS_TIMEOUT)
+                    {
+                        IPERF_SOCKET_ERROR(("cy_socket_recvfrom failed with Timeout error : %d \n", result));
+                        return ANYCLOUD_RECV_SOCKET_TIMEOUT_ERROR;
+                    } else if(result != CY_RSLT_SUCCESS)
                     {
                         IPERF_SOCKET_ERROR(("cy_socket_recvfrom failed with error : %d \n", result));
                         return -1;
+                    } else
+                    {
+                      //DO Nothing
                     }
 
                     remaining_data_length -= bytes_received;
@@ -731,7 +745,7 @@ int iperf_setsockopt(int sockID, int option_level, int option_name, const void *
         {
             struct timeval *tm = (struct timeval*) option_value;
             uint32_t *timeout = (uint32_t*)(&(tm->tv_sec));
-            uint32_t time_ms = ((*timeout) * CONVERT_TO_MS);
+            uint32_t time_ms = (uint32_t)(((*timeout) * CONVERT_TO_MS) + ((tm->tv_usec)/CONVERT_TO_MS));
 
             result = cy_socket_setsockopt(sockets[sockID].socket, CY_SOCKET_SOL_SOCKET, CY_SOCKET_SO_RCVTIMEO, &time_ms, sizeof(time_ms));
             if ( result != CY_RSLT_SUCCESS)
@@ -746,8 +760,7 @@ int iperf_setsockopt(int sockID, int option_level, int option_name, const void *
         {
             struct timeval *tm = (struct timeval*) option_value;
             uint32_t *timeout = (uint32_t*)(&(tm->tv_sec));
-            uint32_t time_ms = ((*timeout) * CONVERT_TO_MS);
-
+            uint32_t time_ms = (uint32_t)(((*timeout) * CONVERT_TO_MS) + ((tm->tv_usec)/CONVERT_TO_MS));
             result = cy_socket_setsockopt(sockets[sockID].socket, CY_SOCKET_SOL_SOCKET, CY_SOCKET_SO_SNDTIMEO, &time_ms, sizeof(time_ms));
             if ( result != CY_RSLT_SUCCESS)
             {

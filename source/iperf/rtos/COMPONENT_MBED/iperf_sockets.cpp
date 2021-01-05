@@ -41,10 +41,11 @@
 #define IPERF_SOCKET_DEBUG(x) //printf x
 
 #ifndef MAX_BSD_SOCKETS
-#define MAX_BSD_SOCKETS             (5)
+#define MAX_BSD_SOCKETS                  (5)
 #endif
 
-#define BUFFER_LENGTH               (100)
+#define BUFFER_LENGTH                    (100)
+#define MBED_RECV_SOCKET_TIMEOUT_ERROR   (-3)
 
 /******************************************************
  *                 Type Definitions
@@ -329,6 +330,11 @@ int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags)
                     }
                     else
                     {
+                        /* return specific error code on socket receive timeout */
+                        if(ret == NSAPI_ERROR_TIMEOUT)
+                        {
+                            return MBED_RECV_SOCKET_TIMEOUT_ERROR;
+                        }
                         return ret;
                     }
                 }
@@ -582,7 +588,7 @@ int iperf_getsockopt(int sockID, int option_level, int option_name, void *option
             switch ( option_name )
             {
                 case SO_SNDBUF:
-                    *(uint32_t*) option_value = MBED_CONF_LWIP_TCP_WND;
+                    *(uint32_t*) option_value = MBED_CONF_LWIP_TCP_SND_BUF;
                     break;
                 case SO_RCVBUF:
                     *(uint32_t*) option_value = MBED_CONF_LWIP_TCP_WND;

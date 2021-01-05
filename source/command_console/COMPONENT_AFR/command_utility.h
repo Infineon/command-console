@@ -31,33 +31,22 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#ifndef __APP_BT_UTILS_H__
-#define __APP_BT_UTILS_H__
+/**
+ * @file command_utility.h
+ */
 
-/******************************************************************************
- *                                INCLUDES
- ******************************************************************************/
-#include "wiced_bt_dev.h"
-#include "wiced_bt_gatt.h"
-#include <stdio.h>
+#pragma once
 
-/******************************************************************************
- *                                Constants
- ******************************************************************************/
-#define CASE_RETURN_STR(enum_val)          case enum_val: return #enum_val;
+#include <stdbool.h>
 
-#define FROM_BIT16_TO_8(val)            ((uint8_t)((val) >> 8 ))
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/****************************************************************************
- *                              FUNCTION DECLARATIONS
- ***************************************************************************/
-void print_bd_address(wiced_bt_device_address_t bdadr);
-const char *get_bt_event_name(wiced_bt_management_evt_t event);
-const char *get_bt_advert_mode_name(wiced_bt_ble_advert_mode_t mode);
-const char *get_bt_gatt_disconn_reason_name(wiced_bt_gatt_disconn_reason_t reason);
-const char *get_bt_gatt_status_name(wiced_bt_gatt_status_t status);
+bool cy_isreadable( void* serial );
 
-#endif      /*__APP_BT_UTILS_H__ */
+int cy_read( void* serial );
 
-
-/* [] END OF FILE */
+#ifdef __cplusplus
+}
+#endif

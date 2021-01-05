@@ -380,7 +380,9 @@ int IPERF_MAIN( int argc, char **argv ) {
 #endif /* NO_DAEMON */
 #endif /* WIN32 */
             {
-                fprintf( stderr, usage_short, argv[0], argv[0] );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, usage_short, argv[0], argv[0] );
+/* IPERF_MODIFIED End */
                 IPERF_DEBUGF( MEMFREE_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( ext_gSettings ) );
                 FREE_PTR( ext_gSettings );
                 ext_gSettings = NULL;

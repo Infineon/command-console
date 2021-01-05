@@ -230,7 +230,9 @@ void Server::RunTCP( void ) {
 #ifdef WIN32
 		    (WSAGetLastError() != WSAEWOULDBLOCK)
 #else
-		    (errno != EAGAIN && errno != EWOULDBLOCK)
+		    /* IPERF_MODIFIED Start */
+		    (errno != EWOULDBLOCK)
+		    /* IPERF_MODIFIED End */
 #endif // WIN32
 		    ) {
 		    err = 1;
@@ -372,12 +374,12 @@ void Server::InitTrafficLoop (void) {
     }
 
     if (isTripTime(mSettings)) {
-    /* IPERF_MODIFIED Start */
-    int n;
-    const int len=3;
-    /* IPERF_MODIFIED End */
+	/* IPERF_MODIFIED Start */
+//	int n;
+	const int len=3;
+	/* IPERF_MODIFIED End */
 	uint32_t buf[len];
-	if (len && ((n = recvn(mSettings->mSock, (char *)&buf[0], sizeof(buf), MSG_PEEK)) != (int) sizeof(buf))) {
+	if (len && (recvn(mSettings->mSock, (char *)&buf[0], sizeof(buf), MSG_PEEK) != (int) sizeof(buf))) {
 	    fprintf(stdout,"Warn: socket trip time read error\n");
 	} else {
 	    mSettings->reporthdr->report.clientStartTime.tv_sec = ntohl(buf[1]);
@@ -410,12 +412,26 @@ int Server::ReadWithRxTimestamp (int *readerr) {
 	// Socket read timeout or read error
 	reportstruct->emptyreport=1;
 	// End loop on 0 read or socket error
+
+    /* IPERF_MODIFIED Start */
+    //TODO: Updating errno to timeout should be handled in secure socket port layer
+    // For socket timeout error, skip returning read error.
+    // Socket timeout is expected when server is continuously waiting to receive but due to UDP packet loss the timeout error occurs which should be ignored.
+    if (currLen == -3)
+    {
+        currLen= 0;
+         goto exit;
+    }
+    /* IPERF_MODIFIED End */
+
 	// except for socket read timeout
 	if (currLen == 0 ||
 #ifdef WIN32
 	    (WSAGetLastError() != WSAEWOULDBLOCK)
 #else
-	    (errno != EAGAIN && errno != EWOULDBLOCK)
+	    /* IPERF_MODIFIED Start */
+	    (errno != EWOULDBLOCK)
+	    /* IPERF_MODIFIED End */
 #endif
 	    ) {
 	    WARN_errno( currLen, "recvmsg");
@@ -424,6 +440,7 @@ int Server::ReadWithRxTimestamp (int *readerr) {
 	currLen= 0;
     }
 
+exit:
     if (!tsdone) {
 	now.setnow();
 	reportstruct->packetTime.tv_sec = now.getSecs();

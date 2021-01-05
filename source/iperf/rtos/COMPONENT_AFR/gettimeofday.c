@@ -31,7 +31,7 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#if defined(AFR) && !defined(HAVE_GETTIMEOFDAY)
+#ifndef HAVE_GETTIMEOFDAY
 
 #if defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_)
     /* NOTE: config.h doesn't have guard includes! */
@@ -74,4 +74,4 @@ int afr_gettimeofday(struct timeval* tv, void* timezone)
 } /* end extern "C" */
 #endif
 
-#endif /* defined(AFR) && !defined(HAVE_GETTIMEOFDAY) */
+#endif /* !defined(HAVE_GETTIMEOFDAY) */

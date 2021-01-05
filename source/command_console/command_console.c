@@ -58,17 +58,20 @@ extern "C" {
  *                    Constants
  ******************************************************/
 
-#define MAX_PARAMS             (250)
-#define MIN_PARAMS             (32)
+#define MAX_PARAMS                              (250)
+#define MIN_PARAMS                              (32)
 
-#define MAX_LOOP_CMDS          (16)
-#define MAX_LOOP_LINE_LENGTH   (128)
-#define MAX_NUM_COMMAND_TABLE  (8)
-#define MIN_NUM_COMMAND_TABLE  (1)
+#define MAX_LOOP_CMDS                           (16)
+#define MAX_LOOP_LINE_LENGTH                    (128)
+#define MAX_NUM_COMMAND_TABLE                   (8)
+#define MIN_NUM_COMMAND_TABLE                   (1)
+
+#define CY_CMD_CONSOLE_THREAD_DELAY_IN_MSEC     (100)
 
 #ifndef CONSOLE_THREAD_STACK_SIZE
-#define CONSOLE_THREAD_STACK_SIZE    (6*1024)
+#define CONSOLE_THREAD_STACK_SIZE               (6*1024)
 #endif
+
 
 /* Enable result info of command */
 #define ENABLE_COMMAND_RESULT_INFO
@@ -176,13 +179,13 @@ static const char* const console_default_error_strings[] =
 };
 static const cy_command_console_cmd_t commands[] =
 {
-    { (char*) "?",      	help_command,   				0, NULL, NULL, NULL, NULL},
-    { (char*) "help",   	help_command,   				0, NULL, NULL, (char*) "[<command> [<example_num>]]", "Print help message or command example."},
-    { (char*) "loop",   	NULL,           				0, NULL, NULL, (char*) "<times> <semicolon_separated_commands_list>", "Loops the specified commands for specified number of times."},
-    { (char*) "$?",     	retval_command, 				0, NULL, NULL, NULL, "Print return value of last executed command."},
+    { (char*) "?",          help_command,                   0, NULL, NULL, NULL, NULL},
+    { (char*) "help",       help_command,                   0, NULL, NULL, (char*) "[<command> [<example_num>]]", "Print help message or command example."},
+    { (char*) "loop",       NULL,                           0, NULL, NULL, (char*) "<times> <semicolon_separated_commands_list>", "Loops the specified commands for specified number of times."},
+    { (char*) "$?",         retval_command,                 0, NULL, NULL, NULL, "Print return value of last executed command."},
 #ifdef CY_POWER_ESTIMATOR_ENABLE
-    { (char*) "cype_cmd",    cype_cmd_send,                 	1, NULL, NULL, (char *)"", (char *)"Trigger WPL commands"},
-    { (char*) "cype_debug",  cype_cmd_debug,                	1, NULL, NULL, (char *)"", (char *)"Enable/Disable prints on console"},
+    { (char*) "cype_cmd",    cype_cmd_send,                 1, NULL, NULL, (char *)"", (char *)"Trigger WPL commands"},
+    { (char*) "cype_debug",  cype_cmd_debug,                1, NULL, NULL, (char *)"", (char *)"Enable/Disable prints on console"},
 #endif
     CMD_TABLE_END
 };
@@ -439,7 +442,7 @@ static void send_str( const char* s )
     {
         printf("%s",s);
         fflush(stdout);
-	}
+    }
 }
 
 /*!
@@ -455,14 +458,16 @@ static void send_charstr( const char* s )
 {
     while ( *s != 0 )
     {
-    	putchar(*s);
-		s++;
-	}
+        putchar(*s);
+        s++;
+    }
     fflush(stdout);
 }
 
 void console_thread_func( cy_thread_arg_t arg )
 {
+    cy_rslt_t res;
+
     /* turn off buffers, so IO occurs immediately */
 #ifdef _IONBF
     setvbuf( stdin, NULL, _IONBF, 0 );
@@ -470,23 +475,31 @@ void console_thread_func( cy_thread_arg_t arg )
     setvbuf( stderr, NULL, _IONBF, 0 );
 #endif
 
+    /* Wait for a while before polling for UART-Rx */
+    res = cy_rtos_delay_milliseconds(CY_CMD_CONSOLE_THREAD_DELAY_IN_MSEC);
+    if(res != CY_RSLT_SUCCESS)
+    {
+        printf(" cy_rtos_delay_milliseconds failed, result =  %lu \n", (unsigned long)res);
+        return;
+    }
+
     cons.console_thread_is_running = true;
 
     while ( 1 )
     {
-    #ifndef ENABLE_UART_POLLING
+#ifndef ENABLE_UART_POLLING
         uint32_t wait_bits =  FLAGS_MSK_RECV | FLAGS_MSK_DEINIT;
         cy_rtos_waitbits_event(&ef_id, &wait_bits, 1, false, CY_RTOS_NEVER_TIMEOUT);
-        if( wait_bits & FLAGS_MSK_RECV)
+        if(wait_bits & FLAGS_MSK_RECV)
         {
             console_process_char( received_character );
         }
-        if( wait_bits & FLAGS_MSK_DEINIT)
+        if(wait_bits & FLAGS_MSK_DEINIT)
         {
             cy_rtos_exit_thread();
         }
-    #else
-        if ( cy_isreadable(cons.uart) == true)
+#else
+        if (cy_isreadable(cons.uart) == true)
         {
             received_character = cy_read( cons.uart );
 
@@ -499,10 +512,7 @@ void console_thread_func( cy_thread_arg_t arg )
                 cons.console_thread_is_running = false;
                 cy_rtos_exit_thread();
             }
-        }
-    #endif
-#ifndef MBEDOS
-        vTaskDelay(100);
+       }
 #endif
     }
 }
@@ -521,10 +531,17 @@ cy_rslt_t cy_command_console_status( void )
 /* wrapper for console init with a modified thread priority, used for applications with high priority threads like audio capture */
 cy_rslt_t cy_command_console_init( cy_command_console_cfg_t *cfg )
 {
-	cy_rslt_t result = CY_RSLT_SUCCESS;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
 
     if( NULL==cfg )
     {
+        return CY_RSLT_COMMAND_CONSOLE_FAILURE;
+    }
+
+    /* Validate thread priority */
+    if ( cfg->thread_priority > CY_RTOS_PRIORITY_MAX )
+    {
+        printf("Input thread priority [%d] is larger than RTOS max thread priority.\n", (int)cfg->thread_priority);
         return CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
 
@@ -578,13 +595,14 @@ cy_rslt_t cy_command_console_init( cy_command_console_cfg_t *cfg )
         printf(" Error in initializing event flag \n");
         return CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
+
     result = cy_rtos_create_thread(&cons.console_thread, console_thread_func, "Console Thread", command_console_thread_stack,
-                                    CONSOLE_THREAD_STACK_SIZE, CY_RTOS_PRIORITY_NORMAL, NULL);
+                                    CONSOLE_THREAD_STACK_SIZE, cfg->thread_priority, NULL);
     if( result != CY_RSLT_SUCCESS)
     {
         printf(" cy_rtos_create_thread failed %lu \n", (unsigned long)result);
         cy_rtos_deinit_event(&ef_id);
-    	result = CY_RSLT_COMMAND_CONSOLE_FAILURE;
+        result = CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
 
     return result;
@@ -605,7 +623,7 @@ cy_rslt_t cy_command_console_deinit(void)
     result = cy_rtos_join_thread(&cons.console_thread);
     if ( result != CY_RSLT_SUCCESS )
     {
-    	return CY_RSLT_COMMAND_CONSOLE_FAILURE;
+        return CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
 
     return result;
@@ -1050,7 +1068,7 @@ cy_command_console_err_t console_parse_cmd( const char* line )
 
     if ( copy == NULL )
     {
-    	return ERR_OUT_OF_HEAP;
+        return ERR_OUT_OF_HEAP;
     }
     memset(copy, 0, (strlen(line)+ 1));
 
@@ -1167,47 +1185,47 @@ cy_command_console_err_t console_parse_cmd( const char* line )
             /* run command */
             if ( ( err == ERR_CMD_OK ) && ( cmd_ptr->command != NULL ) )
             {
-            	int i = 0;
+                int i = 0;
                 //wiced_log_msg(WLF_TEST, WICED_LOG_DEBUG4, "%s:start\n", params[0]);
                 err = (cy_command_console_err_t) cmd_ptr->command( param_cnt, params, &tlv_data );
 
                 if( err == 0 && tlv_data != NULL )
                 {
-                	if( tlv_data->type == 0)
-                	{
-                		printf("%d%d%.*s",tlv_data->type, tlv_data->length, tlv_data->length, tlv_data->value);
-                		printf("\r\n");
-                	}
-                	else
-                	{
-                		printf("%d%d",tlv_data->type, tlv_data->length);
-                		for (i=0; (i < (tlv_data->length)); i++)
-                		{
-                			printf ("%d", tlv_data->value[i]);
-                		}
+                    if( tlv_data->type == 0)
+                    {
+                        printf("%d%d%.*s",tlv_data->type, tlv_data->length, tlv_data->length, tlv_data->value);
+                        printf("\r\n");
+                    }
+                    else
+                    {
+                        printf("%d%d",tlv_data->type, tlv_data->length);
+                        for (i=0; (i < (tlv_data->length)); i++)
+                        {
+                            printf ("%d", tlv_data->value[i]);
+                        }
 
-                		printf("\r\n");
-                	}
+                        printf("\r\n");
+                    }
 
 #ifdef ENABLE_COMMAND_RESULT_INFO
-                	printf("Type ( ascii(0) / binary (1) : %d \r\n", tlv_data->type);
-                	printf("Length                       : %d \r\n", tlv_data->length);
-                	if ( tlv_data->type == 0)
-                	{
-                		printf("Value                        : %.*s \r\n",tlv_data->length, tlv_data->value);
-                	}
-                	else
-                	{
-                		printf("Value                        : ");
-                		for (i=0; (i < (tlv_data->length)); i++)
-                		{
-                			printf ("%d", tlv_data->value[i]);
-                		}
-                		printf("\r\n");
-                	}
+                    printf("Type ( ascii(0) / binary (1) : %d \r\n", tlv_data->type);
+                    printf("Length                       : %d \r\n", tlv_data->length);
+                    if ( tlv_data->type == 0)
+                    {
+                        printf("Value                        : %.*s \r\n",tlv_data->length, tlv_data->value);
+                    }
+                    else
+                    {
+                        printf("Value                        : ");
+                        for (i=0; (i < (tlv_data->length)); i++)
+                        {
+                            printf ("%d", tlv_data->value[i]);
+                        }
+                        printf("\r\n");
+                    }
 #endif
 
-				free(tlv_data);
+                free(tlv_data);
 
                 }
 
@@ -1342,7 +1360,7 @@ int loop_command( const char * line )
 
     if ( copy == NULL )
     {
-    	return ERR_OUT_OF_HEAP;
+        return ERR_OUT_OF_HEAP;
     }
     memset(copy, 0, (strlen(line)+ 1));
     strcpy( copy, line );
@@ -1574,8 +1592,9 @@ cy_command_console_err_t console_process_char( char c )
                 break;
             default:
                 if ( ( c > 31 ) && ( c < 127 ) )
-                { /* limit to printables */
-                    if ( strlen( cons.console_buffer ) + 1 < cons.console_line_len )
+                {
+                    /* limit to printables */
+                    if ( (strlen( cons.console_buffer ) + 1) < cons.console_line_len )
                     {
                         cons.console_current_line = 0;
                         console_insert_char( c );

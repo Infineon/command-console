@@ -80,6 +80,7 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data);
 #define IPERF_COMMANDS \
     { "iperf", iperf_test, 0, NULL, NULL, (char *)"", (char *)"Run iperf --help for usage."}, \
 
+#define IPERF_THREAD_STACK_SIZE 4096
 
 const cy_command_console_cmd_t iperf_command_table[] =
 {
@@ -150,11 +151,8 @@ int iperf_util_find_free_thread()
 void iperf_util_thread(cy_thread_arg_t arg)
 {
     int index;
-#ifdef MBEDOS
-    index = (int)arg;
-#elif defined(AFR) || defined(ANYCLOUD)
-    index = *( (int *)arg );
-#endif
+
+    index = *((int *)arg);
     cy_rtos_setbits_event(&event, wait_bits, false);
     iperf ( iperf_util_threads[index].args.argc, iperf_util_threads[index].args.argv, NULL);
     iperf_util_threads[index].available = true;
@@ -165,6 +163,8 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
 {
     int result = 0;
     int index;
+    cy_thread_arg_t args;
+    cy_rslt_t res;
 
     index = iperf_util_find_free_thread();
     if( index == -1 )
@@ -175,19 +175,9 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
 
     iperf_util_threads[index].args.argc = argc;
     iperf_util_threads[index].args.argv = argv;
-
     iperf_util_threads[index].thread = new cy_thread_t;
-
-    cy_thread_arg_t args;
-
-#ifdef MBEDOS
-    args = (cy_thread_arg_t)index;
-#elif defined(AFR) || defined(ANYCLOUD)
-    args = &index;
-#endif
-
-    cy_rslt_t res = cy_rtos_create_thread(iperf_util_threads[index].thread, iperf_util_thread, NULL, NULL, 4096, CY_RTOS_PRIORITY_ABOVENORMAL, args);
-
+    args = (cy_thread_arg_t)(&index);
+    res = cy_rtos_create_thread(iperf_util_threads[index].thread, iperf_util_thread, NULL, NULL, IPERF_THREAD_STACK_SIZE, (cy_thread_priority_t)(CY_RTOS_PRIORITY_HIGH - 1), args);
     if(res != CY_RSLT_SUCCESS)
     {
     	printf("Error creating thread \n");

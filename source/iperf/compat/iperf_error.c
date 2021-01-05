@@ -191,15 +191,6 @@ const char* winsock_strerror( DWORD inErrno ) {
 
 #endif /* WIN32 */
 
-/* IPERF_MODIFIED Start */
-/* Since IAR doesn't define errno, the below definition is required for IAR build */
-#if defined(__ICCARM__)
-#ifndef errno
-int errno;
-#endif
-#endif
-/* IPERF_MODIFIED End */
-
 /* -------------------------------------------------------------------
  * warn
  *
@@ -229,6 +220,7 @@ void warn_errno( const char *inMessage, const char *inFile, int inLine ) {
     const char* my_str;
 
     /* IPERF_MODIFIED Start */
+    my_str = NULL;
     (void)my_str;
     /* IPERF_MODIFIED End */
 

@@ -100,9 +100,11 @@ const int IPERF_UDP_DELAY=2000;
 #define NONFATALTCPWRITERR(errno) ((errno = WSAGetLastError()) == WSAETIMEDOUT)
 #define FATALUDPWRITERR(errno)  (((errno = WSAGetLastError()) != WSAETIMEDOUT) && (errno != WSAECONNREFUSED))
 #else
-#define FATALTCPWRITERR(errno)  (errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
-#define NONFATALTCPWRITERR(errno)  (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
-#define FATALUDPWRITERR(errno) 	((errno != EAGAIN) && (errno != EWOULDBLOCK) && (errno != EINTR) && (errno != ECONNREFUSED) && (errno != ENOBUFS))
+/* IPERF_MODIFIED Start */
+#define FATALTCPWRITERR(errno)     ((errno != EWOULDBLOCK) && (errno != EINTR))
+#define NONFATALTCPWRITERR(errno)  ((errno == EWOULDBLOCK) || (errno == EINTR))
+#define FATALUDPWRITERR(errno) 	   ((errno != EWOULDBLOCK) && (errno != EINTR) && (errno != ECONNREFUSED) && (errno != ENOBUFS))
+/* IPERF_MODIFIED End */
 #endif
 
 /* ------------------------------------------------------------------- */

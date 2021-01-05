@@ -356,6 +356,7 @@ void Settings_Initialize( thread_Settings *main ) {
     // skip help                         // -h,
     //main->mBufLenSet  = false;         // -l,
     /* IPERF_MODIFIED Start */
+    (void)kDefault_TCPBufLen;
     if(main->mBufLen != 0)
     {
         main->mBufLen = IPERF_BUFFERLEN; // -l,  Default to TCP read/write size
@@ -568,7 +569,7 @@ void Settings_ParseCommandLine( int argc, char **argv, thread_Settings *mSetting
     /* IPERF_MODIFIED Start */
     for ( int i = optind; i < argc; i++ ) {
     /* IPERF_MODIFIED End */
-        fprintf( stderr, "%s: ignoring extra argument -- %s\n", argv[0], argv[i] );
+        fprintf( stdout, "%s: ignoring extra argument -- %s\n", argv[0], argv[i] );
     }
     /* IPERF_MODIFIED Start */
     /* Fix for static variables not getting reset. */
@@ -640,16 +641,22 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'd': // Dual-test Mode
             if ( mExtSettings->mThreadMode != kMode_Client ) {
-                fprintf( stderr, warn_invalid_server_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_server_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
             if ( isCompat( mExtSettings ) ) {
-                fprintf( stderr, warn_invalid_compatibility_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_compatibility_option, option );
+/* IPERF_MODIFIED End */
             }
 #ifdef HAVE_THREAD
             mExtSettings->mMode = kTest_DualTest;
 #else
-            fprintf( stderr, warn_invalid_single_threaded, option );
+/* IPERF_MODIFIED Start */
+            fprintf( stdout, warn_invalid_single_threaded, option );
+/* IPERF_MODIFIED End */
             mExtSettings->mMode = kTest_TradeOff;
 #endif
             break;
@@ -662,10 +669,10 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'h': // print help and exit
             /* IPERF_MODIFIED Start */
-            fprintf(stderr, "\n");
+            fprintf(stdout, "\n");
+            fprintf(stdout, "%s", usage_long1);
+            fprintf(stdout, "%s", usage_long2);
             /* IPERF_MODIFIED End */
-	    fprintf(stderr, "%s", usage_long1);
-            fprintf(stderr, "%s", usage_long2);
             /* IPERF_MODIFIED Start */
 #ifdef NO_EXIT
             should_exit = 1;
@@ -680,12 +687,16 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 	    char *end;
 	    mExtSettings->mInterval = strtof( optarg, &end );
 	    if (*end != '\0') {
-		fprintf (stderr, "Invalid value of '%s' for -i interval\n", optarg);
+/* IPERF_MODIFIED Start */
+        fprintf (stdout, "Invalid value of '%s' for -i interval\n", optarg);
+/* IPERF_MODIFIED End */
 	    } else {
 	        if ( mExtSettings->mInterval < SMALLEST_INTERVAL ) {
 		    mExtSettings->mInterval = SMALLEST_INTERVAL;
 #ifndef HAVE_FASTSAMPLING
-		    fprintf (stderr, report_interval_small, mExtSettings->mInterval);
+/* IPERF_MODIFIED Start */
+		    fprintf (stdout, report_interval_small, mExtSettings->mInterval);
+/* IPERF_MODIFIED End */
 #endif
 	        }
 		if ( mExtSettings->mInterval < 0.5 ) {
@@ -742,11 +753,15 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'r': // test mode tradeoff
             if ( mExtSettings->mThreadMode != kMode_Client ) {
-                fprintf( stderr, warn_invalid_server_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_server_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
             if ( isCompat( mExtSettings ) ) {
-                fprintf( stderr, warn_invalid_compatibility_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_compatibility_option, option );
+/* IPERF_MODIFIED End */
             }
 
             mExtSettings->mMode = kTest_TradeOff;
@@ -754,7 +769,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 's': // server mode
             if ( mExtSettings->mThreadMode != kMode_Unknown ) {
-                fprintf( stderr, warn_invalid_client_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_client_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
 
@@ -794,7 +811,10 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             break;
 
         case 'v': // print version and exit
-	    fprintf( stderr, "%s", version );
+/* IPERF_MODIFIED Start */
+	    fprintf( stdout, "%s", version );
+/* IPERF_MODIFIED End */
+
 /* IPERF_MODIFIED Start */
 #ifdef NO_EXIT
             should_exit = 1;
@@ -809,7 +829,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             mExtSettings->mTCPWin = byte_atoi(optarg);
 
             if ( mExtSettings->mTCPWin < 2048 ) {
-                fprintf( stderr, warn_window_small, mExtSettings->mTCPWin );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_window_small, mExtSettings->mTCPWin );
+/* IPERF_MODIFIED End */
             }
             break;
 
@@ -837,7 +859,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
                         setNoMultReport( mExtSettings );
                         break;
                     default:
-                        fprintf(stderr, warn_invalid_report, *optarg);
+/* IPERF_MODIFIED Start */
+                        fprintf(stdout, warn_invalid_report, *optarg);
+/* IPERF_MODIFIED End */
                 }
                 optarg++;
             }
@@ -855,7 +879,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
                     mExtSettings->mReportMode = kReport_CSV;
                     break;
                 default:
-                    fprintf( stderr, warn_invalid_report_style, optarg );
+/* IPERF_MODIFIED Start */
+                    fprintf( stdout, warn_invalid_report_style, optarg );
+/* IPERF_MODIFIED End */
             }
             break;
 
@@ -875,9 +901,10 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
         case 'C': // Run in Compatibility Mode, i.e. no intial nor final header messaging
             setCompat( mExtSettings );
             if ( mExtSettings->mMode != kTest_Normal ) {
-                fprintf( stderr, warn_invalid_compatibility_option,
-                        ( mExtSettings->mMode == kTest_DualTest ?
-                          'd' : 'r' ) );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_compatibility_option,
+                                        ( mExtSettings->mMode == kTest_DualTest ?
+                                          'd' : 'r' ) );
                 mExtSettings->mMode = kTest_Normal;
             }
             break;
@@ -890,7 +917,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 #ifndef NO_FILE_IO
         case 'F' : // Get the input for the data stream from a file
             if ( mExtSettings->mThreadMode != kMode_Client ) {
-                fprintf( stderr, warn_invalid_server_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_server_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
 
@@ -908,7 +937,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'H' : // Get the SSM host (or Source per the S,G)
             if ( mExtSettings->mThreadMode == kMode_Client ) {
-                fprintf( stderr, warn_invalid_client_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_client_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
             mExtSettings->mSSMMulticastStr = new char[strlen(optarg)+1];
@@ -921,7 +952,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 /* IPERF_MODIFIED End */
         case 'I' : // Set the stdin as the input source
             if ( mExtSettings->mThreadMode != kMode_Client ) {
-                fprintf( stderr, warn_invalid_server_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_server_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
 
@@ -939,7 +972,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 
         case 'L': // Listen Port (bidirectional testing client-side)
             if ( mExtSettings->mThreadMode != kMode_Client ) {
-                fprintf( stderr, warn_invalid_server_option, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_server_option, option );
+/* IPERF_MODIFIED End */
                 break;
             }
 
@@ -959,7 +994,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             mExtSettings->mThreads = atoi( optarg );
 #else
             if ( mExtSettings->mThreadMode != kMode_Server ) {
-                fprintf( stderr, warn_invalid_single_threaded, option );
+/* IPERF_MODIFIED Start */
+                fprintf( stdout, warn_invalid_single_threaded, option );
+/* IPERF_MODIFIED End */
             } else {
                 mExtSettings->mThreads = atoi( optarg );
             }
@@ -971,10 +1008,14 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             break;
 #else
         case 'R':
-	    fprintf( stderr, "The --reverse option is currently not supported\n");
-	    exit(1);
-	    setReverse(mExtSettings);
-            break;
+/* IPERF_MODIFIED Start */
+        	fprintf( stdout, "The --reverse option is currently not supported\n");
+/* IPERF_MODIFIED End */
+        	exit(1);
+/* IPERF_MODIFIED Start */
+//        	setReverse(mExtSettings);
+//        	break;
+/* IPERF_MODIFIED End */
 #endif
 
         case 'S': // IP type-of-service
@@ -996,14 +1037,18 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 #ifdef HAVE_IPV6
             setIPV6( mExtSettings );
 #else
-	    fprintf( stderr, "The --ipv6_domain (-V) option is not enabled in this build.\n");
+/* IPERF_MODIFIED Start */
+        fprintf( stdout, "The --ipv6_domain (-V) option is not enabled in this build.\n");
+/* IPERF_MODIFIED End */
 	    exit(1);
 #endif
             break;
 
         case 'W' :
             setSuggestWin( mExtSettings );
-            fprintf( stderr, "The -W option is not available in this release\n");
+/* IPERF_MODIFIED Start */
+            fprintf( stdout, "The -W option is not available in this release\n");
+/* IPERF_MODIFIED End */
             break;
 
         case 'X' :
@@ -1020,7 +1065,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
             /* IPERF_MODIFIED End */
 	    strcpy( mExtSettings->mCongestion, optarg);
 #else
-            fprintf( stderr, "The -Z option is not available on this operating system\n");
+/* IPERF_MODIFIED Start */
+            fprintf( stdout, "The -Z option is not available on this operating system\n");
+/* IPERF_MODIFIED End */
 #endif
 	    break;
 
@@ -1061,10 +1108,15 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 		    mExtSettings->txstart.tv_sec = seconds;
 		    mExtSettings->txstart.tv_nsec = 0;
 		} else {
-		    fprintf(stderr, "WARNING: invalid --txstart-time format\n");
+/* IPERF_MODIFIED Start */
+		    fprintf(stdout, "WARNING: invalid --txstart-time format\n");
+/* IPERF_MODIFIED End */
 		}
 #else
-	        fprintf(stderr, "WARNING: --txstart-time not supported\n");
+
+/* IPERF_MODIFIED Start */
+	        fprintf(stdout, "WARNING: --txstart-time not supported\n");
+/* IPERF_MODIFIED End */
 #endif
 	    }
 	    if (triptime) {
@@ -1088,9 +1140,13 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 	    }
 	    if (reversetest) {
 		reversetest = 0;
-		fprintf( stderr, "WARNING: The --reverse option is currently not supported\n");
+/* IPERF_MODIFIED Start */
+		fprintf( stdout, "WARNING: The --reverse option is currently not supported\n");
+/* IPERF_MODIFIED End */
 		exit(1);
-		setReverse(mExtSettings);
+/* IPERF_MODIFIED Start */
+//		setReverse(mExtSettings);
+/* IPERF_MODIFIED End */
 	    }
 	    if (fqrate) {
 #if defined(HAVE_DECL_SO_MAX_PACING_RATE)
@@ -1098,7 +1154,9 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 		setFQPacing(mExtSettings);
 		mExtSettings->mFQPacingRate = (unsigned int) (bitorbyte_atoi(optarg) / 8);
 #else
-		fprintf( stderr, "WARNING: The --fq-rate option is not supported\n");
+/* IPERF_MODIFIED Start */
+		fprintf( stdout, "WARNING: The --fq-rate option is not supported\n");
+/* IPERF_MODIFIED End */
 #endif
 	    }
 
@@ -1124,7 +1182,10 @@ void Settings_Interpret( char option, const char *optarg, thread_Settings *mExtS
 		char *end;
 		mExtSettings->mBurstIPG = strtof(optarg,&end);
 		if (*end != '\0') {
-		    fprintf (stderr, "Invalid value of '%s' for --ipg\n", optarg);
+/* IPERF_MODIFIED Start */
+		    fprintf (stdout, "Invalid value of '%s' for --ipg\n", optarg);
+/* IPERF_MODIFIED End */
+
 		}
 	    }
 #endif
@@ -1171,11 +1232,15 @@ void Settings_ModalOptions( thread_Settings *mExtSettings ) {
 
     if (mExtSettings->mThreadMode != kMode_Client) {
 	if (isVaryLoad(mExtSettings)) {
-	    fprintf(stderr, "option of variance ignored as not supported on the server\n");
+/* IPERF_MODIFIED Start */
+	    fprintf(stdout, "option of variance ignored as not supported on the server\n");
+/* IPERF_MODIFIED End */
 	}
 	if (isTxStartTime(mExtSettings)) {
 	    unsetTxStartTime(mExtSettings);
-	    fprintf(stderr, "option of --txstart-time ignored as not supported on the server\n");
+/* IPERF_MODIFIED Start */
+	    fprintf(stdout, "option of --txstart-time ignored as not supported on the server\n");
+/* IPERF_MODIFIED End */
 	}
     }
 
@@ -1215,7 +1280,10 @@ void Settings_ModalOptions( thread_Settings *mExtSettings ) {
 	  // Request server to do length checks
 	  setL2LengthCheck(mExtSettings);
 #else
-	  fprintf(stderr, "--l2checks not supported on this platform\n");
+	  fprintf(stdout, "--l2checks not supported on this platform\n");
+/* IPERF_MODIFIED Start */
+	  fprintf(stdout, "--l2checks not supported on this platform\n");
+/* IPERF_MODIFIED End */
 #endif
 	}
     }
@@ -1224,11 +1292,16 @@ void Settings_ModalOptions( thread_Settings *mExtSettings ) {
 #ifdef HAVE_ISOCHRONOUS
     if (mExtSettings->mBurstIPG > 0.0) {
 	if (!isIsochronous(mExtSettings)) {
-	    fprintf(stderr, "option --ipg requires the --isochronous option\n");
+/* IPERF_MODIFIED Start */
+	    fprintf(stdout, "option --ipg requires the --isochronous option\n");
+/* IPERF_MODIFIED End */
 	    exit(1);
 	}
 	if (mExtSettings->mThreadMode != kMode_Client) {
-	    fprintf(stderr, "option --ipg only supported on clients\n");
+/* IPERF_MODIFIED Start */
+	    fprintf(stdout, "option --ipg only supported on clients\n");
+/* IPERF_MODIFIED End */
+
 	    exit(1);
 	}
     }
@@ -1250,7 +1323,9 @@ void Settings_ModalOptions( thread_Settings *mExtSettings ) {
 		    mExtSettings->mVariance = 0.0;
 		}
 	    } else {
-		fprintf(stderr, "Invalid --isochronous value, format is <fps>:<mean>,<variance> (e.g. 60:18M,1m)\n");
+/* IPERF_MODIFIED Start */
+		fprintf(stdout, "Invalid --isochronous value, format is <fps>:<mean>,<variance> (e.g. 60:18M,1m)\n");
+/* IPERF_MODIFIED End */
 	    }
 	}
     }

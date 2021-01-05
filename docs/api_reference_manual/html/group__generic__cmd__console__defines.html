@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('group__generic__cmd__console__defines.
 <li>error code</li>
 </ul>
 <dl class="section user"><dt>Result Format</dt><dd></dd></dl>
-<pre class="fragment">           Module base                      Type    Library specific error code
+<pre class="fragment">           Module base                      Type    Library-specific error code
    +--------------------------------------+------+------------------------------+
    |CY_RSLT_MODULE_COMMAND_CONSOLE_BASE   | 0x2  |           Error Code         |
    +--------------------------------------+------+------------------------------+
@@ -102,22 +102,53 @@ $(document).ready(function(){initNavTree('group__generic__cmd__console__defines.
 
 See the macro section of this document for library-specific error codes.
 </pre><p>The data structure cy_rslt_t is part of cy_result.h located in &lt;core_lib/include&gt;.</p>
-<p>Module base: This base is derived from CY_RSLT_MODULE_MIDDLEWARE_BASE (defined in cy_result.h) and is an offset of the CY_RSLT_MODULE_MIDDLEWARE_BASE. The details of the offset and the middleware base are defined in cy_result_mw.h, that is part of <a href="https://github.com/cypresssemiconductorco/connectivity-utilities">GitHub connectivity-utilities</a> For instance, Command console library uses CY_RSLT_MODULE_COMMAND_CONSOLE_BASE as the module base.</p>
+<p>Module base: This base is derived from CY_RSLT_MODULE_MIDDLEWARE_BASE (defined in cy_result.h) and is an offset of the CY_RSLT_MODULE_MIDDLEWARE_BASE. The details of the offset and the middleware base are defined in cy_result_mw.h, which is part of <a href="https://github.com/cypresssemiconductorco/connectivity-utilities">GitHub connectivity-utilities</a>. For example, the Command Console library uses CY_RSLT_MODULE_COMMAND_CONSOLE_BASE as the module base.</p>
 <p>Type: This type is defined in cy_result.h and can be one of CY_RSLT_TYPE_FATAL, CY_RSLT_TYPE_ERROR, CY_RSLT_TYPE_WARNING, or CY_RSLT_TYPE_INFO. AWS library error codes are of type CY_RSLT_TYPE_ERROR.</p>
-<p>Library-specific error code: These error codes are library-specific and defined in the macro section.</p>
+<p>Library-specific error code: These error codes are library-specific and are defined in the macro section.</p>
 <p>Helper macros used for creating the library-specific result are provided as part of cy_result.h. </p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga239c9ef5dfcf55b85d60c54c2448d6c5"><td class="memItemLeft" align="right" valign="top"><a id="ga239c9ef5dfcf55b85d60c54c2448d6c5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__generic__cmd__console__defines.html#ga239c9ef5dfcf55b85d60c54c2448d6c5">CY_RSLT_COMMAND_CONSOLE_ERR_BASE</a>&#160;&#160;&#160;CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_COMMAND_CONSOLE_BASE, 0)</td></tr>
-<tr class="memdesc:ga239c9ef5dfcf55b85d60c54c2448d6c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic command console base error code. <br /></td></tr>
+<tr class="memitem:ga239c9ef5dfcf55b85d60c54c2448d6c5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__generic__cmd__console__defines.html#ga239c9ef5dfcf55b85d60c54c2448d6c5">CY_RSLT_COMMAND_CONSOLE_ERR_BASE</a>&#160;&#160;&#160;CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_COMMAND_CONSOLE_BASE, 0)</td></tr>
+<tr class="memdesc:ga239c9ef5dfcf55b85d60c54c2448d6c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic command console base error code.  <a href="#ga239c9ef5dfcf55b85d60c54c2448d6c5">More...</a><br /></td></tr>
 <tr class="separator:ga239c9ef5dfcf55b85d60c54c2448d6c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga22ae62dea8bdd7b59aa2d2d5a4454e78"><td class="memItemLeft" align="right" valign="top"><a id="ga22ae62dea8bdd7b59aa2d2d5a4454e78"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__generic__cmd__console__defines.html#ga22ae62dea8bdd7b59aa2d2d5a4454e78">CY_RSLT_COMMAND_CONSOLE_FAILURE</a>&#160;&#160;&#160;((cy_rslt_t)(<a class="el" href="group__generic__cmd__console__defines.html#ga239c9ef5dfcf55b85d60c54c2448d6c5">CY_RSLT_COMMAND_CONSOLE_ERR_BASE</a> + 1))</td></tr>
-<tr class="memdesc:ga22ae62dea8bdd7b59aa2d2d5a4454e78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic Failure. <br /></td></tr>
+<tr class="memitem:ga22ae62dea8bdd7b59aa2d2d5a4454e78"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__generic__cmd__console__defines.html#ga22ae62dea8bdd7b59aa2d2d5a4454e78">CY_RSLT_COMMAND_CONSOLE_FAILURE</a>&#160;&#160;&#160;((cy_rslt_t)(<a class="el" href="group__generic__cmd__console__defines.html#ga239c9ef5dfcf55b85d60c54c2448d6c5">CY_RSLT_COMMAND_CONSOLE_ERR_BASE</a> + 1))</td></tr>
+<tr class="memdesc:ga22ae62dea8bdd7b59aa2d2d5a4454e78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic failure.  <a href="#ga22ae62dea8bdd7b59aa2d2d5a4454e78">More...</a><br /></td></tr>
 <tr class="separator:ga22ae62dea8bdd7b59aa2d2d5a4454e78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ga239c9ef5dfcf55b85d60c54c2448d6c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga239c9ef5dfcf55b85d60c54c2448d6c5">&#9670;&nbsp;</a></span>CY_RSLT_COMMAND_CONSOLE_ERR_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CY_RSLT_COMMAND_CONSOLE_ERR_BASE&#160;&#160;&#160;CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_COMMAND_CONSOLE_BASE, 0)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generic command console base error code. </p>
+
+</div>
+</div>
+<a id="ga22ae62dea8bdd7b59aa2d2d5a4454e78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga22ae62dea8bdd7b59aa2d2d5a4454e78">&#9670;&nbsp;</a></span>CY_RSLT_COMMAND_CONSOLE_FAILURE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CY_RSLT_COMMAND_CONSOLE_FAILURE&#160;&#160;&#160;((cy_rslt_t)(<a class="el" href="group__generic__cmd__console__defines.html#ga239c9ef5dfcf55b85d60c54c2448d6c5">CY_RSLT_COMMAND_CONSOLE_ERR_BASE</a> + 1))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generic failure. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -30,8 +30,8 @@
  * of such system or application assumes all risk of such use and in doing
  * so agrees to indemnify Cypress against all liability.
  */
-#if defined(ANYCLOUD) && !defined(HAVE_GETTIMEOFDAY)
 
+#ifndef HAVE_GETTIMEOFDAY
 #if defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_)
 /* NOTE: config.h doesn't have guard includes! */
 #define INCLUDED_CONFIG_H_
@@ -68,4 +68,4 @@ int anycloud_gettimeofday(struct timeval* tv, void* timezone)
 } /* end extern "C" */
 #endif
 
-#endif /* defined(ANYCLOUD) && !defined(HAVE_GETTIMEOFDAY) */
+#endif /*!defined(HAVE_GETTIMEOFDAY) */

@@ -1453,7 +1453,10 @@ int Listener::ReadClientHeader(client_hdr *hdr ) {
 	    reporter_peerversion(server, ntohl(hdr->udp.version_u), ntohl(hdr->udp.version_l));
 	}
     } else {
-	int n, len;
+	/* IPERF_MODIFIED Start */
+//	int n, len;
+	int len;
+	/* IPERF_MODIFIED End */
 	char *p = (char *)hdr;
 	len = sizeof(client_hdr_v1);
 	int sorcvtimer = 0;
@@ -1484,7 +1487,9 @@ int Listener::ReadClientHeader(client_hdr *hdr ) {
 	// Read the headers but don't pull them from the queue in order to
 	// preserve server thread accounting, i.e. these exchanges will
 	// be part of traffic accounting
-	if ((n = recvn(server->mSock, p, 4, MSG_PEEK)) == 4) {
+    /* IPERF_MODIFIED Start */
+	if (recvn(server->mSock, p, 4, MSG_PEEK) == 4) {
+	/* IPERF_MODIFIED End */
 	    flags = ntohl(hdr->base.flags);
 	    len=0;
 	    if ((flags & HEADER_EXTEND) != 0) {
@@ -1494,7 +1499,9 @@ int Listener::ReadClientHeader(client_hdr *hdr ) {
 	    } else if ((flags & HEADER_TIMESTAMP) != 0 ) {
 		setTripTime(server);
 	    }
-	    if (len && ((n = recvn(server->mSock, p, len, MSG_PEEK)) != len)) {
+	    /* IPERF_MODIFIED Start */
+	    if (len && (recvn(server->mSock, p, len, MSG_PEEK) != len)) {
+		/* IPERF_MODIFIED End */
 		return -1;
 	    }
 	}
