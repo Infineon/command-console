@@ -1,10 +1,10 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -61,7 +61,9 @@
 #define APP_WORKER_THREAD_STACK_SIZE    (2048)
 #define APP_QUEUE_MAX_ENTRIES           (5)
 #define NEVER_TIMEOUT                   ((uint32_t) 0xFFFFFFFF)
-#define DEFAULT_LE_COC_MTU              (100)
+#ifndef BLE_COC_MTU_SIZE
+#define BLE_COC_MTU_SIZE                (100)
+#endif
 #define LE_COC_PSM                      (19)
 #define MAX_SEMA_COUNT                  (1)
 #define MAX_MUTEX_WAIT_TIME_MS          (0xFFFFFFFF)
@@ -71,6 +73,10 @@
  * if not, return with result value;
  */
 #define IS_BT_ON()   { if (!bt_state) { BT_LE_INFO( (" Error BT is OFF \r\n")); return WICED_ERROR;}}
+
+#if(BLE_COC_MTU_SIZE > 512)
+#error Maximum value of BLE_COC_MTU_SIZE that can be configured is 512
+#endif
 
 /******************************************************
  *               Function Declarations
@@ -116,7 +122,7 @@ static wiced_bt_dev_status_t bt_management_cback(wiced_bt_management_evt_t event
 static void le_coc_set_advertisement_data(void);
 static void le_coc_connect_ind_cback(wiced_bt_device_address_t bda, uint16_t local_cid, uint16_t psm, uint8_t id, uint16_t mtu_peer);
 static void le_coc_connect_cfm_cback(uint16_t local_cid, uint16_t result, uint16_t mtu_peer);
-static void le_coc_disconnect_ind_cback(uint16_t local_cid, wiced_bool_t ack);
+static void le_coc_disconnect_ind_cback(uint16_t local_cid, uint16_t reason, wiced_bool_t ack);
 static void le_coc_disconnect_cfm_cback(uint16_t local_cid, uint16_t result);
 static void le_coc_data_cback(uint16_t local_cid, tDRB *p_drb);
 static void le_coc_tx_complete_cback(uint16_t local_cid, void *p_data);
@@ -154,15 +160,15 @@ wiced_bt_l2cap_le_appl_information_t l2c_appl_info =
 bool bt_state         = WICED_FALSE;
 cy_thread_t           ble_thread;
 static volatile bool  send_data;
-static uint64_t       data_le_tx_counter;
-static uint64_t       data_le_rx_counter;
+static uint32_t       data_le_tx_counter;
+static uint32_t       data_le_rx_counter;
 static bool           le_coc_data_rx_flag;
 static cy_time_t      start_time;
 static cy_time_t      end_time;
 cy_semaphore_t        send_data_semaphore;
 uint16_t              psm;
 uint16_t              our_mtu;
-uint8_t               lec_coc_data[ DEFAULT_LE_COC_MTU ];
+uint8_t               lec_coc_data[ BLE_COC_MTU_SIZE ];
 le_coc_cb_t           le_coc_cb;
 static cy_mutex_t     bt_mutex;
 
@@ -180,7 +186,7 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
         return result;
     }
     cybt_platform_config_init(&bt_platform_cfg_settings);
-    wiced_bt_stack_init(bt_management_cback, &wiced_bt_cfg_settings);
+    wiced_bt_stack_init(bt_management_cback, &wiced_bt_command_console_cfg_settings);
     // create application heap for BT
     wiced_bt_create_heap ("app", NULL, 0x1000, NULL, WICED_TRUE);\
 
@@ -259,10 +265,10 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
         cy_rtos_get_time(&end_time);
         elapsed_time = (float)(end_time - start_time)/1000;
         data_rate = (((float)data_le_rx_counter * 8)/elapsed_time);
-        BT_LE_INFO(("start Time = %lu ...\n", start_time));
-        BT_LE_INFO(("END Time = %lu ...\n", end_time));
+        BT_LE_INFO(("start Time = %u ...\n", (unsigned int)start_time));
+        BT_LE_INFO(("END Time = %u ...\n", (unsigned int)end_time));
         BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
-        BT_LE_INFO(("total le bytes recieved  = %llu \n", data_le_rx_counter));
+        BT_LE_INFO(("total le bytes recieved  = %u \n", (unsigned int)data_le_rx_counter));
         BT_LE_INFO(("RX throughput =  %f bps\n", data_rate));
         le_coc_data_rx_flag = false;
         data_le_rx_counter = 0;
@@ -275,10 +281,10 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
         BT_LE_INFO(("Throughput details for DATA TX ..\n"));
         elapsed_time = (float)(end_time - start_time)/1000;
         data_rate = (((float)data_le_tx_counter * 8)/elapsed_time);
-        BT_LE_INFO(("start Time = %lu ...\n", start_time));
-        BT_LE_INFO(("END Time = %lu ...\n", end_time));
+        BT_LE_INFO(("start Time = %u ...\n", (unsigned int)start_time));
+        BT_LE_INFO(("END Time = %u ...\n", (unsigned int)end_time));
         BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
-        BT_LE_INFO(("total le bytes transferred  = %llu \n", data_le_tx_counter));
+        BT_LE_INFO(("total le bytes transferred  = %u \n", (unsigned int)data_le_tx_counter));
         BT_LE_INFO(("TX throughput =  %f bps\n", data_rate));
         data_le_tx_counter = 0;
         start_time = 0;
@@ -398,7 +404,7 @@ static void le_coc_data_cback(uint16_t local_cid, tDRB *p_drb)
         cy_rtos_get_time(&start_time);
     }
     data_le_rx_counter += rcvd_len;
-    BT_LE_INFO(("[%s] received %llu bytes\n", __func__, data_le_rx_counter));
+    BT_LE_INFO(("[%s] received %u bytes\n", __func__, (unsigned int)data_le_rx_counter));
     return;
 }
 
@@ -441,7 +447,7 @@ static void le_coc_connect_cfm_cback(uint16_t local_cid, uint16_t result, uint16
 
 }
 
-static void le_coc_disconnect_ind_cback(uint16_t local_cid, wiced_bool_t ack)
+static void le_coc_disconnect_ind_cback(uint16_t local_cid, uint16_t reason, wiced_bool_t ack)
 {
     BT_LE_INFO( ("[%s] CID %d \n", __func__, local_cid) );
 
@@ -522,8 +528,8 @@ static void le_coc_set_advertisement_data(void)
     num_elem++;
 
     adv_data[ num_elem ].advert_type = BTM_BLE_ADVERT_TYPE_NAME_SHORT;
-    adv_data[ num_elem ].len = strlen( (const char *) wiced_bt_cfg_settings.device_name);
-    adv_data[ num_elem ].p_data = wiced_bt_cfg_settings.device_name;
+    adv_data[ num_elem ].len = strlen( (const char *) wiced_bt_command_console_cfg_settings.device_name);
+    adv_data[ num_elem ].p_data = wiced_bt_command_console_cfg_settings.device_name;
     num_elem++;
 
     if((wiced_bt_ble_set_raw_advertisement_data( num_elem, adv_data)) != WICED_BT_SUCCESS)
@@ -545,7 +551,7 @@ int handle_ble_coc_init(int argc, char *argv[], tlv_buffer_t** data)
     le_coc_data_rx_flag = false;
     data_le_rx_counter = 0;
     data_le_tx_counter = 0;
-    our_mtu = DEFAULT_LE_COC_MTU;
+    our_mtu = BLE_COC_MTU_SIZE;
     /* Clear app control block */
     memset( &le_coc_cb, 0, sizeof(le_coc_cb_t));
     le_coc_cb.local_cid = 0xFFFF;
@@ -553,7 +559,7 @@ int handle_ble_coc_init(int argc, char *argv[], tlv_buffer_t** data)
     /* Register LE l2cap callbacks */
     result = wiced_bt_l2cap_le_register(LE_COC_PSM, &l2c_appl_info);
 
-    for(i = 0; i < DEFAULT_LE_COC_MTU; i++)
+    for(i = 0; i < BLE_COC_MTU_SIZE; i++)
     {
         lec_coc_data[i] = 0x41;
     }
@@ -590,6 +596,8 @@ void le_coc_connect( wiced_bt_device_address_t bd_addr, wiced_bt_ble_address_typ
     uint8_t *p_data = le_coc_cb.peer_bda;
     tDRB    *p_rx_drb;
     p_rx_drb = (tDRB *)wiced_bt_get_buffer (our_mtu + DRB_OVERHEAD_SIZE);
+
+    memset(p_rx_drb, 0, our_mtu + DRB_OVERHEAD_SIZE);
     /* Initiate the connection L2CAP connection */
     wiced_bt_l2cap_le_connect_req( LE_COC_PSM, (uint8_t*) bd_addr, bd_addr_type, BLE_CONN_MODE_HIGH_DUTY, our_mtu,
                                    req_security, req_encr_key_size, p_rx_drb);
@@ -603,7 +611,7 @@ int handle_ble_coc_send_start(int argc, char *argv[], tlv_buffer_t** data)
     data_le_tx_counter = 0;
     IS_BT_ON();
     cy_rtos_get_time(&start_time);
-    BT_LE_INFO(("current_time = %ld \n", start_time));
+    BT_LE_INFO(("current_time = %u \n", (unsigned int)start_time));
     if(cy_rtos_get_mutex(&bt_mutex, MAX_MUTEX_WAIT_TIME_MS) != CY_RSLT_SUCCESS)
     {
         BT_LE_ERROR(("Unable to acquire mutex \n"));
@@ -648,21 +656,17 @@ static void le_coc_scan_result_cback( wiced_bt_ble_scan_results_t *p_scan_result
 {
     uint8_t length;
     uint8_t * p_data;
-    tDRB    p_rx_drb;
 
     BT_LE_DEBUG(("le_coc_scan_result_cback \n"));
     if(p_scan_result)
     {
         p_data = wiced_bt_ble_check_advertising_data(p_adv_data, BTM_BLE_ADVERT_TYPE_NAME_SHORT, &length);
-        if (memcmp(p_data, wiced_bt_cfg_settings.device_name, strlen( (const char *) wiced_bt_cfg_settings.device_name ) ) == 0 )
+        if (memcmp(p_data, wiced_bt_command_console_cfg_settings.device_name, strlen( (const char *) wiced_bt_command_console_cfg_settings.device_name ) ) == 0 )
         {
             BT_LE_INFO( ("Found LE COC Server \n") );
-            uint8_t req_security = 0;
-            uint8_t req_encr_key_size = 0;
             /* Initiate the connection L2CAP connection */
             wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_NONE, 0, NULL );
-            wiced_bt_l2cap_le_connect_req( LE_COC_PSM, p_scan_result->remote_bd_addr, p_scan_result->ble_addr_type, BLE_CONN_MODE_HIGH_DUTY, our_mtu,
-            req_security, req_encr_key_size, &p_rx_drb);
+            le_coc_connect( p_scan_result->remote_bd_addr, p_scan_result->ble_addr_type );
         }
         else
         {
@@ -690,10 +694,10 @@ static void send_data_thread(cy_thread_arg_t thread_input)
         {
             BT_LE_INFO((" DATA SEND STOPPED \n"));
             cy_rtos_get_time(&end_time);
-            BT_LE_INFO(("start Time = %lu ...\n", start_time));
-            BT_LE_INFO(("END Time = %lu ...\n", end_time));
-            BT_LE_INFO(("elapsed time = %lu \n", (end_time - start_time)));
-            BT_LE_INFO(("total le bytes transmitted = %llu \n", data_le_tx_counter));
+            BT_LE_INFO(("start Time = %u ...\n", (unsigned int)start_time));
+            BT_LE_INFO(("END Time = %u ...\n", (unsigned int)end_time));
+            BT_LE_INFO(("elapsed time = %u \n", (unsigned int)(end_time - start_time)));
+            BT_LE_INFO(("total le bytes transmitted = %u \n", (unsigned int)data_le_tx_counter));
         }
 
         if (cy_rtos_set_mutex(&bt_mutex) != CY_RSLT_SUCCESS)

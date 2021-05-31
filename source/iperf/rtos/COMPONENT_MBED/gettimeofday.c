@@ -1,10 +1,10 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -31,29 +31,36 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#ifndef CY_IPERF_RTC_H
-#define CY_IPERF_RTC_H
+#ifndef HAVE_GETTIMEOFDAY
 
+#if defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_)
+    /* NOTE: config.h doesn't have guard includes! */
+    #define INCLUDED_CONFIG_H_
+    #include "config.h"
+#endif /* defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_) */
 
-#include <time.h>
+#include "headers.h"
+#include "gettimeofday.h"
+#include "cyabs_rtos.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
-void rtc_init(void);
+int mbed_port_gettimeofday(struct timeval* tv, void* timezone)
+{
+    cy_time_t time_ms;
 
-void rtc_free(void);
+    (void)timezone; /* Unused parameter */
+    (void) cy_rtos_get_time(&time_ms);
+    tv->tv_sec =  ( time_ms / 1000 );
+    tv->tv_usec = ( time_ms - ( tv->tv_sec * 1000 ) ) * 1000;
 
-int rtc_isenabled(void);
-
-time_t rtc_read(void);
-
-void rtc_write(time_t t);
-
+    return 0;
+}
 
 #ifdef __cplusplus
-}
+} /* end extern "C" */
 #endif
 
-#endif
+#endif /* !defined(HAVE_GETTIMEOFDAY) */

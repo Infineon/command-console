@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -263,6 +263,13 @@ MultiHeader* InitMulti( thread_Settings *agent, int inID) {
 		}
                 if ( isUDP( agent ) ) {
                     multihdr->report->info.mUDP = (char)agent->mThreadMode;
+                    /* IPERF_MODIFIED Start */
+                    /*
+                    * FALSE-POSITIVE: CID 294196: Unused value
+                    * Reason:
+                    * This is original IPERF code. Hence marked this as a false positive
+                    */
+                    /* IPERF_MODIFIED End */
                     multihdr->report->info.mUDP = 0;
                 } else {
                     multihdr->report->info.mTCP = (char)agent->mThreadMode;
@@ -548,7 +555,6 @@ void ReportPacket( ReportHeader* agent, ReportStruct *packet ) {
 
 static int ReportPacketInternal( ReportHeader* agent, ReportStruct *packet,
                                  ProcessReportFunction *processreportfn ) {
-    IPERF_DEBUGF_COUNTER( REPORTER_DEBUG | IPERF_DBG_TRACE, ( "Reporting packet %d [reporterindex=%d] [agentindex=%d].\n", packet->packetID, agent->reporterindex, agent->agentindex ) );
 
 #ifdef HAVE_THREAD
     /* Unused variable */
@@ -610,7 +616,6 @@ static int ReportPacketInternal( ReportHeader* agent, ReportStruct *packet,
          * Process the report in this thread
          */
         /* IPERF_MODIFIED Start */
-        IPERF_DEBUGF_COUNTER( REPORTER_DEBUG | IPERF_DBG_TRACE, ( "Processing report for packet %d [reporterindex=%d] [agentindex=%d]\n", packet->packetID, agent->reporterindex, agent->agentindex ) );
         return (*processreportfn)( agent );
         /* IPERF_MODIFIED End */
 #endif
@@ -627,7 +632,7 @@ static int ReportPacketInternal( ReportHeader* agent, ReportStruct *packet,
 void CloseReport( ReportHeader *agent, ReportStruct *packet ) {
     int currpktid;
     /* IPERF_MODIFIED Start */
-    IPERF_DEBUGF( REPORTER_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Closing report for packet %d [reporterindex=%d] [agentindex=%d].\n", packet->packetID, agent->reporterindex, agent->agentindex ) );
+    IPERF_DEBUGF( REPORTER_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Closing report for packet %" PRIdMAX "[reporterindex=%d] [agentindex=%d].\n", packet->packetID, agent->reporterindex, agent->agentindex ) );
     /* IPERF_MODIFIED End */
 
     if ( agent != NULL) {
@@ -644,7 +649,7 @@ void CloseReport( ReportHeader *agent, ReportStruct *packet ) {
         packet->packetID = currpktid;
         /* IPERF_MODIFIED Start */
         if ( need_free != 0 ) {
-            IPERF_DEBUGF( MEMFREE_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( report ) );
+            IPERF_DEBUGF( MEMFREE_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( agent ) );
             free( agent );
         }
         /* IPERF_MODIFIED End */
@@ -1068,9 +1073,6 @@ again:
 int process_report ( ReportHeader *report ) {
 /* IPERF_MODIFIED End */
     if ( report != NULL ) {
-        /* IPERF_MODIFIED Start */
-        IPERF_DEBUGF( MEMFREE_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( report ) );
-        /* IPERF_MODIFIED End */
         if ( reporter_process_report( report ) ) {
 	    if (report->report.info.latency_histogram) {
 		histogram_delete(report->report.info.latency_histogram);
@@ -1125,9 +1127,6 @@ int reporter_process_report ( ReportHeader *reporthdr ) {
             free( temp );
         }
     }
-    /* IPERF_MODIFIED Start */
-    IPERF_DEBUGF_COUNTER( REPORTER_DEBUG | IPERF_DBG_TRACE, ( "Reporter is processing a report [reporterindex=%d] [agentindex=%d]\n", reporthdr->reporterindex, reporthdr->agentindex ) );
-    /* IPERF_MODIFIED End */
 
     if ( (reporthdr->report.type & SETTINGS_REPORT) != 0 ) {
         reporthdr->report.type &= ~SETTINGS_REPORT;
@@ -1186,10 +1185,6 @@ int reporter_handle_packet( ReportHeader *reporthdr ) {
     Transfer_Info *stats = &reporthdr->report.info;
     int finished = 0;
     double usec_transit;
-
-    /* IPERF_MODIFIED Start */
-    IPERF_DEBUGF_COUNTER( REPORTER_DEBUG | IPERF_DBG_TRACE, ( "Reporter is handling packet %d. [Datagram count=%d]\n", packet->packetID, data->cntDatagrams ) );
-    /* IPERF_MODIFIED End */
 
     data->packetTime = packet->packetTime;
     stats->socket = packet->socket;

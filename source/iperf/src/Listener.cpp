@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -134,6 +134,9 @@ Listener::Listener( thread_Settings *inSettings ) {
     /* IPERF_MODIFIED Start */
     IPERF_DEBUGF( LISTENER_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Creating new Listener.\n" ) );
     server = NULL;
+    eth_hdr = NULL;
+    ip_hdr = NULL;
+    udp_hdr = NULL;
     /* IPERF_MODIFIED End */
 
     mClients = inSettings->mThreads;
@@ -238,7 +241,9 @@ void Listener::Run( void ) {
     {
         bool client = false, UDP = isUDP( mSettings ), mCount = (mSettings->mThreads != 0);
         thread_Settings *tempSettings = NULL;
-        Iperf_ListEntry *exist, *listtemp;
+        /* IPERF_MODIFIED Start */
+        Iperf_ListEntry *exist = NULL, *listtemp = NULL;
+        /* IPERF_MODIFIED End */
         client_hdr* hdr = ( UDP ? (client_hdr*) (((UDP_datagram*)mBuf) + 1) :
                                   (client_hdr*) mBuf);
 
@@ -353,6 +358,12 @@ sInterupted == SIGALRM
 
             // Create an entry for the connection list
             /* IPERF_MODIFIED Start */
+            /*
+            * FALSE-POSITIVE: CID 294197: Resource Leak
+            * Reason:
+            * Memory allocated for listtemp is getting assigned to global clients list. And once IPERF operation is completed,
+            * clients list is getting freed.
+            */
             listtemp = (Iperf_ListEntry*) malloc( sizeof( Iperf_ListEntry ) );
             FAIL( listtemp == NULL, ( "No memory for Iperf_ListEntry listtemp.\n" ), mSettings );
             IPERF_DEBUGF( MEMFREE_DEBUG | IPERF_DBG_TRACE, IPERF_MEMALLOC_MSG( listtemp, sizeof( Iperf_ListEntry ) ) );
@@ -380,7 +391,9 @@ sInterupted == SIGALRM
 	    if (isUDP(mSettings) && (isL2LengthCheck(mSettings) || isL2LengthCheck(server))) {
 		if (L2_setup() < 0) {
 		    // L2 not allowed, abort this server try
-		    delete server;
+            /* IPERF_MODIFIED Start */
+            FREE_PTR(server);
+            /* IPERF_MODIFIED End */
 		    mSettings->mSock = -1;
 		}
 	    }
@@ -411,7 +424,10 @@ sInterupted == SIGALRM
 		{
             /* IPERF_MODIFIED Start */
 //          if (mSettings->mSock > 0)
-            iperf_thread_start( server );
+            if ( server != NULL )
+            {
+                iperf_thread_start( server );
+            }
             /* IPERF_MODIFIED End */
 		}
 	    // create a new socket for the Listener thread now that server thread
@@ -464,6 +480,16 @@ void Listener::Listen( ) {
     // for the case of L2 testing and UDP, a new AF_PACKET
     // will be created to supercede this one
     int type = (isUDP( mSettings )  ?  SOCK_DGRAM  :  SOCK_STREAM);
+
+    /* IPERF_MODIFIED Start */
+    /*
+    * INTENTIONAL: CID 37361: Identical code for different branches (IDENTICAL_BRANCHES)
+    * Reason:
+    * This is expected if HAVE_IPV6 is not enabled at runtime. This is not a bug and is the intended behaviour
+    * and hence can be ignored.
+    */
+    /* IPERF_MODIFIED End */
+
     int domain = (SockAddr_isIPv6( &mSettings->local ) ?
 #ifdef HAVE_IPV6
 		  AF_INET6
@@ -1189,6 +1215,9 @@ void Listener::UDPSingleServer( ) {
             /* IPERF_MODIFIED End */
             WARN_errno( rc == SOCKET_ERROR, "recvfrom" );
             if ( rc == SOCKET_ERROR ) {
+                /* IPERF_MODIFIED Start */
+                free( reportstruct );
+                /* IPERF_MODIFIED End */
                 return;
             }
 

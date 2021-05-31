@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -230,6 +230,11 @@ Client::Client( thread_Settings *inSettings ) {
     reportstruct->errwrite=WriteNoErr;
     reportstruct->emptyreport=0;
     reportstruct->socket = mSettings->mSock;
+    /* IPERF_MODIFIED Start */
+    readAt = NULL;
+    delay_lower_bounds = 0;
+    totLen = 0;
+    /* IPERF_MODIFIED End */
 
 } // end Client
 
@@ -241,7 +246,7 @@ Client::~Client() {
     IPERF_DEBUGF( CLIENT_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Destroying Client.\n" ) );
     /* IPERF_MODIFIED End */
     if ( mSettings->mSock != INVALID_SOCKET ) {
-    	/* IPERF_MODIFIED Start */
+        /* IPERF_MODIFIED Start */
         int rc = iperf_close( mSettings->mSock );
         /* IPERF_MODIFIED End */
         WARN_errno( rc == SOCKET_ERROR, "close" );
@@ -274,6 +279,14 @@ double Client::Connect( ) {
     // create an internet socket
     int type = ( isUDP( mSettings )  ?  SOCK_DGRAM : SOCK_STREAM);
 
+    /* IPERF_MODIFIED Start */
+    /*
+    * INTENTIONAL: CID 29413: Identical code for different branches (IDENTICAL_BRANCHES)
+    * Reason:
+    * This is expected if HAVE_IPV6 is not enabled at runtime. This is not a bug and is the intended behaviour
+    * and hence can be ignored.
+    */
+    /* IPERF_MODIFIED End */
     int domain = (SockAddr_isIPv6( &mSettings->peer ) ?
 #ifdef HAVE_IPV6
                   AF_INET6
@@ -518,10 +531,12 @@ void Client::RunTCP( void ) {
         // perform write
         if (!isModeTime(mSettings)) {
             /* IPERF_MODIFIED Start */
+            IPERF_DEBUGF_COUNTER( SOCKET_DEBUG | IPERF_DBG_TRACE, ( "Client is writing %d bytes to socket %d [total length=%lu].\n", (mSettings->mAmount < (unsigned) mSettings->mBufLen) ? mSettings->mAmount : mSettings->mBufLen, mSettings->mSock, (long unsigned) totLen ) );
             currLen = iperf_write( mSettings->mSock, mBuf, (mSettings->mAmount < (unsigned) mSettings->mBufLen) ? mSettings->mAmount : mSettings->mBufLen);
             /* IPERF_MODIFIED End */
 	} else {
             /* IPERF_MODIFIED Start */
+        IPERF_DEBUGF_COUNTER( SOCKET_DEBUG | IPERF_DBG_TRACE, ( "Client is writing %d bytes to socket %d [total length=%lu].\n", mSettings->mBufLen, mSettings->mSock, (long unsigned) totLen ) );
             currLen = iperf_write( mSettings->mSock, mBuf, mSettings->mBufLen);
             /* IPERF_MODIFIED End */
 	}
@@ -712,8 +727,14 @@ void Client::RunUDP( void ) {
 		if (var_rate < 0)
 		    var_rate = 0;
 
+        /* IPERF_MODIFIED Start */
+        if(var_rate != 0) {
+        /* IPERF_MODIFIED End */
 		delay_target = (double) ( mSettings->mBufLen * ((kSecs_to_nsecs * kBytes_to_Bits)
 								/ var_rate) );
+        /* IPERF_MODIFIED Start */
+        }
+        /* IPERF_MODIFIED End */
 		time3 = now;
 	    }
 	}
@@ -827,7 +848,9 @@ void Client::RunUDP( void ) {
 void Client::RunUDPIsochronous (void) {
 #ifndef HAVE_ISOCHRONOUS
     FAIL_errno(1, "UDP isochronous not supported, recompile after using config --enable-isochronous\n", mSettings );
-    return;
+    /* IPERF_MODIFIED Start */
+    //return;
+	/* IPERF_MODIFIED End */
 #else
     struct UDP_datagram* mBuf_UDP = (struct UDP_datagram*) mBuf;
     // skip over the UDP datagram (seq no, timestamp) to reach the isoch fields
@@ -1038,7 +1061,7 @@ sInterupted ||
 void Client::FinishTrafficActions(void) {
     // stop timing
     /* IPERF_MODIFIED Start */
-    IPERF_DEBUGF( CLIENT_DEBUG | SOCKET_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Client has finished transmitting TCP packets.\n" ) );
+    IPERF_DEBUGF( CLIENT_DEBUG | SOCKET_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Client has finished transmitting UDP packets.\n" ) );
     /* IPERF_MODIFIED End */
     now.setnow();
     reportstruct->packetTime.tv_sec = now.getSecs();

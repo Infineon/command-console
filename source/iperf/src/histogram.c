@@ -51,13 +51,39 @@
 histogram_t *histogram_init(unsigned int bincount, unsigned int binwidth, float offset, float units,\
 			    double ci_lower, double ci_upper, unsigned int id, char *name) {
     histogram_t *this = (histogram_t *) malloc(sizeof(histogram_t));
-    this->mybins = (unsigned int *) malloc(sizeof(unsigned int) * bincount);
-    this->myname = (char *) malloc(sizeof(strlen(name)));
-    this->outbuf = (char *) malloc(120 + (32*bincount) + strlen(name));
-    if (!this->outbuf || !this || !this->mybins || !this->myname) {
-	fprintf(stderr,"Malloc failure in histogram init\n");
-	return(NULL);
+    /* IPERF_MODIFIED Start */
+    if( !this ){
+        fprintf(stderr,"Malloc failure in histogram init\n");
+        return(NULL);
     }
+    /* IPERF_MODIFIED End */
+    this->mybins = (unsigned int *) malloc(sizeof(unsigned int) * bincount);
+    /* IPERF_MODIFIED Start */
+    if( !this->mybins ){
+        fprintf(stderr,"Malloc failure in mybins init\n");
+        free(this);
+        return(NULL);
+    }
+    /* IPERF_MODIFIED End */
+    this->myname = (char *) malloc(sizeof(strlen(name)));
+    /* IPERF_MODIFIED Start */
+    if( !this->myname ){
+        fprintf(stderr,"Malloc failure in myname init\n");
+        free(this->mybins);
+        free(this);
+        return(NULL);
+    }
+    /* IPERF_MODIFIED End */
+    this->outbuf = (char *) malloc(120 + (32*bincount) + strlen(name));
+    /* IPERF_MODIFIED Start */
+    if (!this->outbuf) {
+    fprintf(stderr,"Malloc failure in outbuf init\n");
+    free(this->myname);
+    free(this->mybins);
+    free(this);
+    return(NULL);
+    }
+    /* IPERF_MODIFIED End */
     memset(this->mybins, 0, bincount * sizeof(unsigned int));
     strcpy(this->myname, name);
     this->id = id;

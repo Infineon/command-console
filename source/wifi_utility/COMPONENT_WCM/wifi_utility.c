@@ -1,10 +1,10 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -137,7 +137,7 @@ cy_rslt_t wifi_utility_init(void)
     res = cy_wcm_init(&wcm_config);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to initialize Wi-Fi module. Res:%lu\n", res));
+        WIFI_ERROR(("Failed to initialize Wi-Fi module. Res:%u\n", (unsigned int)res));
         return res;
     }
     WIFI_INFO(("Wi-Fi module initialized...\n"));
@@ -172,7 +172,7 @@ int join(int argc, char* argv[], tlv_buffer_t** data)
         res = cy_wcm_connect_ap(&connect_params, &ip_addr);
         if(res != CY_RSLT_SUCCESS)
         {
-            WIFI_INFO(("Failed to join AP [%lu]. Retrying...\n", res));
+            WIFI_INFO(("Failed to join AP [%u]. Retrying...\n", (unsigned int)res));
             continue;            
         }
         wifi_connected = true;
@@ -203,7 +203,7 @@ int leave(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_disconnect_ap();
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to disconnect from AP. Res:%lu", res));
+        WIFI_ERROR(("Failed to disconnect from AP. Res:%u", (unsigned int)res));
         return -1;
     }
 
@@ -222,7 +222,7 @@ int scan(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_start_scan(scan_result_cb, NULL, NULL);
     if(res != CY_RSLT_SUCCESS && res != CY_RSLT_WCM_SCAN_IN_PROGRESS)
     {
-        WIFI_ERROR(("Error while scanning. Res: %lu", res));
+        WIFI_ERROR(("Error while scanning. Res: %u", (unsigned int)res));
         return -1;
     }
 
@@ -261,11 +261,11 @@ int ping(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_ping(CY_WCM_INTERFACE_TYPE_STA, &ip_addr, timeout_ms, &elapsed_ms);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Ping failed. Error: %lu\n", res));
+        WIFI_ERROR(("Ping failed. Error: %u\n", (unsigned int)res));
         return -1;
     }
 
-    WIFI_INFO(("Ping successful. Elapsed time: %lu (ms)\n", elapsed_ms));
+    WIFI_INFO(("Ping successful. Elapsed time: %u (ms)\n", (unsigned int)elapsed_ms));
 
     return 0;
 }
@@ -278,7 +278,7 @@ int get_rssi(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_get_associated_ap_info(&ap_info);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to get RSSI. Res:%lu\n", res));
+        WIFI_ERROR(("Failed to get RSSI. Res:%u\n", (unsigned int)res));
         return -1;
     }
     WIFI_INFO(("RSSI: %d dBm\n", ap_info.signal_strength));
@@ -379,19 +379,40 @@ int convert_to_wcm_connect_params(int argc, char* argv[], cy_wcm_connect_params_
 int wifi_utils_str_to_ip(char* ip_str, cy_wcm_ip_address_t* ip_addr)
 {
     int bytes[CMD_CONSOLE_IPV4_ADDR_SIZE];
-    char* p;
+    char* p = NULL;
+    char* rest = NULL;
     int i = 0;
     char* delimiter = ".";
 
-    p = strtok (ip_str, delimiter);
+    if((ip_str == NULL)||(ip_addr == NULL))
+    {
+        WIFI_ERROR(("Invalid parameter.\n"));
+        return -1;
+    }
+    memset(&bytes, 0x00, sizeof(bytes));
+    rest = ip_str;
+    p = strtok_r (rest, delimiter, &rest);
+    if(p == NULL)
+    {
+        WIFI_ERROR(("Invalid IP Addr.\n"));
+        return -1;
+    }
     bytes[i] = atoi(p);
     WIFI_DEBUG(("bytes[%d]:%d\n", i, bytes[i]));
-    while(p != NULL && i < CMD_CONSOLE_IPV4_ADDR_SIZE)
+    while(p != NULL)
     {
         ++i;
-        p = strtok (NULL, delimiter);
-        bytes[i] = atoi(p);
-        WIFI_DEBUG(("bytes[%d]:%d\n", i, bytes[i]));
+        p = strtok_r (rest, delimiter, &rest);
+        if(i < CMD_CONSOLE_IPV4_ADDR_SIZE)
+        {
+            if(p == NULL)
+            {
+                WIFI_ERROR(("Invalid IP Addr.\n"));
+                return -1;
+            }
+            bytes[i] = atoi(p);
+            WIFI_DEBUG(("bytes[%d]:%d\n", i, bytes[i]));
+        }
     }
 
     if(i != (CMD_CONSOLE_IPV4_ADDR_SIZE))

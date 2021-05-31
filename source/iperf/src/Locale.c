@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -110,11 +110,12 @@ Client/Server:\n\
   -i, --interval  #         seconds between periodic bandwidth reports\n\
   -l, --len       #[kmKM]   length of buffer in bytes to read or write (Defaults: TCP=128K, v4 UDP=1470, v6 UDP=1450)\n\
   -p, --port      #         server port to listen on/connect to\n\
-  -u, --udp                 use UDP rather than TCP\n"
+  -u, --udp                 use UDP rather than TCP\n\
+  -b, --bandwidth #[kmgKMG | pps]  bandwidth to send at in bits/sec or packets per second for UDP client\n"
 #ifdef HAVE_SEQNO64b
 "      --udp-counters-64bit use 64 bit sequence numbers with UDP\n"
 #endif
-"  TCP Window size can be configured through network stack configuration \n\
+"  -w, --window TCP window size is not supported through run time option, however user can configure the TCP Window size at the build time using the below instructions \n\
    MBED OS:\n\
    Update the following configurations in 'mbed_app.json' \n\
    1. For server, modify/add the below lines to change the TCP window size with pbuf pool size: \n\

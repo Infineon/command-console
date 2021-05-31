@@ -56,6 +56,9 @@ using namespace Isochronous;
 FrameCounter::FrameCounter(double value)  : frequency(value) {
     period = (unsigned int) (1000000 / frequency);
     lastcounter = 0;
+    /* IPERF_MODIFIED Start */
+    slip = 0;
+    /* IPERF_MODIFIED End */
 }
 
 unsigned int FrameCounter::get(long *ticks_remaining) {

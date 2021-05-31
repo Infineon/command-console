@@ -1,10 +1,10 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -43,9 +43,6 @@
 #include "gettimeofday.h"
 #include <FreeRTOS.h>
 #include <task.h>
-#include "cy_iperf_rtc.h"
-
-static bool rtc_enabled = false;
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,19 +50,12 @@ extern "C" {
 
 int afr_gettimeofday(struct timeval* tv, void* timezone)
 {
-    if(!rtc_enabled)
-    {
-        rtc_init();
-        rtc_write(0);
-        rtc_enabled = true;
-    }
+    cy_time_t time_ms;
 
-    time_t t = (time_t)-1;
-
-    t = rtc_read();
-
-    tv->tv_sec = (long) t;
-    tv->tv_usec = (long) ((t - tv->tv_sec) * 1e6);
+    (void)timezone; /* Unused parameter */
+    (void) cy_rtos_get_time(&time_ms);
+    tv->tv_sec =  ( time_ms / 1000 );
+    tv->tv_usec = ( time_ms - ( tv->tv_sec * 1000 ) ) * 1000;
 
     return 0;
 }

@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -149,57 +149,98 @@ BOOL WINAPI sig_dispatcher( DWORD type );
 void warn      ( const char *inMessage, const char *inFile, int inLine );
 void warn_errno( const char *inMessage, const char *inFile, int inLine );
 
-#if defined( HAVE_POSIX_THREAD ) || defined( HAVE_WIN32_THREAD)
-#define FAIL( cond, msg, settings )             \
-  do {                                          \
-    if ( cond ) {                               \
-      warn( msg, __FILE__, __LINE__ );          \
-      thread_stop(settings);                    \
-    }                                           \
-  } while( 0 )
+/*
+ * The STRINGIFY and TOSTRING macros were adopted from
+ * http://www.decompile.com/cpp/faq/file_and_line_error_string.htm
+ */
+#define STRINGIFY(x) #x
+#define TOSTRING(x)  STRINGIFY( x )
+
+/** Print a standard message to the console */
+#define IPERF_BASIC_MSG(msg) do { printf msg; } while(0)
+
+/*
+ * Print a message to the console, together with the file name and line number 
+ * from which the message originated, and the thread number of the thread that
+ * is printing the message.
+ */
+#include "iperf_thread.h"
+#define IPERF_DETAILED_MSG(msg)                                   \
+	    IPERF_BASIC_MSG(("[" __FILE__ ":" TOSTRING(__LINE__) "]: "));       \
+	    IPERF_BASIC_MSG(("{Thread %lu} ", (unsigned long) thread_getid())); \
+	    IPERF_BASIC_MSG(msg)
+
+#ifdef NDEBUG
+    /*
+     * If we are not in debug build, then we want nice-looking messages.
+     */
+    #define IPERF_MSG(msg) IPERF_BASIC_MSG(msg)
 #else
-#define FAIL( cond, msg, settings )             \
-  do {                                          \
-    if ( cond ) {                               \
-      warn( msg, __FILE__, __LINE__ );          \
-      exit( 1 );                                \
-    }                                           \
-  } while( 0 )
-#endif
+    /*
+     * In debug messages, we want messages that contain some extra useful 
+     * information, hence we will use IPERF_DETAILED_MSG instead of IPERF_MSG.
+     */
+    #define IPERF_MSG(msg) IPERF_DETAILED_MSG(msg)
+#endif /* NDEBUG */
 
-#define WARN( cond, msg )                       \
-  do {                                          \
-    if ( cond ) {                               \
-      warn( msg, __FILE__, __LINE__ );          \
-    }                                           \
-  } while( 0 )
 
-#if defined( HAVE_POSIX_THREAD ) || defined( HAVE_WIN32_THREAD)
-#define FAIL_errno( cond, msg, settings )       \
-  do {                                          \
-    if ( cond ) {                               \
-      warn_errno( msg, __FILE__, __LINE__ );    \
-      thread_stop(settings);                    \
-    }                                           \
-  } while( 0 )
-#else
-#define FAIL_errno( cond, msg, settings )       \
-  do {                                          \
-    if ( cond ) {                               \
-      warn_errno( msg, __FILE__, __LINE__ );    \
-      /* IPERF_MODIFIED Start */                \
-      cy_rtos_exit_thread();                    \
-      /* IPERF_MODIFIED End */                  \
-    }                                           \
-  } while( 0 )
-#endif
+/* FAIL */
+    #ifdef HAVE_THREAD
+        #define FAIL(cond, msg, settings)  \
+            do {                           \
+                if (cond) {                \
+                    IPERF_MSG(msg);        \
+                    thread_stop(settings); \
+                }                          \
+            } while (0)
+    #else
+        #define FAIL(cond, msg, settings)  \
+            do {                           \
+                if (cond) {                \
+                    printf((msg));         \
+                    cy_rtos_exit_thread(); \
+                }                          \
+            } while (0)
+    #endif /* HAVE_THREAD */
 
-#define WARN_errno( cond, msg )                 \
-  do {                                          \
-    if ( cond ) {                               \
-      warn_errno( msg, __FILE__, __LINE__ );    \
-    }                                           \
-  } while( 0 )
+/* WARN */
+    #define WARN(cond, msg)     \
+        do {                    \
+            if (cond) {         \
+                printf((msg));  \
+            }                   \
+        } while (0)
+
+/* FAIL_errno */
+    #ifdef HAVE_THREAD
+        #define FAIL_errno(cond, msg, settings) \
+            do {                                \
+                if (cond) {                     \
+                    IPERF_MSG(msg);             \
+                    thread_stop(settings);      \
+                }                               \
+            } while (0)
+    #else
+        #define FAIL_errno(cond, msg, settings) \
+            do {                                \
+                if (cond) {                     \
+                    printf((msg));              \
+                    cy_rtos_exit_thread();      \
+                }                               \
+            } while (0)
+    #endif /* HAVE_THREAD */
+
+/* WARN_errno */
+    #define WARN_errno(cond, msg) \
+        do {                      \
+            if (cond) {           \
+                printf((msg));    \
+            }                     \
+        } while (0)
+
+#ifndef UNUSED_PARAMETER
+#define UNUSED_PARAMETER(x) (void) x
+#endif /* UNUSED_PARAMETER */
 
 /* -------------------------------------------------------------------
  * initialize buffer to a pattern

@@ -1,10 +1,10 @@
 /*
-* Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
-* Cypress Semiconductor Corporation. All Rights Reserved.
+* Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
-* materials ("Software"), is owned by Cypress Semiconductor Corporation
-* or one of its subsidiaries ("Cypress") and is protected by and subject to
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
 * worldwide patent protection (United States and foreign),
 * United States copyright laws and international treaty provisions.
 * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
 * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
 * non-transferable license to copy, modify, and compile the Software
 * source code solely for use in connection with Cypress's
-* integrated circuit products. Any reproduction, modification, translation,
+* integrated circuit products.  Any reproduction, modification, translation,
 * compilation, or representation of this Software except as specified
 * above is prohibited without the express written permission of Cypress.
 *
@@ -665,6 +665,13 @@ _gnu_getopt_internal( int argc,
 
             /* Test all long options for either exact match
                or abbreviated matches.  */
+            /* IPERF_MODIFIED Start */
+            /*
+            * FALSE-POSITIVE: CID 294205: Dereference after null check (FORWARD_NULL)
+            * Reason:
+            * longopts variable NULL check is already done at the begining of this for loop.
+            */
+            /* IPERF_MODIFIED End */
             for ( p = longopts, option_index = 0; p->name; p++, option_index++ )
                 if ( !strncmp (p->name, nextchar, nameend - nextchar) ) {
                     if ( (unsigned int) (nameend - nextchar) == strlen (p->name) ) {

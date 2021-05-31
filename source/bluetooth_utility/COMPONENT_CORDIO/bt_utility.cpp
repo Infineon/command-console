@@ -1,10 +1,10 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
- * Cypress Semiconductor Corporation. All Rights Reserved.
+ * Copyright 2021, Cypress Semiconductor Corporation (an Infineon company) or
+ * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
- * materials ("Software"), is owned by Cypress Semiconductor Corporation
- * or one of its subsidiaries ("Cypress") and is protected by and subject to
+ * materials ("Software") is owned by Cypress Semiconductor Corporation
+ * or one of its affiliates ("Cypress") and is protected by and subject to
  * worldwide patent protection (United States and foreign),
  * United States copyright laws and international treaty provisions.
  * Therefore, you may use this Software only as provided in the license
@@ -13,7 +13,7 @@
  * If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
  * non-transferable license to copy, modify, and compile the Software
  * source code solely for use in connection with Cypress's
- * integrated circuit products. Any reproduction, modification, translation,
+ * integrated circuit products.  Any reproduction, modification, translation,
  * compilation, or representation of this Software except as specified
  * above is prohibited without the express written permission of Cypress.
  *
@@ -57,9 +57,19 @@ extern "C" {
 #define BT_LE_DEBUG(X)            //printf X
 #define BT_LE_ERROR(X)            printf X
 
-#define LE_COC_NAME_LEN           6
-#define L2CAP_COC_PSM_USED        19
-#define L2CAP_COC_MTU             100
+#ifndef BLE_COC_MTU_SIZE
+#define BLE_COC_MTU_SIZE               (100)
+#endif
+#ifndef BLE_CONNECTION_INTERVAL
+#define BLE_CONNECTION_INTERVAL        (40)
+#endif
+#define LE_COC_NAME_LEN                (6)
+#define L2CAP_COC_PSM_USED             (19)
+#define LE_DEFAULT_SUPERVISION_TIMEOUT (100)
+
+#if(BLE_COC_MTU_SIZE > 512)
+#error Maximum value of BLE_COC_MTU_SIZE that can be configured is 512
+#endif
 
 /******************************************************
  *                    Constants
@@ -71,7 +81,7 @@ static bool le_coc_connect_pending = false;
 static uint16_t le_coc_conn_id = DM_CONN_ID_NONE;
 
 // LE COC MTU
-static int le_coc_mtu = L2CAP_COC_MTU;
+static int le_coc_mtu = BLE_COC_MTU_SIZE;
 
 // LE COC PSM
 static int le_coc_psm = L2CAP_COC_PSM_USED;
@@ -138,8 +148,8 @@ const cy_command_console_cmd_t bt_coex_command_table[] =
 // Default LE COC Registration param structure.
 l2cCocReg_t l2c_coc_reg = {
     .psm = L2CAP_COC_PSM_USED,
-    .mps = L2CAP_COC_MTU,
-    .mtu = L2CAP_COC_MTU,
+    .mps = BLE_COC_MTU_SIZE,
+    .mtu = BLE_COC_MTU_SIZE,
     .credits = 4,
     .authoriz = 0,
     .secLevel = 0,
@@ -318,12 +328,19 @@ private:
         if(le_coc_device_found)
          {
              _ble.gap().stopScan();
-             if ( _ble.gap().connect(event.getPeerAddressType(), event.getPeerAddress(), ble::ConnectionParameters()) == BLE_ERROR_NONE)
+             ble::phy_t phy = ble::phy_t::LE_1M;
+             ble::conn_interval_t minConnectionInterval = ble::conn_interval_t(BLE_CONNECTION_INTERVAL);
+             ble::conn_interval_t maxConnectionInterval = ble::conn_interval_t(BLE_CONNECTION_INTERVAL);
+             ble::slave_latency_t slaveLatency = ble::slave_latency_t::min();
+             ble::supervision_timeout_t connectionSupervisionTimeout = ble::supervision_timeout_t(LE_DEFAULT_SUPERVISION_TIMEOUT);
+             ble::conn_event_length_t minEventLength = ble::conn_event_length_t::min();
+             ble::conn_event_length_t maxEventLength = ble::conn_event_length_t::max();
+             if (_ble.gap().connect(event.getPeerAddressType(), event.getPeerAddress(),
+                  ble::ConnectionParameters().setConnectionParameters(phy, minConnectionInterval, maxConnectionInterval, slaveLatency, connectionSupervisionTimeout, minEventLength, maxEventLength)) == BLE_ERROR_NONE)
              {
-                 BT_LE_INFO(("gap().connect is successfull \n"));
+                     BT_LE_INFO(("gap().connect is successfull \n"));
              }
          }
-
     }
     virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event)
     {

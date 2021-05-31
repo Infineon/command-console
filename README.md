@@ -1,112 +1,135 @@
-# Command Console Library
+# Command console library
 
 ## Introduction
 
-This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf, and Bluetooth Low Energy (BLE) commands is bundled with this library.
+This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf, and Bluetooth Low Energy commands are bundled with this library.
 
-[ModusToolbox® AnyCloud Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/mbed-os-wifi-bluetooth-tester), and [AFR Wi-Fi Bluetooth Tester](https://github.com/cypresssemiconductorco/afr-wifi-bluetooth-tester) applications are built over this library.
+[ModusToolbox&trade; AnyCloud Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/mbed-os-wifi-bluetooth-tester), and [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/afr-wifi-bluetooth-tester) applications are built over this library.
 
 ## Features
 
-- Supports Wi-Fi commands to perform network operations such as scan and join.
+- Supports Wi-Fi commands to perform network operations such as scan and join
 
 - Integrates iPerf 2.0 commands. iPerf is a tool for active measurements of the maximum achievable bandwidth on IP networks.
 
-- Supports TCP client/server and UDP client/server on IPv4. Supports a single instance of iPerf client and server. IPv6 support will be added in the future.
+  **Note:** While iPerf provides several other commands, only a subset of commands that are relevant to embedded connectivity use cases is enabled in this library. See the [iPerf commands](#iperf-commands) section.
 
-- Supports Bluetooth LE commands including Tx/Rx for measuring BLE throughput.
+- Supports TCP client/server and UDP client/server on IPv4. Supports a single instance of the iPerf client and server. IPv6 support will be added in the future.
 
-**Note:** While iPerf provides several other commands, only a subset of commands that are relevant to embedded connectivity use cases is enabled in this library. See the [Supported iPerf Commands](#supported-iperf-commands) section.
+- Supports Bluetooth&reg; LE commands including Tx/Rx for measuring Bluetooth&reg; LE throughput
 
-## Supported Platforms
+## Supported platforms
+
+This library is supported on the following list of platforms/frameworks.
 
 ### AnyCloud
 
-- [PSoC® 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
 
-- [PSoC 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
 
 ### Mbed OS
 
-- [PSoC 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
 
-- [PSoC 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
 
-### Amazon FreeRTOS
+### FreeRTOS
 
-- [PSoC 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
 
-- [PSoC 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
 
-## Supported Frameworks
+## Supported frameworks
 
 This library supports the following frameworks:
 
-- **AnyCloud Framework:** AnyCloud is an Amazon FreeRTOS-based solution. The Command Console Library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/cypresssemiconductorco/secure-sockets) library for implementing socket functions. For the BLE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
+- **AnyCloud framework:** AnyCloud is a FreeRTOS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/cypresssemiconductorco/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
 
-- **Mbed Framework:** The Mbed framework is an Mbed OS-based solution. The Command Console Library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the BLE functionality, it uses the Cordio BLE stack in Mbed OS.
+- **Mbed framework:** The Mbed framework is an Mbed OS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the Bluetooth&reg; functionality, it uses the Cordio Bluetooth&reg; LE stack in Mbed OS.
 
-- **Amazon FreeRTOS (AFR) Framework:** AFR is an Amazon FreeRTOS-based solution. The Command Console Library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Amazon FreeRTOS Framework network abstraction and lwIP library for implementing socket functions. For the BLE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
+- **FreeRTOS framework:** This is a FreeRTOS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the FreeRTOS framework network abstraction and lwIP library for implementing socket functions. For the Bluetooth&reg; functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
 
 ## Dependencies
 
-This section provides the list of dependent libraries required for this middleware library to work on AnyCloud and Arm® Mbed OS IoT frameworks.
+This section provides the list of dependent libraries required for this middleware library to work on AnyCloud FreeRTOS and Arm® Mbed OS IoT frameworks.
 
 ### AnyCloud
 
-- [Wi-Fi Connection Manager](https://github.com/cypresssemiconductorco/wifi-connection-manager)
+- [Wi-Fi connection manager](https://github.com/cypresssemiconductorco/wifi-connection-manager)
 
-- [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos)
+- [Bluetooth&reg; stack for FreeRTOS](https://github.com/cypresssemiconductorco/bluetooth-freertos)
 
 ### Mbed OS
 
-- [Arm Mbed OS 6.2.0 and above](https://os.mbed.com/mbed-os/releases)
+- [Arm&reg; Mbed OS 6.2.0](https://os.mbed.com/mbed-os/releases)
 
-- [Connectivity Utilities Library](https://github.com/cypresssemiconductorco/connectivity-utilities)
+- [Connectivity utilities library](https://github.com/cypresssemiconductorco/connectivity-utilities/releases/tag/latest-v3.X)
 
-### Amazon FreeRTOS
+### FreeRTOS
 
-- [Amazon FreeRTOS](https://github.com/cypresssemiconductorco/amazon-freertos)
+- [FreeRTOS](https://github.com/cypresssemiconductorco/amazon-freertos)
 
-- [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos)
+- [Bluetooth&reg; stack for FreeRTOS](https://github.com/cypresssemiconductorco/bluetooth-freertos)
 
-## Quick Start
+## Quick start
 
-This library is supported on AnyCloud, Mbed OS, and Amazon FreeRTOS frameworks. See the following section to build the library in those frameworks.
+This library is supported on AnyCloud, Mbed OS, and FreeRTOS frameworks. See the following section to build the library in those frameworks.
 
 ### AnyCloud
 
-A set of pre-defined configuration files have been bundled with the wifi-mw-core library for Amazon FreeRTOS, lwIP, and mbed TLS. Review the configuration and make the required adjustments. See the "Quick Start" section in [README.md](https://github.com/cypresssemiconductorco/wifi-mw-core/blob/master/README.md).
+1. A set of pre-defined configuration files have been bundled with the wifi-mw-core library for FreeRTOS, lwIP, and mbed TLS libraries. Review the configuration files and make required adjustments for your application/product use case. See the [Wi-Fi middleware core library - quick start](https://github.com/cypresssemiconductorco/wifi-mw-core#quick-start) section.
 
-1. Define the following COMPONENTS in the application's Makefile for the HTTP Server Library. For additional information, see the "Quick Start" section in [README.md](https://github.com/cypresssemiconductorco/wifi-mw-core/blob/master/README.md).
+2. Define the following COMPONENTS in the application's Makefile which are relevant for this library. For additional information, see the [Wi-Fi middleware core library - quick start](https://github.com/cypresssemiconductorco/wifi-mw-core#quick-start) section.
 
    ```
    COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
    ```
 
-2. To enable BLE functionality, add `WICED_BLE` to the `COMPONENTS` section in the application's Makefile:
+3. To enable the Bluetooth&reg; LE functionality, add `WICED_BLE` to the `COMPONENTS` section in the application's Makefile:
 
    ```
    COMPONENTS=WICED_BLE
    ```
 
-3. Add the following compiler directives to the `DEFINES` section in the application's Makefile:
+4. Add the following compiler directives to the `DEFINES` section in the application's Makefile:
 
    ```
    DEFINES=HAVE_SNPRINTF
    ```
 
-4. Tune the lwIP configuration parameters depending on the required Wi-Fi throughput and use case.
+5. Tune the lwIP configuration parameters listed in application's *lwipopts.h* file, depending on the required Wi-Fi throughput and use case.
+
 
 ### Mbed OS
 
-1. Add `MBED` to the *components_add* section in the code example's JSON file. The JSON file entry would look like as follows:
+1. Add the .lib file(s) for dependent libraries:
+
+   1. Create a folder named "deps".
+
+   2. Create a file with the name "mbed-os.lib" and add the following line to this file. The SHA given below points to the **mbed-os-6.2.0** release:
+      ```
+      https://github.com/ARMmbed/mbed-os/#a2ada74770f043aff3e61e29d164a8e78274fcd4
+      ```
+   3. Create a file with the name "connectivity-utilities.lib" and add the following line to this file:
+      ```
+      https://github.com/cypresssemiconductorco/connectivity-utilities/#<commit-SHA-for-latest-release-v3.X>
+      ```
+   4. Replace `<commit-SHA-for-latest-release-v3.X>` in the above line with the commit SHA of the latest-v3.X tag available in the [connectivity utilities library - release](https://github.com/cypresssemiconductorco/connectivity-utilities/releases).
+
+      Example: For tag `release-v3.0.2`
+
+      ```
+      https://github.com/cypresssemiconductorco/connectivity-utilities/#bbed663a71670b02d362c6f1bd69fe970ff814ec
+      ```
+
+2. Add `MBED` to the *components_add* section in the code example's JSON file. The JSON file entry would look like as follows:
 
    ```
    "target.components_add": ["MBED"]
    ```
 
-2. The BLE Command Utility is supported on Mbed Cordio BLE stack and the WICED® BT Stack.
+3. The Bluetooth&reg; LE command utility is supported on Mbed Cordio Bluetooth&reg; LE stack and the WICED&trade; Bluetooth&reg; Stack.
 
    - To use the Mbed Cordio stack, add `CORDIO` to the list of components as follows:
 
@@ -114,45 +137,138 @@ A set of pre-defined configuration files have been bundled with the wifi-mw-core
       "target.components_add" : ["MBED", "CORDIO"]
       ```
 
-   - To use the WICED BT stack, do the following:
+   - To use the WICED&trade; Bluetooth&reg; stack, do the following:
 
-     - Add the following to the *target_overrides* section of the *mbed_app.json* file:
+     1. Add the following to the *target_overrides* section of the *mbed_app.json* file:
 
         ```
         "target.extra_labels_remove": ["CORDIO"],
         "target.features_remove": ["BLE"]
         ```
-     - Add `WICED_BLE` in the list of components as follows:
+     2.  Add `WICED_BLE` in the list of components as follows:
 
-       ```
-       "target.components_add" : ["MBED", "WICED_BLE"]
-       ```
+         ```
+         "target.components_add" : ["MBED", "WICED_BLE"]
+         ```
 
-3. Tune the lwIP configuration parameters depending on the required Wi-Fi throughput and use case.
+4. Tune the lwIP configuration parameters listed in the application's *lwipopts.h* file, depending on the required Wi-Fi throughput and use case.
 
-### Amazon FreeRTOS
+### FreeRTOS
 
-1. All configurations for the Command Console library on AFR are set by the values defined in the config files of the application.
+All the configurations required for the command console library on FreeRTOS are set by the values defined in the *afr-wifi-bluetooth-tester/config_files/* files of the [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/afr-wifi-bluetooth-tester) application.
 
-   Config files for the afr-wifi-bluetooth-tester application, are in the *afr-wifi-bluetooth-tester/config_files/*.
+## Commands supported
 
-## Supported iPerf Commands
+This section lists the Wi-Fi and Bluetooth&reg; LE commands that are natively supported by the command console library.
 
-The following commands are supported by the iPerf library integrated into the Command Console. On the console, type `iperf --help` to list the supported commands.
+### Wi-Fi commands
 
-**Note:** The `-w` command is not supported through the command line option; it can be only configured by changing network stack configuration.
+#### *Basic Wi-Fi commands*
+
+Use the following Wi-Fi commands to perform network operations. Enter the following commands after the device boots up and the Wi-Fi module is initialized and ready.
+
+1. Scan for nearby networks:
+   ```
+   > scan
+	```
+
+2. Connect to a network AP:
+   ```
+   > join <ssid> <security type> [password] [channel]
+   ```
+
+3. Disconnect from the network AP:
+   ```
+   > leave
+	```
+
+4. Get the signal strength/RSSI of the network:
+    ```
+    > get_rssi
+    ```
+
+5. Ping another device on the network:
+    ```
+    > ping <ip address>
+    ```
+   **Note:** This command is not supported on Mbed.
+
+### iPerf commands
+
+iPerf commands are used for measuring the Wi-Fi performance/throughput. The _iperf_ sends TCP/UDP data between two peer devices to compute the Wi-Fi performance/throughput.
+
+#### iPerf command options
+
+The following options are supported by the iPerf software integrated into this library. On the console, type `iperf --help` for the list of options supported by the _iperf_ command.
+
+**Note:** The `-w` command is not supported through the command line option; it can be only configured by changing the network stack configuration. See the following notes to configure the TCP window size.
 
 ```
 > iperf --help
+
   Usage: iperf [-s|-c host] [options]
          iperf [-h|--help] [-v|--version]
 
    Client/Server:
-   -i, --interval  #         seconds between periodic bandwidth reports
-   -l, --len       #[kmKM]   length of buffer in bytes to read or write (Defaults: TCP=128K, v4 UDP=1470, v6 UDP=1450)
-   -p, --port      #         server port to listen on/connect to
-   -u, --udp                 use UDP rather than TCP
+   -i, --interval  #         Seconds between periodic bandwidth reports
+   -l, --len       #[kmKM]   Length of buffer in bytes to read or write (Defaults: TCP=128K, v4 UDP=1470, v6 UDP=1450)
+   -p, --port      #         Server port to listen on/connect to
+   -u, --udp                 Use UDP rather than TCP
+   -b, --bandwidth #[kmgKMG | pps]  Bandwidth to send at in bits/sec or packets per second for UDP client
+
+   Note:
+   -w, --window              TCP window size is not supported through run time option; however, you can configure the TCP window size \n
+                             at the build time using the following instructions. The values given for the macros/configurations in the following  section\n
+                             are just an example for reference, the actual values of the macros/configuration may vary with your mbed_app.json (or) *lwipopts.h* file.
    ```
+
+   #### Mbed OS:
+
+   Update the following configurations in *mbed_app.json*:
+
+   1. For the server, modify/add the following configurations with a suitable value to change the TCP window size and pbuf pool size:
+
+      \"lwip.tcp-wnd\": (TCP_MSS * 20)
+      \"lwip.pbuf-pool-size\": 20
+
+   2. For the client, modify the following configurations with a suitable value to change the TCP send buffer size:
+
+      \"lwip.tcp-snd-buf\": (TCP_MSS * 20)
+      \"lwip.memp-num-tcp-seg\": 127
+
+
+   #### AnyCloud:
+
+   Update the following configurations in the application's config file (For example, *mtb-anycloud-wifi-bluetooth-tester/lwipopts.h*)
+
+   1. For the server, modify/add the following macros with a suitable value to change the TCP window size and pbuf pool size:
+      ```
+      #define TCP_WND (TCP_MSS * 20)
+      #define PBUF_POOL_SIZE 20
+      ```
+
+   2. For the client, modify the following macros with a suitable value to change the TCP send buffer size:
+
+      ```
+      #define TCP_SND_BUF (TCP_MSS * 20)
+      #define MEMP_NUM_TCP_SEG 127
+      ```
+
+   #### FreeRTOS:
+
+   Update the following configurations in the application's config file (For example, *afr-wifi-bluetooth-tester/config_files/lwipopts.h*).
+
+   1. For the server, modify the following macros with a suitable value to change the TCP window size and pbuf pool size:
+
+      ```
+      #define TCP_WND (TCP_MSS * 20)
+      #define PBUF_POOL_SIZE 20
+      ```
+
+   2. For the client, modify the following macro with a suitable value to change the TCP send buffer size:
+      ```
+      #define TCP_SND_BUF (TCP_MSS * 20)
+      ```
 
    *Server-specific:*
 
@@ -168,6 +284,7 @@ The following commands are supported by the iPerf library integrated into the Co
    -n, --num       #[kmgKMG]    number of bytes to transmit (instead of -t)
    -t, --time      #        time in seconds to transmit for (default 10 secs)
    ```
+
    *Miscellaneous:*
 
    ```
@@ -176,238 +293,284 @@ The following commands are supported by the iPerf library integrated into the Co
    -h, --help               print this message and quit
    -v, --version            print version information and quit
    ```
+
 **Note:** On Mbed OS, the iPerf command line option `-l` has a max limit of 60 KB (per packet) for data transfer.
 
-Use the network stack configuration to set the TCP window size:   
-**Mbed OS:**
+### iPerf setup
 
-Update the following configurations in *mbed_app.json*:
+The following diagram shows the exact setup that should be used for measuring the Wi-Fi performance/throughput of a PSoC&trade; device using _iperf_.
 
-1. For the TCP server, modify/add the following lines to change the TCP window size with the packet buffer (PBUF) pool size:
-   ```
-   "lwip.tcp-wnd": (TCP_MSS * 20)
-   "lwip.pbuf-pool-size": 20
-   ```
-2. For the TCP client, modify the following line to change the TCP send buffer size:
-   ```
-   "lwip.tcp-snd-buf": (TCP_MSS * 20)
-   "lwip.memp-num-tcp-seg": 127
-   ```
-**AnyCloud:**
+![iPerf setup - Wi-Fi throughput measurement](images/iperf-setup.png)
 
-Update the following configurations in the application's config file (For example, *mtb-anycloud-wifi-bluetooth-tester/lwipopts.h*):
 
-1. For the TCP server, modify/add the following lines to change the TCP window size and PBUF pool size:
+### iPerf commands for Wi-Fi throughput measurement
 
-   ```
-   #define TCP_WND (TCP_MSS * 20)
-   #define PBUF_POOL_SIZE 21
-   ```
-2. For the TCP client, modify the following line to change the TCP send buffer size:
-
-   ```
-   #define TCP_SND_BUF (TCP_MSS *20)
-   #define MEMP_NUM_TCP_SEG 127
-   ```
-
-**Amazon FreeRTOS:**
-
-Update the following configurations in the application's config file (For example, *afr-wifi-bluetooth-tester/config_files/lwipopts.h*):
-
-   1. For the TCP server, modify the following lines to change the TCP window size and PBUF pool size:
-
-      ```
-      #define TCP_WND (TCP_MSS * 20)
-      #define PBUF_POOL_SIZE 20
-      ```
-   2. For the TCP client, modify the following line to change the TCP send buffer size:
-
-      ```
-      #define TCP_SND_BUF (TCP_MSS * 20)
-      ```
-
-## Operation
-
-Use the following Wi-Fi commands to perform network operations. Enter the following commands after the device boots up and the Wi-Fi module is initialized and ready.
-
-1. Scan for nearby networks:
-   ```
-   >scan
-	```
-
-2. Connect to a network AP:
-   ```
-   >join <ssid> <security type> [password] [channel]
-	```
-
-3. Disconnect from the network AP:
-   ```
-   >leave
-	```
-
-4. Get the signal strength / RSSI of the network:
-   ```
-   >get_rssi
-	```
-
-5. Ping another device on the network:
-   ```
-   >ping <ip address>
-    ```
-   **Note:** This command is not supported on Mbed.
-
-### Run iPerf Client and Server Against a Remote Peer Device
-
-Enter the following commands after the device boots up and connects to the configured AP.
+Enter the following commands on the PSoC&trade; device (DUT) after the device boots up and connects to the Wi-Fi network. This section provides only the commands to be run on the DUT. When the 'client _iperf_ command' runs on the DUT, the 'server _iperf_ command' should run on the host PC (as shown in the iPerf Setup diagram), and vice versa.
 
 1. Start iPerf as a TCP server:
-   ```
-   >iperf -s
-   ```
-   **Note:** On the peer device, start iPerf as a TCP client and send the TCP IPv4 data from the client.
+	```
+	> iperf -s
+	```
+   **Note:** On the peer iPerf device (host PC), start iPerf as a TCP client to send the TCP data.
 
 2. Start iPerf as a TCP client:
+	```
+	> iperf -c <server_ip_addr> -t <time in sec>
+	```
+	**Note:** On the peer iPerf device (host PC), start iPerf as a TCP server.
 
-   ```
-	>iperf -c <server_ip_addr>
-   ```
-   **Note:** On the peer device, start iPerf as server. It must be on the same subnet as the client.
+   Sample command:
+	```
+	> iperf -c 192.168.0.100 -t 60
+	```
 
 3. Start iPerf as a UDP server:
-   ```
-   >iperf -s -u
-   ```
+	```
+	> iperf -s -u
+	```
+   **Note:** On the peer iPerf device (host PC), start iPerf as a UDP client to send the UDP data.
 
 4. Start iPerf as a UDP client:
-   ```
-   >iperf -c <server_ip_addr> -u
-   ```
+	```
+	> iperf -c <server_ip_addr> -t <time in sec> -u -b <band width>
+	```
+   **Note:** On the peer iPerf device (host PC), start iPerf as a UDP server.
 
-### Run BLE Commands Against a Remote Peer Device
+   Sample command:
+	```
+	> iperf -c 192.168.0.100 -t 60 -u -b 50M
+	```
 
-As an example, use the LE Connection-oriented Channel (CoC) application on a CYW20719B2Q40EVB-01 kit as the remote device.
+## Tuning for optimal Wi-Fi performance
 
-The following BLE commands are supported:
+The TCP and UDP Wi-Fi performance can be tuned using the _iperf_ command options. The TCP window size option impacts the TCP throughput, and bandwidth option (`-b`) impacts the UDP throughput. You can tune the configurations either for TCP or UDP based on the details given in the following sections.
 
-1. Turn on Bluetooth:
-   ```
-   >bt_on
-   ```
+### Tuning the TCP throughput
 
-2. Turn off Bluetooth:
-   ```
-   >bt_off
-   ```
+The TCP window size is configured with a default optimal value in the Wi-Fi Bluetooth&reg; tester applications for PSoC&trade; 6 2M devices. If you are using a different PSoC&trade; device, see the [iPerf command options](#iperf-command-options) section of this document to adjust the configuration for a better TCP throughput. Note that the TCP window size of _iperf_ can be configured only at compile time.
 
-3. Start BLE advertisement:
-   ```
-   >ble_start_adv
-   ```
+### Tuning the UDP throughput
 
-4. Stop BLE advertisement:
-   ```
-   >ble_stop_adv
-   ```
+The iPerf command given in the [iPerf commands for Wi-Fi throughput measurement](#iperf-commands-for-wi-fi-throughput-measurement) section of this document is an ideal command for UDP throughput measurement on PSoC&trade; 6 2M devices. If you are using a different PSoC&trade; device, try different bandwidth values for the _iperf_ `-b` option to measure the UDP throughput.
 
-5. Start BLE scan:
-   ```
-   >ble_start_scan
-   ```
+For example, when you run the command `iperf -c 192.168.0.100 -t 60 -u -b 50M` to measure the UDP Tx throughput on the device, if you see the resulting throughput closer to 50 Mbps, you should run the same command again with the `-b 60M` option and measure the throughput again. If the resulting throughput is different (56 Mbps, which is lesser than 60M, for example), the max UDP Tx throughput supported by the device is 56 Mbps. On the contrary, if the resulting throughput is 27 Mbps with the `-b 50M` option, you should run the same command again with the `-b 30M` option and measure the throughput again. If the resulting throughput in this case is 28 Mbps, this is the max UDP Tx throughput supported by the PSoC&trade; device. Use this as a guideline to identify the real max UDP throughput supported by your device.
 
-6. Stop BLE scan:
-   ```
-   >ble_stop_scan
-   ```
+## Bluetooth&reg; LE commands
 
-7. Initialize LE Connection-oriented Channel (CoC):
-   ```
-   >ble_coc_init
-   ```
+As an example, use the LE connection-oriented channel (CoC) application on a CYW20719B2Q40EVB-01 kit as the Bluetooth&reg; LE peer device to measure the Bluetooth&reg; LE throughput. Ensure that the Bluetooth&reg; LE connection-interval and LE-COC-MTU-size configurations are set to the same value in both the Bluetooth&reg; LE devices that are used for throughput measurement. To modify the Bluetooth&reg; LE connection-interval and MTU, see the [Tuning for optimal Bluetooth&reg; LE performance](#tuning-for-optimal-ble-performance) section.
 
+The following Bluetooth&reg; LE commands are supported in this library:
+
+1. Turn on Bluetooth&reg;:
+	```
+	> bt_on
+	```
+
+2. Turn off Bluetooth&reg;:
+	```
+	> bt_off
+	```
+
+3. Start Bluetooth&reg; LE advertisement:
+	```
+	> ble_start_adv
+	```
+
+4. Stop Bluetooth&reg; LE advertisement:
+	```
+	> ble_stop_adv
+	```
+
+5. Start Bluetooth&reg; LE scan:
+	```
+	> ble_start_scan
+	```
+
+6. Stop Bluetooth&reg; LE scan:
+	```
+	> ble_stop_scan
+	```
+
+7. Initialize LE connection-oriented channel (CoC):
+	```
+	> ble_coc_init
+	```
    **Note:** LE CoC will be initialized with an MTU size of 100 and local Protocol Service Multiplexer (PSM) 0x19.
 
 8. Start LE CoC advertisement:
-   ```
-   >ble_coc_adv
-   ```
+	```
+	> ble_coc_adv
+	```
 
-9. Scan and connect to a remote BLE device running the LE CoC app on the CYW20719B2Q40EVB-01 device:
-   ```
-   >ble_coc_scan_connect
-   ```
+9. Scan and connect to a remote Bluetooth&reg; LE device running the LE CoC app on the CYW20719B2Q40EVB-01 device:
+	```
+	> ble_coc_scan_connect
+	```
 
 10. Disconnect an LE CoC connection:
-    ```
-    >ble_coc_disconnect
-    ```
+	```
+	> ble_coc_disconnect
+	```
 
 11. Send LE CoC data:
-    ```
-    >ble_coc_send_start
-    ```
+	```
+	> ble_coc_send_start
+	```
 
 12. Stop sending LE CoC data:
-    ```
-    >ble_coc_send_stop
-    ```
+	```
+	> ble_coc_send_stop
+	```
 
 13. Get the throughput:
-    ```
-    >ble_get_throughput
-    ```
+	```
+	> ble_get_throughput
+	```
 
 14. Get the device address:
-    ```
-    >bt_get_device_address
-    ```
-   **Note:** This command is supported only on the WICED BLE stack and not on the Mbed Cordio stack.
+	```
+	> bt_get_device_address
+	```
+	**Note:** This command is supported only on the WICED&trade; Bluetooth&reg; LE stack and not on the Mbed Cordio stack.
 
-### Add Console Commands in an Application
+### Tuning for optimal Bluetooth&reg; LE performance
+
+Bluetooth&reg; LE performance can be tuned using the Bluetooth&reg; LE connection-interval and LE-COC-MTU-size configurations. Ensure that the Bluetooth&reg; LE  connection-interval and LE-COC-MTU-size configurations are set to the same value in both the Bluetooth&reg; LE devices that are used for throughput measurement.
+
+For a given MTU size, if the configured connection interval is low, the resulting throughput will be higher, and vice-versa.
+
+### Modifying Bluetooth&reg; LE configurations on a PSoC&trade; device
+
+**AnyCloud:** (Cypress Bluetooth&reg; stack)
+
+1. The connection interval value is configured in multiples of 1.25 milliseconds based on the connection interval assigned in the Bluetooth&reg; LE configuration structure.
+
+   By default, the library sets the Bluetooth&reg; LE connection interval configuration value to 40 which computes to a connection interval time of 50 msec (40 * 1.25 msec). The connection interval can be modified through a build macro.
+
+   Add the `BLE_CONNECTION_INTERVAL` macro to the *DEFINES* in the application's Makefile. If the connection interval needs to be set to 24, the Makefile entry would look like as follows:
+
+    ```
+    DEFINES += BLE_CONNECTION_INTERVAL=24
+    ```
+   For the range of connection interval that can be configured, see [Bluetooth&reg; LE connection interval](https://cypresssemiconductorco.github.io/btstack/ble/api_reference_manual/html/group__wiced__bt__cfg.html#ga4b1a4ba915ebe81ea7c7771f44f5cd07).
+
+2. By default, `BLE_COC_MTU_SIZE` is set to 100 bytes; the max value that can be configured is 512 bytes. To modify this to 200, do the following:
+
+   Add the `BLE_COC_MTU_SIZE` macro to the *DEFINES* in the application's Makefile. The Makefile entry would look like as follows:
+
+    ```
+    DEFINES += BLE_COC_MTU_SIZE=200
+    ```
+
+**Mbed OS:** (Cordio Bluetooth&reg; LE stack)
+
+1. The connection interval value is configured in multiples of 1.25 milliseconds based on the connection parameter class of the Cordio stack.
+
+   By default, the library sets the Bluetooth&reg; LE connection interval value to 40, which computes to a connection interval time of 50 ms (40 * 1.25 ms).
+
+   To modify the connection interval, add the `BLE_CONNECTION_INTERVAL` macro to the *macros* section of the application's *mbed_app.json*. If the connection interval needs to be set to 24, the JSON entry would look like as follows:
+
+    ```
+    macros : "BLE_CONNECTION_INTERVAL=24"
+    ```
+   For the range of connection interval that can be configured, see [Bluetooth&reg; LE connection interval](https://os.mbed.com/docs/mbed-os/v6.7/mbed-os-api-doxy/structble_1_1_gap_1_1_preferred_connection_params__t.html#a5a859522981a2d8fd68fdf33cd6bcc2d).
+
+2. By default, `BLE_COC_MTU_SIZE` is set to 100 bytes; the max value that can be configured is 512 bytes. To modify the this value to 200, add the `BLE_COC_MTU_SIZE` macro to the *macros* section of the application's *mbed_app.json*. The JSON entry would look like as follows:
+    ```
+    macros :  "BLE_COC_MTU_SIZE=200"
+    ```
+### Modifying Bluetooth&reg; LE configurations on a peer device
+
+Do the following to modify the connection interval and MTU on the peer LE COC application running on the CYW20719B2Q40EVB-01 device:
+
+1. The connection interval of LE COC application can be modified by changing the min and max connection interval values of BLE scan configuration structure in *le_coc_cfg.c*.By default, the connection interval of the PSoC&trade; device is set to 40. To set the same value, use the configuration given below:
+
+    ```
+    ble_scan_cfg =
+    {
+        ...
+        /* Connection configuration */
+        .conn_min_interval               = 40,
+        .conn_max_interval               = 40,
+        ...
+    },
+    ```
+2. Configure the MTU using the client control tool:
+
+   1. Right-click the LE_Connection_Oriented_Channel project on the Eclipse IDE for ModusToolbox&trade;.  Navigate to *ModusToolbox* and then select **ClientControl** from the floating window menu.
+
+   2. Select the appropriate **WICED HCI UART** from the drop-down list and then click **Open Port**.
+
+   3. Select the **LE COC** tab to set the required MTU size.
+
+   4. Click **Close Port**, reset the CYW20719B2Q40EVB-01 device, and then click **Open Port** for these settings to take effect.
+
+### Understanding the Bluetooth&reg; LE throughput
+
+This section explains the theoretical Bluetooth&reg; LE throughput numbers achievable on a Bluetooth&reg; LE platform based on the configuration.
+
+The theoretical Bluetooth&reg; LE throughput can be calculated using the following formula:
+
+ **Throughput = (MTU size in bits) / (connection interval in seconds)**
+
+The following default values are used in this library:
+
+    - Default connection interval = 50 ms
+
+    - Default MTU size = 100 bytes
+
+The theoretical Bluetooth&reg; LE throughput achievable for  these default values can be calculated as follows:
+
+   = (100 * 8) / (50 / 10^3)
+   = (800 / 0.050)
+   = 16,000 bps
+   = 16 kbps
+
+## Adding new console commands in an application
 
 1. Initialize the command console framework:
-   ```
-   cy_command_console_init
-   ```
+	```
+	cy_command_console_init
+	```
 
-   You should define the commands table and the handler along with the primary library. For example, the WHD library console commands may be placed in `WHD_utils` and located along with the WHD library. The test application will invoke the relevant function in `WHD_utils` for adding the commands.
+   You should define the commands table and the handler along with the primary library. For example, the WHD library console commands may be placed in *WHD_utils* and located along with the WHD library. The test application will invoke the relevant function in *WHD_utils* for adding the commands.
 
-3. Define the commands as shown in the following example:
-
-   ```
-   >#define MY_COMMANDS \
-   { "mycmd1", my_command1, 0, NULL, NULL, (char *)"", (char *)"Run mycmd1 --help for usage."}, \
-   { "mycmd2", my_command2, 0, NULL, NULL, (char *)"", (char *)"Run mycmd2 --help for usage."}, \
-   ```
+2. Define the commands as shown in the following example:
+	```
+	#define MY_COMMANDS    \
+		{ "mycmd1", my_command1, 0, NULL, NULL, (char *)"", (char *)"Run mycmd1 --help for usage."}, \
+		{ "mycmd2", my_command2, 0, NULL, NULL, (char *)"", (char *)"Run mycmd2 --help for usage."}, \
+	```
 
 4. Define the command table:
-   ```
-   >const cy_command_console_cmd_t my_command_table[] =
+	```
+	const cy_command_console_cmd_t my_command_table[] =
 	{
 		MY_COMMANDS
 		CMD_TABLE_END
 	};
-   ```
+	```
 
 5. Implement command handlers when the commands are executed on the console.
 
    In this example, implement `my_command1` and `my_command2` function handlers.
 
 6. Add the command table to the console:
-   ```
-   >cy_command_console_add_table( my_command_table )
-   ```
+	```
+	cy_command_console_add_table( my_command_table )
+	```
 
 7. De-register the command table:
-   ```
-   >cy_command_console_delete_table( my_command_table )
-   ```
+	```
+	cy_command_console_delete_table( my_command_table )
+	```
 
-## Additional Information
+## Additional information
 
 - [Command console RELEASE.md](./RELEASE.md)
 
-- [Command Console API Reference Guide](https://cypresssemiconductorco.github.io/command-console/api_reference_manual/html/index.html)
+- [Command console API reference guide](https://cypresssemiconductorco.github.io/command-console/api_reference_manual/html/index.html)
 
-- [ModusToolbox® Software Environment, Quick Start Guide, Documentation, and Videos](https://www.cypress.com/products/modustoolbox-software-environment)
+- [ModusToolbox&trade; software, quick start guide, documentation, and videos](https://www.cypress.com/products/modustoolbox-software-environment)
 
-- [Command Console Version](./version.txt)
+- [Command console version](./version.txt)
