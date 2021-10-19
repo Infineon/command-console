@@ -34,6 +34,7 @@
 /** @file
  *
  */
+#ifndef DISABLE_COMMAND_CONSOLE_BT
 #include <events/mbed_events.h>
 #include <mbed.h>
 #include <stdio.h>
@@ -69,6 +70,14 @@ extern "C" {
 
 #if(BLE_COC_MTU_SIZE > 512)
 #error Maximum value of BLE_COC_MTU_SIZE that can be configured is 512
+#endif
+
+#if defined(__ICCARM__)
+#define CORDIO_BT_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define CORDIO_BT_WEAK_FUNC            __attribute__((weak))
+#else
+#define CORDIO_BT_WEAK_FUNC           __attribute__((weak))
 #endif
 
 /******************************************************
@@ -729,7 +738,7 @@ int handle_bt_get_device_address( int argc, char *argv[], tlv_buffer_t** data )
 }
 
 // BT Coex Utility initialization.
-void bt_utility_init(void)
+CORDIO_BT_WEAK_FUNC void bt_utility_init(void)
 {
     cy_command_console_add_table ( bt_coex_command_table );
 
@@ -742,4 +751,5 @@ void bt_utility_init(void)
 }
 #ifdef __cplusplus
 }
+#endif
 #endif

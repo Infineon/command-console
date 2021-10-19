@@ -12,6 +12,12 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v3.0.1
+
+- Renamed Wi-Fi command names
+
+- Build switch provided to disable command sets
+
 ### v3.0.0
 
 - Minor documentation and BT configuration updates
@@ -21,7 +27,6 @@ See the [README.md](./README.md) for a complete description of the command conso
 - Introduced ARMC6 toolchain build support for AnyCloud
 
 - Integrated with BTSTACK library version v3.x
-
 
 ### v2.0.0
 
@@ -47,9 +52,9 @@ The current version of the library was validated for compatibility with the foll
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software                            | 2.3.1   |
-| PSoC&trade; 6 peripheral driver library (PDL)           | 2.2.0   |
-| GCC Compiler                                            | 9.3.1   |
-| IAR Compiler (only for AnyCloud)                        | 8.32    |
+| ModusToolbox&trade; software                            | 2.4     |
+| PSoC&trade; 6 peripheral driver library (PDL)           | 2.3.0   |
+| GCC Compiler                                            | 10.3.1  |
+| IAR Compiler (only for ModusToolbox&trade;)             | 8.32    |
 | Arm® Compiler 6                                         | 6.14    |
 | Mbed OS                                                 | 6.2.0   |

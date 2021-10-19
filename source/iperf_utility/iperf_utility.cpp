@@ -34,7 +34,7 @@
 /** @file
  *
  */
-
+#ifndef DISABLE_COMMAND_CONSOLE_IPERF
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -82,18 +82,26 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data);
 
 #define IPERF_THREAD_STACK_SIZE 4096
 
+#if defined(__ICCARM__)
+#define IPERF_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define IPERF_WEAK_FUNC            __attribute__((weak))
+#else
+#define IPERF_WEAK_FUNC           __attribute__((weak))
+#endif
+
 const cy_command_console_cmd_t iperf_command_table[] =
 {
-	IPERF_COMMANDS
-	CMD_TABLE_END
+    IPERF_COMMANDS
+    CMD_TABLE_END
 };
 
 #pragma pack(1)
 struct cmd_result
 {
-	char status;
-	char flag;
-	int  count;
+    char status;
+    char flag;
+    int  count;
 };
 
 struct iperf_args
@@ -115,7 +123,7 @@ iperf_thread_t iperf_util_threads[MAX_SIMULTANEOUS_COMMANDS];
 /******************************************************
  *               Function Definitions
  ******************************************************/
-void iperf_utility_init( void *networkInterface)
+IPERF_WEAK_FUNC void iperf_utility_init( void *networkInterface)
 {
     int i;
     iperf_network_init( networkInterface );
@@ -138,6 +146,7 @@ int iperf_util_find_free_thread()
         {
             if(iperf_util_threads[i].thread != NULL)
             {
+                cy_rtos_join_thread(iperf_util_threads[i].thread);
                 delete iperf_util_threads[i].thread;
                 iperf_util_threads[i].thread = NULL;
             }
@@ -165,6 +174,8 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
     int index;
     cy_thread_arg_t args;
     cy_rslt_t res;
+    int i = 1;
+    bool is_server = false;
 
     index = iperf_util_find_free_thread();
     if( index == -1 )
@@ -176,12 +187,30 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
     iperf_util_threads[index].args.argc = argc;
     iperf_util_threads[index].args.argv = argv;
     iperf_util_threads[index].thread = new cy_thread_t;
+
     args = (cy_thread_arg_t)(&index);
-    res = cy_rtos_create_thread(iperf_util_threads[index].thread, iperf_util_thread, NULL, NULL, IPERF_THREAD_STACK_SIZE, (cy_thread_priority_t)(CY_RTOS_PRIORITY_HIGH - 1), args);
+    while (i <= (argc - 1))
+    {
+        if (strcasecmp (argv[i], "-s") == 0)
+        {
+            is_server = true;
+        }
+        i = i+1 ;
+    }
+
+    if ( is_server ==  true)
+    {
+        res = cy_rtos_create_thread(iperf_util_threads[index].thread, iperf_util_thread, NULL, NULL, IPERF_THREAD_STACK_SIZE, (cy_thread_priority_t)(CY_RTOS_PRIORITY_HIGH), args);
+    }
+    else
+    {
+        res = cy_rtos_create_thread(iperf_util_threads[index].thread, iperf_util_thread, NULL, NULL, IPERF_THREAD_STACK_SIZE, (cy_thread_priority_t)(CY_RTOS_PRIORITY_HIGH - 1), args);
+    }
+
     if(res != CY_RSLT_SUCCESS)
     {
-    	printf("Error creating thread \n");
-    	return -1;
+        printf("Error creating thread \n");
+        return -1;
     }
 
     cy_rtos_waitbits_event(&event, &wait_bits, true, true, CY_RTOS_NEVER_TIMEOUT);
@@ -191,4 +220,5 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
 
 #ifdef __cplusplus
 }
+#endif
 #endif

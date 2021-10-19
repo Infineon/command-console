@@ -37,7 +37,7 @@
  */
 
 /* FreeRTOS includes. */
-
+#ifndef DISABLE_COMMAND_CONSOLE_WIFI
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "command_console.h"
@@ -92,11 +92,16 @@ int handle_get_rssi                          ( int argc, char *argv[], tlv_buffe
 #endif
 
 #define WIFI_COMMANDS \
-    { "join",       handle_join,        2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa3> [password] [channel] "ESCAPE_SPACE_PROMPT, (char*) "Join an AP"}, \
-    { "leave",      handle_leave,       0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
-    { "scan",       handle_scan,        0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
-    { "ping",       handle_ping,        1, NULL, NULL, (char*) "<IP address>", (char*) "Ping to an IP address"}, \
-    { "get_rssi",   handle_get_rssi,    0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
+    { "join",            handle_join,        2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa3> [password] [channel] "ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
+    { "leave",           handle_leave,       0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
+    { "scan",            handle_scan,        0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
+    { "ping",            handle_ping,        1, NULL, NULL, (char*) "<IP address>", (char*) "Ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
+    { "get_rssi",        handle_get_rssi,    0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
+    { "wifi_join",       handle_join,        2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa3> [password] [channel] "ESCAPE_SPACE_PROMPT, (char*) "Join an AP"}, \
+    { "wifi_leave",      handle_leave,       0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
+    { "wifi_scan",       handle_scan,        0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
+    { "wifi_ping",       handle_ping,        1, NULL, NULL, (char*) "<IP address>", (char*) "Ping to an IP address"}, \
+    { "wifi_get_rssi",   handle_get_rssi,    0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
 
 static const cy_command_console_cmd_t wifi_command_table[] =
 {
@@ -105,6 +110,14 @@ static const cy_command_console_cmd_t wifi_command_table[] =
 };
 
 #define MAKE_IPV4_ADDRESS1(a, b, c, d) ((((uint32_t) d) << 24) | (((uint32_t) c) << 16) | (((uint32_t) b) << 8) |((uint32_t) a))
+
+#if defined(__ICCARM__)
+#define WIFI_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define WIFI_WEAK_FUNC            __attribute__((weak))
+#else
+#define WIFI_WEAK_FUNC           __attribute__((weak))
+#endif
 
 /******************************************************
  *               Variable Definitions
@@ -333,7 +346,7 @@ int handle_get_rssi(int argc, char *argv[], tlv_buffer_t** data)
     return 0;
 }
 
-cy_rslt_t wifi_utility_init()
+WIFI_WEAK_FUNC cy_rslt_t wifi_utility_init()
 {
     WIFIReturnCode_t xWifiStatus;
     cy_rslt_t res;
@@ -582,4 +595,5 @@ exit :
 
 #ifdef __cplusplus
 }
+#endif
 #endif

@@ -34,6 +34,7 @@
 /** @file
  *
  */
+#ifndef DISABLE_COMMAND_CONSOLE_BT
 #include "command_console.h"
 #include "bt_cfg.h"
 #include "wiced_bt_stack.h"
@@ -76,6 +77,14 @@
 
 #if(BLE_COC_MTU_SIZE > 512)
 #error Maximum value of BLE_COC_MTU_SIZE that can be configured is 512
+#endif
+
+#if defined(__ICCARM__)
+#define WICED_BLE_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define WICED_BLE_WEAK_FUNC            __attribute__((weak))
+#else
+#define WICED_BLE_WEAK_FUNC           __attribute__((weak))
 #endif
 
 /******************************************************
@@ -733,7 +742,8 @@ void scan_result_cback(wiced_bt_ble_scan_results_t *p_scan_result, uint8_t *p_ad
     }
 }
 
-void bt_utility_init(void)
+WICED_BLE_WEAK_FUNC void bt_utility_init(void)
 {
     cy_command_console_add_table (bt_coex_command_table);
 }
+#endif

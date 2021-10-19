@@ -22,11 +22,13 @@ This library provides a framework to add command console support to your applica
 
 This library is supported on the following list of platforms/frameworks.
 
-### AnyCloud
+### ModusToolbox&trade;
 
 - [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
 
 - [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+
+- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
 
 ### Mbed OS
 
@@ -44,7 +46,7 @@ This library is supported on the following list of platforms/frameworks.
 
 This library supports the following frameworks:
 
-- **AnyCloud framework:** AnyCloud is a FreeRTOS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/cypresssemiconductorco/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
+- **ModusToolbox&trade; environment:** In this environment the command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/cypresssemiconductorco/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
 
 - **Mbed framework:** The Mbed framework is an Mbed OS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the Bluetooth&reg; functionality, it uses the Cordio Bluetooth&reg; LE stack in Mbed OS.
 
@@ -52,9 +54,9 @@ This library supports the following frameworks:
 
 ## Dependencies
 
-This section provides the list of dependent libraries required for this middleware library to work on AnyCloud FreeRTOS and Arm® Mbed OS IoT frameworks.
+This section provides the list of dependent libraries required for this middleware library to work on FreeRTOS and Arm® Mbed OS IoT frameworks.
 
-### AnyCloud
+### ModusToolbox&trade;
 
 - [Wi-Fi connection manager](https://github.com/cypresssemiconductorco/wifi-connection-manager)
 
@@ -74,9 +76,9 @@ This section provides the list of dependent libraries required for this middlewa
 
 ## Quick start
 
-This library is supported on AnyCloud, Mbed OS, and FreeRTOS frameworks. See the following section to build the library in those frameworks.
+This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS frameworks. See the following section to build the library in those frameworks.
 
-### AnyCloud
+### ModusToolbox&trade;
 
 1. A set of pre-defined configuration files have been bundled with the wifi-mw-core library for FreeRTOS, lwIP, and mbed TLS libraries. Review the configuration files and make required adjustments for your application/product use case. See the [Wi-Fi middleware core library - quick start](https://github.com/cypresssemiconductorco/wifi-mw-core#quick-start) section.
 
@@ -169,29 +171,31 @@ Use the following Wi-Fi commands to perform network operations. Enter the follow
 
 1. Scan for nearby networks:
    ```
-   > scan
+   > wifi_scan
 	```
 
 2. Connect to a network AP:
    ```
-   > join <ssid> <security type> [password] [channel]
+   > wifi_join <ssid> <security type> [password] [channel]
    ```
 
 3. Disconnect from the network AP:
    ```
-   > leave
+   > wifi_leave
 	```
 
 4. Get the signal strength/RSSI of the network:
     ```
-    > get_rssi
+    > wifi_get_rssi
     ```
 
 5. Ping another device on the network:
     ```
-    > ping <ip address>
+    > wifi_ping <ip address>
     ```
    **Note:** This command is not supported on Mbed.
+   
+**Note:** Wi-Fi commands(scan/join/leave/get_rssi/ping) are retained for backward compatibility. These commands are deprecated and it will be removed in the future release.
 
 ### iPerf commands
 
@@ -237,7 +241,7 @@ The following options are supported by the iPerf software integrated into this l
       \"lwip.memp-num-tcp-seg\": 127
 
 
-   #### AnyCloud:
+   #### ModusToolbox&trade;:
 
    Update the following configurations in the application's config file (For example, *mtb-anycloud-wifi-bluetooth-tester/lwipopts.h*)
 
@@ -441,7 +445,7 @@ For a given MTU size, if the configured connection interval is low, the resultin
 
 ### Modifying Bluetooth&reg; LE configurations on a PSoC&trade; device
 
-**AnyCloud:** (Cypress Bluetooth&reg; stack)
+**ModusToolbox&trade;:** (Cypress Bluetooth&reg; stack)
 
 1. The connection interval value is configured in multiples of 1.25 milliseconds based on the connection interval assigned in the Bluetooth&reg; LE configuration structure.
 
@@ -461,7 +465,7 @@ For a given MTU size, if the configured connection interval is low, the resultin
     ```
     DEFINES += BLE_COC_MTU_SIZE=200
     ```
-
+   
 **Mbed OS:** (Cordio Bluetooth&reg; LE stack)
 
 1. The connection interval value is configured in multiples of 1.25 milliseconds based on the connection parameter class of the Cordio stack.
@@ -479,6 +483,7 @@ For a given MTU size, if the configured connection interval is low, the resultin
     ```
     macros :  "BLE_COC_MTU_SIZE=200"
     ```
+    
 ### Modifying Bluetooth&reg; LE configurations on a peer device
 
 Do the following to modify the connection interval and MTU on the peer LE COC application running on the CYW20719B2Q40EVB-01 device:
@@ -497,7 +502,7 @@ Do the following to modify the connection interval and MTU on the peer LE COC ap
     ```
 2. Configure the MTU using the client control tool:
 
-   1. Right-click the LE_Connection_Oriented_Channel project on the Eclipse IDE for ModusToolbox&trade;.  Navigate to *ModusToolbox* and then select **ClientControl** from the floating window menu.
+   1. Right-click the LE_Connection_Oriented_Channel project on the Eclipse IDE for ModusToolbox&trade;.  Navigate to *ModusToolbox&trade;* and then select **ClientControl** from the floating window menu.
 
    2. Select the appropriate **WICED HCI UART** from the drop-down list and then click **Open Port**.
 
@@ -564,6 +569,41 @@ The theoretical Bluetooth&reg; LE throughput achievable for  these default value
 	```
 	cy_command_console_delete_table( my_command_table )
 	```
+## Configuring Command set based on user needs
+
+**ModusToolbox&trade;:**
+
+   By default, `Wifi`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following to the Makefile of the application.
+   
+   To disable Wi-Fi commands:
+   ```
+   DEFINES+=DISABLE_COMMAND_CONSOLE_WIFI
+   ```
+   To disable iperf command:
+   ```
+   DEFINES+=DISABLE_COMMAND_CONSOLE_IPERF
+   ```
+   To disable bluetooth commands:
+   ```
+   DEFINES+=DISABLE_COMMAND_CONSOLE_BT
+   ```
+   
+**Mbed OS:**
+
+   By default, `Wifi`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following macros to the *macros* section of the application's *mbed_app.json*. The JSON entry would look like as follows:
+
+   To disable Wi-Fi commands:
+   ```
+   macros : "DISABLE_COMMAND_CONSOLE_WIFI"
+   ```
+   To disable iperf command:
+   ```
+   macros : "DISABLE_COMMAND_CONSOLE_IPERF"
+   ```
+   To disable bluetooth commands:
+   ```
+   macros : "DISABLE_COMMAND_CONSOLE_BT"
+   ```
 
 ## Additional information
 
@@ -573,4 +613,4 @@ The theoretical Bluetooth&reg; LE throughput achievable for  these default value
 
 - [ModusToolbox&trade; software, quick start guide, documentation, and videos](https://www.cypress.com/products/modustoolbox-software-environment)
 
-- [Command console version](./version.txt)
+- [Command console version](./version.xml)

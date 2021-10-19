@@ -35,7 +35,7 @@
  *  @brief This file contains the definition of Wi-Fi commands and implementation of the
  *  command handlers on Mbed.
  */
-
+#ifndef DISABLE_COMMAND_CONSOLE_WIFI
 #include "mbed.h"
 
 #include <stdio.h>
@@ -60,6 +60,14 @@ extern "C" {
 #define CMD_CONSOLE_MAX_WIFI_RETRY_COUNT    5
 #endif
 
+#if defined(__ICCARM__)
+#define WIFI_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define WIFI_WEAK_FUNC            __attribute__((weak))
+#else
+#define WIFI_WEAK_FUNC           __attribute__((weak))
+#endif
+
 /******************************************************
  *               Function Declarations
  ******************************************************/
@@ -75,11 +83,16 @@ int get_rssi     (int argc, char* argv[], tlv_buffer_t** data);
 int ping         (int argc, char* argv[], tlv_buffer_t** data);
 
 #define WIFI_COMMANDS_LIMITED_SET \
-    { (char*) "join",      join,       2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa_wpa2|wpa3|wpa3_wpa2> [password] [channel]", (char*) "Join an AP."}, \
-    { (char*) "leave",     leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
-    { (char*) "scan",      scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
-    { (char*) "get_rssi",  get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
-    { (char*) "ping",      ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
+    { (char*) "join",           join,       2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa_wpa2|wpa3|wpa3_wpa2> [password] [channel]", (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
+    { (char*) "leave",          leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
+    { (char*) "scan",           scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
+    { (char*) "get_rssi",       get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
+    { (char*) "ping",           ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
+    { (char*) "wifi_join",      join,       2, NULL, NULL, (char*) "<ssid> <open|wpa|wpa2|wpa_wpa2|wpa3|wpa3_wpa2> [password] [channel]", (char*) "Join an AP."}, \
+    { (char*) "wifi_leave",     leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
+    { (char*) "wifi_scan",      scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
+    { (char*) "wifi_get_rssi",  get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
+    { (char*) "wifi_ping",      ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
 
 /******************************************************
  *                    Constants
@@ -99,7 +112,7 @@ static const cy_command_console_cmd_t wifi_command_table[] =
  *               Function Definitions
  ******************************************************/
 
-cy_rslt_t wifi_utility_init(void)
+WIFI_WEAK_FUNC cy_rslt_t wifi_utility_init(void)
 {
     cy_command_console_add_table(wifi_command_table);
     WIFI_INFO(("Wi-Fi module initialized...\n"));
@@ -396,4 +409,5 @@ const char* wifi_utils_authtype_to_str(nsapi_security_t sec)
 
 #ifdef __cplusplus
 }
+#endif
 #endif

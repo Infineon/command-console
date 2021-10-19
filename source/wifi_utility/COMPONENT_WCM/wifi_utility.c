@@ -33,9 +33,9 @@
 
 /** @file wifi_utility.c
  *  @brief This file contains the definition of Wi-Fi commands and implementation of the
- *  command handlers on AnyCloud.
+ *  command handlers.
  */
-
+#ifndef DISABLE_COMMAND_CONSOLE_WIFI
 #include "command_console.h"
 #include "wifi_utility.h"
 
@@ -65,6 +65,14 @@ extern "C" {
 #define CMD_CONSOLE_PING_TIMEOUT_DEFAULT    10000
 #define CMD_CONSOLE_IPV4_ADDR_SIZE          4
 
+#if defined(__ICCARM__)
+#define WIFI_WEAK_FUNC            __WEAK
+#elif defined(__GNUC__) || defined(__clang__) || defined(__CC_ARM)
+#define WIFI_WEAK_FUNC            __attribute__((weak))
+#else
+#define WIFI_WEAK_FUNC           __attribute__((weak))
+#endif
+
 /******************************************************
  *               Function Declarations
  ******************************************************/
@@ -77,11 +85,16 @@ int ping         (int argc, char* argv[], tlv_buffer_t** data);
 int get_rssi     (int argc, char* argv[], tlv_buffer_t** data);
 
 #define WIFI_COMMANDS_LIMITED_SET \
-    { (char*) "join",      join,       2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
-    { (char*) "leave",     leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
-    { (char*) "scan",      scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
-    { (char*) "ping",      ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
-    { (char*) "get_rssi",  get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
+    { (char*) "join",           join,       2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
+    { (char*) "leave",          leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
+    { (char*) "scan",           scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
+    { (char*) "ping",           ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
+    { (char*) "get_rssi",       get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
+    { (char*) "wifi_join",      join,       2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
+    { (char*) "wifi_leave",     leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
+    { (char*) "wifi_scan",      scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
+    { (char*) "wifi_ping",      ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
+    { (char*) "wifi_get_rssi",  get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
 
 /******************************************************
  *                    Constants
@@ -126,7 +139,7 @@ static void print_ip4(uint32_t ip);
  *               Function Definitions
  ******************************************************/
 
-cy_rslt_t wifi_utility_init(void)
+WIFI_WEAK_FUNC cy_rslt_t wifi_utility_init(void)
 {
     cy_rslt_t res;
     cy_wcm_config_t wcm_config;
@@ -532,4 +545,5 @@ static void print_ip4(uint32_t ip)
 
 #ifdef __cplusplus
 }
+#endif
 #endif
