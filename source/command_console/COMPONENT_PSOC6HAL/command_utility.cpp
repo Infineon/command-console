@@ -39,7 +39,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "cyhal_uart.h"
 #include "cyhal_hw_types.h"
