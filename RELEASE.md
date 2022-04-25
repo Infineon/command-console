@@ -12,6 +12,10 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v3.2.0
+
+- Added support for CYW954907AEVAL1F and CYW943907AEVAL1F kits
+
 ### v3.1.0
 
 - Added support for CY8CEVAL-062S2-MUR-43439M2 kit

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['structures',['Structures',['../group__group__cmd__console__structs.html',1,'']]]
+  ['structures_0',['Structures',['../group__group__cmd__console__structs.html',1,'']]]
 ];
