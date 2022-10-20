@@ -240,7 +240,16 @@ int iperf_write( int sockID, const char *msg, size_t msgLength )
     {
         case CY_SOCKET_IPPROTO_TCP:
         {
-            result = cy_socket_send(sockets[sockID].socket, msg, msgLength, 0, &bytes_sent);
+            /* cy_socket_send may return CY_RSLT_MODULE_SECURE_SOCKETS_WOULDBLOCK for lower network speeds which means that the socket send buffer is full.
+             * Example: This situation can occur with ethernet link with 10M speed. The application posts packets to network stack at a faster rate than
+             * it can be sent out through the network and the send buffer might overflow returning CY_RSLT_MODULE_SECURE_SOCKETS_WOULDBLOCK.
+             * In such situation, we can send the packet again so that when the send buffer is freed after sometime, cy_socket_send returns success.
+             */
+            do
+            {
+                result = cy_socket_send(sockets[sockID].socket, msg, msgLength, 0, &bytes_sent);
+            } while(result == CY_RSLT_MODULE_SECURE_SOCKETS_WOULDBLOCK);
+
             if( result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_ERROR(("cy_socket_send failed with error : %ld \n", result));

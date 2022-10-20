@@ -36,7 +36,7 @@
 
 #include "lwip/sockets.h"
 #include "iperf_utility.h"
-
+#include <stdbool.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

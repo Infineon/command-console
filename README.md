@@ -4,7 +4,7 @@
 
 This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf, and Bluetooth Low Energy commands are bundled with this library.
 
-[ModusToolbox&trade; AnyCloud Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/mbed-os-wifi-bluetooth-tester), and [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/afr-wifi-bluetooth-tester) applications are built over this library.
+[ModusToolbox&trade; AnyCloud Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mbed-os-wifi-bluetooth-tester), and [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/afr-wifi-bluetooth-tester) applications are built over this library.
 
 ## Features
 
@@ -24,40 +24,39 @@ This library is supported on the following list of platforms/frameworks.
 
 ### ModusToolbox&trade;
 
-- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/)
 
-- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012/)
 
-- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
+- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
 
-- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2)
+- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
 
 - [CYW943907AEVAL1F evaluation kit (CYW943907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw943907aeval1f)
 
 - [CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f)
 
-
 ### Mbed OS
 
-- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/)
 
-- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012/)
 
 ### FreeRTOS
 
-- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w)
+- [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/)
 
-- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012)
+- [PSoC&trade; 62S2 Wi-Fi Bluetooth&reg; pioneer kit (CY8CKIT-062S2-43012)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012/)
 
 ## Supported frameworks
 
 This library supports the following frameworks:
 
-- **ModusToolbox&trade; environment:** In this environment the command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/cypresssemiconductorco/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
+- **ModusToolbox&trade; environment:** In this environment the command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/Infineon/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/Infineon/bluetooth-freertos).
 
-- **Mbed framework:** The Mbed framework is an Mbed OS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the Bluetooth&reg; functionality, it uses the Cordio Bluetooth&reg; LE stack in Mbed OS.
+- **Mbed framework:** The Mbed framework is an Mbed OS-based solution. The command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the Bluetooth&reg; functionality, it uses the Cordio Bluetooth&reg; LE stack in Mbed OS.
 
-- **FreeRTOS framework:** This is a FreeRTOS-based solution. The command console library uses the [abstraction-rtos](https://github.com/cypresssemiconductorco/abstraction-rtos) library that provides the RTOS abstraction API, and uses the FreeRTOS framework network abstraction and lwIP library for implementing socket functions. For the Bluetooth&reg; functionality, this library uses [bluetooth-freertos](https://github.com/cypresssemiconductorco/bluetooth-freertos).
+- **FreeRTOS framework:** This is a FreeRTOS-based solution. The command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the FreeRTOS framework network abstraction and lwIP library for implementing socket functions. For the Bluetooth&reg; functionality, this library uses [bluetooth-freertos](https://github.com/Infineon/bluetooth-freertos).
 
 ## Dependencies
 
@@ -65,21 +64,21 @@ This section provides the list of dependent libraries required for this middlewa
 
 ### ModusToolbox&trade;
 
-- [Wi-Fi connection manager](https://github.com/cypresssemiconductorco/wifi-connection-manager)
+- [Wi-Fi connection manager](https://github.com/Infineon/wifi-connection-manager)
 
-- [Bluetooth&reg; stack for FreeRTOS](https://github.com/cypresssemiconductorco/bluetooth-freertos)
+- [Bluetooth&reg; stack for FreeRTOS](https://github.com/Infineon/bluetooth-freertos)
 
 ### Mbed OS
 
 - [Arm&reg; Mbed OS 6.2.0](https://os.mbed.com/mbed-os/releases)
 
-- [Connectivity utilities library](https://github.com/cypresssemiconductorco/connectivity-utilities/releases/tag/latest-v3.X)
+- [Connectivity utilities library](https://github.com/Infineon/connectivity-utilities/releases/tag/latest-v3.X)
 
 ### FreeRTOS
 
-- [FreeRTOS](https://github.com/cypresssemiconductorco/amazon-freertos)
+- [FreeRTOS](https://github.com/Infineon/amazon-freertos)
 
-- [Bluetooth&reg; stack for FreeRTOS](https://github.com/cypresssemiconductorco/bluetooth-freertos)
+- [Bluetooth&reg; stack for FreeRTOS](https://github.com/Infineon/bluetooth-freertos)
 
 ## Quick start
 
@@ -87,9 +86,15 @@ This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS framewor
 
 ### ModusToolbox&trade;
 
-1. A set of pre-defined configuration files have been bundled with the wifi-mw-core library for FreeRTOS, lwIP, and mbed TLS libraries. Review the configuration files and make required adjustments for your application/product use case. See the [Wi-Fi middleware core library - quick start](https://github.com/cypresssemiconductorco/wifi-mw-core#quick-start) section.
+1. Review and make the required changes to the pre-defined configuration files.
 
-2. Define the following COMPONENTS in the application's Makefile which are relevant for this library. For additional information, see the [Wi-Fi middleware core library - quick start](https://github.com/cypresssemiconductorco/wifi-mw-core#quick-start) section.
+- The configuration files are bundled with the wifi-mw-core library for FreeRTOS, lwIP, and Mbed TLS. See README.md for details.
+
+   See the "Quick Start" section in [README.md](https://github.com/Infineon/wifi-mw-core/blob/master/README.md)(https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls/blob/master/README.md).
+
+- If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using Wi-Fi core freertos lwip mbedtls bundle library, the configuration files are in wifi-core-freertos-lwip-mbedtls/configs folder. Similarly if the application is using Ethernet Core FreeRTOS lwIP mbedtls library, the configuration files are in ethernet-core-freertos-lwip-mbedtls/configs folder.
+
+2. A set of COMPONENTS must be defined in the code example project's Makefile for this library. 
 
    ```
    COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
@@ -109,7 +114,6 @@ This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS framewor
 
 5. Tune the lwIP configuration parameters listed in application's *lwipopts.h* file, depending on the required Wi-Fi throughput and use case.
 
-
 ### Mbed OS
 
 1. Add the .lib file(s) for dependent libraries:
@@ -122,14 +126,14 @@ This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS framewor
       ```
    3. Create a file with the name "connectivity-utilities.lib" and add the following line to this file:
       ```
-      https://github.com/cypresssemiconductorco/connectivity-utilities/#<commit-SHA-for-latest-release-v3.X>
+      https://github.com/Infineon/connectivity-utilities/#<commit-SHA-for-latest-release-v3.X>
       ```
-   4. Replace `<commit-SHA-for-latest-release-v3.X>` in the above line with the commit SHA of the latest-v3.X tag available in the [connectivity utilities library - release](https://github.com/cypresssemiconductorco/connectivity-utilities/releases).
+   4. Replace `<commit-SHA-for-latest-release-v3.X>` in the above line with the commit SHA of the latest-v3.X tag available in the [connectivity utilities library - release](https://github.com/Infineon/connectivity-utilities/releases).
 
       Example: For tag `release-v3.0.2`
 
       ```
-      https://github.com/cypresssemiconductorco/connectivity-utilities/#bbed663a71670b02d362c6f1bd69fe970ff814ec
+      https://github.com/Infineon/connectivity-utilities/#bbed663a71670b02d362c6f1bd69fe970ff814ec
       ```
 
 2. Add `MBED` to the *components_add* section in the code example's JSON file. The JSON file entry would look like as follows:
@@ -164,7 +168,7 @@ This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS framewor
 
 ### FreeRTOS
 
-All the configurations required for the command console library on FreeRTOS are set by the values defined in the *afr-wifi-bluetooth-tester/config_files/* files of the [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/cypresssemiconductorco/afr-wifi-bluetooth-tester) application.
+All the configurations required for the command console library on FreeRTOS are set by the values defined in the *afr-wifi-bluetooth-tester/config_files/* files of the [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/afr-wifi-bluetooth-tester) application.
 
 ## Commands supported
 
@@ -452,7 +456,7 @@ For a given MTU size, if the configured connection interval is low, the resultin
 
 ### Modifying Bluetooth&reg; LE configurations on a PSoC&trade; device
 
-**ModusToolbox&trade;:** (Cypress Bluetooth&reg; stack)
+**ModusToolbox&trade;:** (Infineon Bluetooth&reg; stack)
 
 1. The connection interval value is configured in multiples of 1.25 milliseconds based on the connection interval assigned in the Bluetooth&reg; LE configuration structure.
 
@@ -463,7 +467,7 @@ For a given MTU size, if the configured connection interval is low, the resultin
     ```
     DEFINES += BLE_CONNECTION_INTERVAL=24
     ```
-   For the range of connection interval that can be configured, see [Bluetooth&reg; LE connection interval](https://cypresssemiconductorco.github.io/btstack/ble/api_reference_manual/html/group__wiced__bt__cfg.html#ga4b1a4ba915ebe81ea7c7771f44f5cd07).
+   For the range of connection interval that can be configured, see [Bluetooth&reg; LE connection interval](https:///infineon.github.io/btstack/ble/api_reference_manual/html/group__wiced__bt__cfg.html#ga4b1a4ba915ebe81ea7c7771f44f5cd07).
 
 2. By default, `BLE_COC_MTU_SIZE` is set to 100 bytes; the max value that can be configured is 512 bytes. To modify this to 200, do the following:
 
@@ -616,8 +620,8 @@ The theoretical Bluetooth&reg; LE throughput achievable for  these default value
 
 - [Command console RELEASE.md](./RELEASE.md)
 
-- [Command console API reference guide](https://cypresssemiconductorco.github.io/command-console/api_reference_manual/html/index.html)
+- [Command console API reference guide](https://infineon.github.io/command-console/api_reference_manual/html/index.html)
 
-- [ModusToolbox&trade; software, quick start guide, documentation, and videos](https://www.cypress.com/products/modustoolbox-software-environment)
+- [ModusToolbox&trade; software, quick start guide, documentation, and videos](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/)
 
 - [Command console version](./version.xml)

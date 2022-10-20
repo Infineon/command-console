@@ -520,6 +520,8 @@ void Settings_Destroy( thread_Settings *mSettings) {
     FREE_PTR( mSettings->mSSMMulticastStr);
     IPERF_DEBUGF( MEMALLOC_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( mSettings->mIfrname ) );
     FREE_PTR( mSettings->mIfrname);
+    IPERF_DEBUGF( MEMALLOC_DEBUG | IPERF_DBG_TRACE, IPERF_MEMFREE_MSG( mSettings->multihdr ) );
+    FREE_PTR(mSettings->multihdr);
 #ifdef HAVE_ISOCHRONOUS
     FREE_PTR( mSettings->mIsochronousStr );
 #endif

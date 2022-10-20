@@ -8,9 +8,15 @@ See the [README.md](./README.md) for a complete description of the command conso
 | Problem | Workaround |
 | ------- | ---------- |
 | Running iperf command in client UDP mode with the `-i 1` (interval) option reports a lower throughput. | Run the iPerf without the `-i` (interval) option (or) use an interval value greater than 1 second. |
-
+| IAR 9.30 toolchain throws build errors on Debug mode, if application explicitly includes iar_dlmalloc.h file | Add '--advance-heap' to LDFLAGS in application Makefile. |
 
 ## Changelog
+
+### v4.0.0
+
+- Added ethernet utility support
+- Added support for CM0P core
+- Minor Documentation updates
 
 ### v3.2.0
 
@@ -60,9 +66,9 @@ The current version of the library was validated for compatibility with the foll
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software                            | 2.4     |
-| PSoC&trade; 6 peripheral driver library (PDL)           | 2.3.0   |
+| ModusToolbox&trade; software                            | 3.0     |
+| PSoC&trade; 6 peripheral driver library (PDL)           | 3.0.0   |
 | GCC Compiler                                            | 10.3.1  |
-| IAR Compiler (only for ModusToolbox&trade;)             | 8.32    |
-| Arm® Compiler 6                                         | 6.14    |
+| IAR Compiler (only for ModusToolbox&trade;)             | 9.30    |
+| Arm® Compiler 6                                         | 6.16   |
 | Mbed OS                                                 | 6.2.0   |

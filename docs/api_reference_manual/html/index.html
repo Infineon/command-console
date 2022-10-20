@@ -88,7 +88,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><p >This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf and Bluetooth Low Energy (BLE) commands is bundled with this library.</p>
 <p >MTB AnyCloud Wi-Fi Bluetooth Tester, Mbed OS Wi-Fi Bluetooth Tester and AFR Wi-Fi Bluetooth Tester applications are built over this library.</p>
-<p >Please refer <a href="https://github.com/cypresssemiconductorco/command-console/blob/master/README.md">Readme</a> for more information.</p>
+<p >Please refer <a href="https://github.com/Infineon/command-console/blob/master/README.md">Readme</a> for more information.</p>
 <h1><a class="anchor" id="section_features"></a>
 Features and Functionality</h1>
 <ul>
@@ -103,51 +103,51 @@ Supported Platforms</h1>
 <h2><a class="anchor" id="section_plat_anycloud"></a>
 ModusToolbox™</h2>
 <ul>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012">PSoC&trade; 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2">PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)</a></li>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-evaluation-kit-cy8ceval-062s2">PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012/">PSoC&trade; 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/">PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-LAI-4373M2)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/">PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)</a></li>
 <li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cyw943907aeval1f">CYW943907AEVAL1F evaluation kit (CYW943907AEVAL1F)</a></li>
 <li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f">CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)</a></li>
 </ul>
 <h2><a class="anchor" id="section_plat_mbed"></a>
 Mbed OS</h2>
 <ul>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012">PSoC 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012">PSoC 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
 </ul>
 <h2><a class="anchor" id="section_plat_afr"></a>
 Amazon FreeRTOS (AFR)</h2>
 <ul>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-6-wi-fi-bt-prototyping-kit-cy8cproto-062-4343w">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
-<li><a href="https://www.cypress.com/documentation/development-kitsboards/psoc-62s2-wi-fi-bt-pioneer-kit-cy8ckit-062s2-43012">PSoC&trade; 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/">PSoC&trade; 6 WiFi-BT Prototyping Kit (CY8CPROTO-062-4343W)</a></li>
+<li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ckit-062s2-43012">PSoC&trade; 62S2 Wi-Fi BT Pioneer Kit (CY8CKIT-062S2-43012)</a></li>
 </ul>
 <h1><a class="anchor" id="section_supported_frameworks"></a>
 Supported Frameworks</h1>
 <ul>
-<li>ModusToolbox&trade; environment: In this environment the command-console Library uses the <a href="https://github.com/cypresssemiconductorco/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API and uses the <a href="https://github.com/cypresssemiconductorco/secure-sockets">secure-sockets</a> library for implementing socket functions. For the BLE functionality, this library uses [bluetooth-freertos]((<a href="https://github.com/cypresssemiconductorco/bluetooth-freertos">https://github.com/cypresssemiconductorco/bluetooth-freertos</a>).</li>
-<li>Mbed Framework: Mbed framework is an Mbed OS-based solution. Command Console Library uses the <a href="https://github.com/cypresssemiconductorco/abstraction-rtos">abstraction-rtos</a> library that provides RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the BLE functionality, it uses the Cordio BLE stack in Mbed OS.</li>
-<li>Amazon FreeRTOS (AFR) Framework: AFR is a FreeRTOS-based solution. Command Console Library uses the <a href="https://github.com/cypresssemiconductorco/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API, and uses the AFR network abstraction and LwIP library for implementing socket functions. For the BLE functionality, this library uses <a href="https://github.com/cypresssemiconductorco/bluetooth-freertos">bluetooth-freertos</a>.</li>
+<li>ModusToolbox&trade; environment: In this environment the command-console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API and uses the <a href="https://github.com/Infineon/secure-sockets">secure-sockets</a> library for implementing socket functions. For the BLE functionality, this library uses [bluetooth-freertos]((<a href="https://github.com/Infineon/bluetooth-freertos">https://github.com/Infineon/bluetooth-freertos</a>).</li>
+<li>Mbed Framework: Mbed framework is an Mbed OS-based solution. Command Console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the BLE functionality, it uses the Cordio BLE stack in Mbed OS.</li>
+<li>Amazon FreeRTOS (AFR) Framework: AFR is a FreeRTOS-based solution. Command Console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API, and uses the AFR network abstraction and LwIP library for implementing socket functions. For the BLE functionality, this library uses <a href="https://github.com/Infineon/bluetooth-freertos">bluetooth-freertos</a>.</li>
 </ul>
 <h1><a class="anchor" id="section_dependencies"></a>
 Dependent Libraries</h1>
 <h2><a class="anchor" id="section_dep__anycloud"></a>
 ModusToolbox™</h2>
 <ul>
-<li><a href="https://github.com/cypresssemiconductorco/wifi-connection-manager">Wi-Fi Connection Manager</a></li>
-<li><a href="https://github.com/cypresssemiconductorco/bluetooth-freertos">bluetooth-freertos</a></li>
+<li><a href="https://github.com/Infineon/wifi-connection-manager">Wi-Fi Connection Manager</a></li>
+<li><a href="https://github.com/Infineon/bluetooth-freertos">bluetooth-freertos</a></li>
 </ul>
 <h2><a class="anchor" id="section_dep_mbed"></a>
 Mbed OS</h2>
 <ul>
 <li><a href="https://os.mbed.com/mbed-os/releases">Arm Mbed OS 6.2.0</a></li>
-<li><a href="https://github.com/cypresssemiconductorco/connectivity-utilities/releases/tag/latest-v3.X">Connectivity Utilities Library</a></li>
+<li><a href="https://github.com/Infineon/connectivity-utilities/releases/tag/latest-v3.X">Connectivity Utilities Library</a></li>
 </ul>
 <h2><a class="anchor" id="section_dep_afr"></a>
 Amazon FreeRTOS</h2>
 <ul>
-<li><a href="https://github.com/cypresssemiconductorco/amazon-freertos">Amazon FreeRTOS</a></li>
-<li><a href="https://github.com/cypresssemiconductorco/bluetooth-freertos">bluetooth-freertos</a></li>
+<li><a href="https://github.com/Infineon/amazon-freertos">Amazon FreeRTOS</a></li>
+<li><a href="https://github.com/Infineon/bluetooth-freertos">bluetooth-freertos</a></li>
 </ul>
 <h1><a class="anchor" id="section_quick_start"></a>
 Quick Start</h1>
@@ -155,14 +155,17 @@ Quick Start</h1>
 <h2><a class="anchor" id="framework_1"></a>
 ModusToolbox™</h2>
 <ul>
-<li>A set of pre-defined configuration files have been bundled with the wifi-mw-core library for Amazon FreeRTOS, lwIP, and mbed TLS. Review the configuration and make the required adjustments. See the "Quick Start" section in <a href="https://github.com/cypresssemiconductorco/wifi-mw-core/blob/master/README.md">README.md</a>.</li>
-<li>Define the following COMPONENTS in the application's Makefile for the HTTP Server Library. For additional information, see the "Quick Start" section in <a href="https://github.com/cypresssemiconductorco/wifi-mw-core/blob/master/README.md">README.md</a>. <div class="fragment"><div class="line">COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS</div>
+<li>Review and make the required changes to the pre-defined configuration files.<ul>
+<li>The configuration files are bundled with the wifi-mw-core library for FreeRTOS, lwIP, and Mbed TLS. See <a href="https://github.com/Infineon/wifi-mw-core/blob/master/README.md">README.md</a> for more details.</li>
+<li>If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using <em>Wi-Fi core freertos lwip mbedtls bundle library</em>, the configuration files are in <code>wifi-core-freertos-lwip-mbedtls/configs</code> folder. Similarly if the application is using <em>Ethernet Core FreeRTOS lwIP mbedtls library</em>, the configuration files are in <code>ethernet-core-freertos-lwip-mbedtls/configs</code> folder.</li>
+</ul>
+</li>
+<li>A set of COMPONENTS must be defined in the code example project's Makefile for this library. See the Quick Start section in <a href="https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls/blob/master/README.md">README.md</a>. <div class="fragment"><div class="line">COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS</div>
 </div><!-- fragment --></li>
 <li>To enable BLE functionality, add <code>WICED_BLE</code> to the <code>COMPONENTS</code> section in the application's Makefile: <div class="fragment"><div class="line">COMPONENTS=WICED_BLE</div>
 </div><!-- fragment --></li>
 <li>Add the following compiler directives to the <code>DEFINES</code> section in the application's Makefile: <div class="fragment"><div class="line">DEFINES=HAVE_SNPRINTF</div>
 </div><!-- fragment --></li>
-<li>Tune the lwIP configuration parameters depending on the required Wi-Fi throughput and use case.</li>
 </ul>
 <h2><a class="anchor" id="framework_2"></a>
 Mbed OS</h2>
@@ -171,9 +174,9 @@ Mbed OS</h2>
 <li>Create a folder named <code>deps</code>.</li>
 <li>Create a file with name mbed-os.lib and add the following line to this file: <div class="fragment"><div class="line">https:<span class="comment">//github.com/ARMmbed/mbed-os/#a2ada74770f043aff3e61e29d164a8e78274fcd4</span></div>
 </div><!-- fragment --></li>
-<li>Create a file with name connectivity-utilities.lib and add the following line to this file: <div class="fragment"><div class="line">https:<span class="comment">//github.com/cypresssemiconductorco/connectivity-utilities/#&lt;commit-SHA-for-latest-release-v3.X&gt;</span></div>
+<li>Create a file with name connectivity-utilities.lib and add the following line to this file: <div class="fragment"><div class="line">https:<span class="comment">//github.com/Infineon/connectivity-utilities/#&lt;commit-SHA-for-latest-release-v3.X&gt;</span></div>
 </div><!-- fragment --><ul>
-<li>Replace <code>&lt;commit-SHA-for-latest-release-v3.X&gt;</code> in the above line with commit SHA of the latest-v3.X tag available in the <a href="https://github.com/cypresssemiconductorco/connectivity-utilities/releases/tag/latest-v3.X">GitHub repository</a>. Example: For tag <code>release-v3.0.1</code> <div class="fragment"><div class="line">https:<span class="comment">//github.com/cypresssemiconductorco/connectivity-utilities/#68bd1bc9883a0ab424eb6daf1e726f0aba2c54a6</span></div>
+<li>Replace <code>&lt;commit-SHA-for-latest-release-v3.X&gt;</code> in the above line with commit SHA of the latest-v3.X tag available in the <a href="https://github.com/Infineon/connectivity-utilities/releases/tag/latest-v3.X">GitHub repository</a>. Example: For tag <code>release-v3.0.1</code> <div class="fragment"><div class="line">https:<span class="comment">//github.com/Infineon/connectivity-utilities/#68bd1bc9883a0ab424eb6daf1e726f0aba2c54a6</span></div>
 </div><!-- fragment --></li>
 </ul>
 </li>
