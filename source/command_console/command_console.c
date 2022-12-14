@@ -538,13 +538,6 @@ cy_rslt_t cy_command_console_init( cy_command_console_cfg_t *cfg )
         return CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
 
-    /* Validate thread priority */
-    if ( cfg->thread_priority > CY_RTOS_PRIORITY_MAX )
-    {
-        printf("Input thread priority [%d] is larger than RTOS max thread priority.\n", (int)cfg->thread_priority);
-        return CY_RSLT_COMMAND_CONSOLE_FAILURE;
-    }
-
     /* sanity check: max/min params num */
     if ( cfg->params_num < MIN_PARAMS )
     {

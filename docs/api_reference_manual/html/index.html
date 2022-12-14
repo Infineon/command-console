@@ -86,13 +86,14 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">Overview </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p >This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf and Bluetooth Low Energy (BLE) commands is bundled with this library.</p>
-<p >MTB AnyCloud Wi-Fi Bluetooth Tester, Mbed OS Wi-Fi Bluetooth Tester and AFR Wi-Fi Bluetooth Tester applications are built over this library.</p>
+<div class="textblock"><p >This library provides a framework to add command console support to your application. Support for Wi-Fi, Ethernet, iPerf and Bluetooth Low Energy (BLE) commands is bundled with this library.</p>
+<p >MTB AnyCloud Wi-Fi Bluetooth Tester, Mbed OS Wi-Fi Bluetooth Tester and AFR Wi-Fi Bluetooth Tester applications are built over this library for Wi-Fi kits.</p>
 <p >Please refer <a href="https://github.com/Infineon/command-console/blob/master/README.md">Readme</a> for more information.</p>
 <h1><a class="anchor" id="section_features"></a>
 Features and Functionality</h1>
 <ul>
 <li>Supports Wi-Fi commands to perform network operations such as scan, join, etc.</li>
+<li>Supports Ethernet commands to perform network operations such as ethernet interface up and ethernet interface down.</li>
 <li>Integrates iPerf 2.0 commands. iPerf is a tool for active measurements of the maximum achievable bandwidth on IP networks.</li>
 <li>Supports TCP client/server and UDP client/server on IPv4. IPv6 support will be added in the future.</li>
 <li>Supports Bluetooth LE commands including Tx/Rx for measuring BLE throughput</li>
@@ -109,6 +110,7 @@ ModusToolbox™</h2>
 <li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/">PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-MUR-43439M2)</a></li>
 <li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cyw943907aeval1f">CYW943907AEVAL1F evaluation kit (CYW943907AEVAL1F)</a></li>
 <li><a href="https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f">CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)</a></li>
+<li><a href="https://www.infineon.com/KIT_XMC72_EVK">XMC7200D-E272K8384 kit (KIT-XMC72-EVK)</a></li>
 </ul>
 <h2><a class="anchor" id="section_plat_mbed"></a>
 Mbed OS</h2>
@@ -125,7 +127,7 @@ Amazon FreeRTOS (AFR)</h2>
 <h1><a class="anchor" id="section_supported_frameworks"></a>
 Supported Frameworks</h1>
 <ul>
-<li>ModusToolbox&trade; environment: In this environment the command-console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API and uses the <a href="https://github.com/Infineon/secure-sockets">secure-sockets</a> library for implementing socket functions. For the BLE functionality, this library uses [bluetooth-freertos]((<a href="https://github.com/Infineon/bluetooth-freertos">https://github.com/Infineon/bluetooth-freertos</a>).</li>
+<li>ModusToolbox&trade; environment: In this environment the command-console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API and uses the <a href="https://github.com/Infineon/secure-sockets">secure-sockets</a> library for implementing socket functions. For the BLE functionality, this library uses <a href="https://github.com/Infineon/btstack-integration">BT stack Integration</a>.</li>
 <li>Mbed Framework: Mbed framework is an Mbed OS-based solution. Command Console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the BLE functionality, it uses the Cordio BLE stack in Mbed OS.</li>
 <li>Amazon FreeRTOS (AFR) Framework: AFR is a FreeRTOS-based solution. Command Console Library uses the <a href="https://github.com/Infineon/abstraction-rtos">abstraction-rtos</a> library that provides the RTOS abstraction API, and uses the AFR network abstraction and LwIP library for implementing socket functions. For the BLE functionality, this library uses <a href="https://github.com/Infineon/bluetooth-freertos">bluetooth-freertos</a>.</li>
 </ul>
@@ -134,8 +136,9 @@ Dependent Libraries</h1>
 <h2><a class="anchor" id="section_dep__anycloud"></a>
 ModusToolbox™</h2>
 <ul>
-<li><a href="https://github.com/Infineon/wifi-connection-manager">Wi-Fi Connection Manager</a></li>
-<li><a href="https://github.com/Infineon/bluetooth-freertos">bluetooth-freertos</a></li>
+<li><a href="https://github.com/Infineon/wifi-connection-manager">Wi-Fi connection manager</a></li>
+<li><a href="https://github.com/Infineon/ethernet-connection-manager">Ethernet connection manager</a></li>
+<li><a href="https://github.com/Infineon/btstack-integration">BT stack Integration</a></li>
 </ul>
 <h2><a class="anchor" id="section_dep_mbed"></a>
 Mbed OS</h2>
@@ -155,8 +158,12 @@ Quick Start</h1>
 <h2><a class="anchor" id="framework_1"></a>
 ModusToolbox™</h2>
 <ul>
-<li>Review and make the required changes to the pre-defined configuration files.<ul>
-<li>The configuration files are bundled with the wifi-mw-core library for FreeRTOS, lwIP, and Mbed TLS. See <a href="https://github.com/Infineon/wifi-mw-core/blob/master/README.md">README.md</a> for more details.</li>
+<li>Review and make the required changes to the pre-defined configuration files and Makefile COMPONENTS in the application.<ul>
+<li>The configuration files are bundled with the Wi-Fi core freertos lwip mbedtls library/Ethernet core freertos lwip mbedtls library for FreeRTOS, lwIP, and Mbed TLS.<ul>
+<li>See <a href="https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls/blob/master/README.md">README.md</a> of Wi-Fi core freertos lwip mbedtls library for Wi-Fi kits.</li>
+<li>See <a href="https://github.com/Infineon/ethernet-core-freertos-lwip-mbedtls/blob/master/README.md">README.md</a> of Ethernet core freertos lwip mbedtls library for Ethernet kits.</li>
+</ul>
+</li>
 <li>If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using <em>Wi-Fi core freertos lwip mbedtls bundle library</em>, the configuration files are in <code>wifi-core-freertos-lwip-mbedtls/configs</code> folder. Similarly if the application is using <em>Ethernet Core FreeRTOS lwIP mbedtls library</em>, the configuration files are in <code>ethernet-core-freertos-lwip-mbedtls/configs</code> folder.</li>
 </ul>
 </li>

@@ -12,6 +12,12 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v4.1.0
+
+- Added support for KIT-XMC72-EVK kit
+- Fixed build warnings with IAR 9.30 toolchain
+- Minor Documentation updates
+
 ### v4.0.0
 
 - Added ethernet utility support

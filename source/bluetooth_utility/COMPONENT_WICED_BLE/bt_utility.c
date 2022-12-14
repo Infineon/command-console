@@ -276,9 +276,9 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
         data_rate = (((float)data_le_rx_counter * 8)/elapsed_time);
         BT_LE_INFO(("start Time = %u ...\n", (unsigned int)start_time));
         BT_LE_INFO(("END Time = %u ...\n", (unsigned int)end_time));
-        BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
+        BT_LE_INFO(("elapsed time in seconds = %f \n", (double)elapsed_time));
         BT_LE_INFO(("total le bytes recieved  = %u \n", (unsigned int)data_le_rx_counter));
-        BT_LE_INFO(("RX throughput =  %f bps\n", data_rate));
+        BT_LE_INFO(("RX throughput =  %f bps\n", (double)data_rate));
         le_coc_data_rx_flag = false;
         data_le_rx_counter = 0;
         start_time = 0;
@@ -292,9 +292,9 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
         data_rate = (((float)data_le_tx_counter * 8)/elapsed_time);
         BT_LE_INFO(("start Time = %u ...\n", (unsigned int)start_time));
         BT_LE_INFO(("END Time = %u ...\n", (unsigned int)end_time));
-        BT_LE_INFO(("elapsed time in seconds = %f \n", elapsed_time));
+        BT_LE_INFO(("elapsed time in seconds = %f \n", (double)elapsed_time));
         BT_LE_INFO(("total le bytes transferred  = %u \n", (unsigned int)data_le_tx_counter));
-        BT_LE_INFO(("TX throughput =  %f bps\n", data_rate));
+        BT_LE_INFO(("TX throughput =  %f bps\n", (double)data_rate));
         data_le_tx_counter = 0;
         start_time = 0;
         end_time = 0;

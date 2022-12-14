@@ -2,13 +2,15 @@
 
 ## Introduction
 
-This library provides a framework to add command console support to your application. Support for Wi-Fi, iPerf, and Bluetooth Low Energy commands are bundled with this library.
+This library provides a framework to add command console support to your application. Support for Wi-Fi, Ethernet, iPerf, and Bluetooth Low Energy commands are bundled with this library.
 
-[ModusToolbox&trade; AnyCloud Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mbed-os-wifi-bluetooth-tester), and [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/afr-wifi-bluetooth-tester) applications are built over this library.
+[ModusToolbox&trade; AnyCloud Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mtb-anycloud-wifi-bluetooth-tester), [Mbed OS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/mbed-os-wifi-bluetooth-tester), and [Amazon FreeRTOS Tester - Wi-Fi Bluetooth&reg; Console](https://github.com/Infineon/afr-wifi-bluetooth-tester) applications are built over this library for Wi-Fi kits.
 
 ## Features
 
 - Supports Wi-Fi commands to perform network operations such as scan and join
+
+- Supports Ethernet commands to perform network operations such as ethernet interface up and ethernet interface down.
 
 - Integrates iPerf 2.0 commands. iPerf is a tool for active measurements of the maximum achievable bandwidth on IP networks.
 
@@ -36,6 +38,8 @@ This library is supported on the following list of platforms/frameworks.
 
 - [CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f)
 
+- [XMC7200D-E272K8384 kit (KIT-XMC72-EVK)](https://www.infineon.com/KIT_XMC72_EVK)
+
 ### Mbed OS
 
 - [PSoC&trade; 6 Wi-Fi Bluetooth&reg; prototyping kit (CY8CPROTO-062-4343W)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8cproto-062-4343w/)
@@ -52,7 +56,7 @@ This library is supported on the following list of platforms/frameworks.
 
 This library supports the following frameworks:
 
-- **ModusToolbox&trade; environment:** In this environment the command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/Infineon/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [bluetooth-freertos](https://github.com/Infineon/bluetooth-freertos).
+- **ModusToolbox&trade; environment:** In this environment the command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the [secure-sockets](https://github.com/Infineon/secure-sockets) library for implementing socket functions. For the Bluetooth&reg; LE functionality, this library uses [BT stack Integration](https://github.com/Infineon/btstack-integration).
 
 - **Mbed framework:** The Mbed framework is an Mbed OS-based solution. The command console library uses the [abstraction-rtos](https://github.com/Infineon/abstraction-rtos) library that provides the RTOS abstraction API, and uses the Mbed socket API for implementing socket functions. For the Bluetooth&reg; functionality, it uses the Cordio Bluetooth&reg; LE stack in Mbed OS.
 
@@ -66,7 +70,9 @@ This section provides the list of dependent libraries required for this middlewa
 
 - [Wi-Fi connection manager](https://github.com/Infineon/wifi-connection-manager)
 
-- [Bluetooth&reg; stack for FreeRTOS](https://github.com/Infineon/bluetooth-freertos)
+- [Ethernet connection manager](https://github.com/Infineon/ethernet-connection-manager)
+
+- [BT stack Integration](https://github.com/Infineon/btstack-integration)
 
 ### Mbed OS
 
@@ -86,13 +92,14 @@ This library is supported on ModusToolbox&trade;, Mbed OS, and FreeRTOS framewor
 
 ### ModusToolbox&trade;
 
-1. Review and make the required changes to the pre-defined configuration files.
+1. Review and make the required changes to the pre-defined configuration files and Makefile COMPONENTS in the application.
 
-- The configuration files are bundled with the wifi-mw-core library for FreeRTOS, lwIP, and Mbed TLS. See README.md for details.
+    - The configuration files for FreeRTOS, lwIP, and Mbed TLS combination are bundled in Wi-Fi core freertos lwip mbedtls library for Wi-Fi kits and in Ethernet core freertos lwip mbedtls library for Ethernet kits.
 
-   See the "Quick Start" section in [README.md](https://github.com/Infineon/wifi-mw-core/blob/master/README.md)(https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls/blob/master/README.md).
+      - See the "Quick Start" section in [README.md](https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls/blob/master/README.md) of Wi-Fi core freertos lwip mbedtls library for Wi-Fi kits
+      - See the "Quick Start" section in [README.md](https://github.com/Infineon/ethernet-core-freertos-lwip-mbedtls/blob/master/README.md) of Ethernet core freertos lwip mbedtls library for Ethernet kits
 
-- If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using Wi-Fi core freertos lwip mbedtls bundle library, the configuration files are in wifi-core-freertos-lwip-mbedtls/configs folder. Similarly if the application is using Ethernet Core FreeRTOS lwIP mbedtls library, the configuration files are in ethernet-core-freertos-lwip-mbedtls/configs folder.
+    - If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using Wi-Fi core freertos lwip mbedtls bundle library, the configuration files are in wifi-core-freertos-lwip-mbedtls/configs folder. Similarly if the application is using Ethernet Core FreeRTOS lwIP mbedtls library, the configuration files are in ethernet-core-freertos-lwip-mbedtls/configs folder.
 
 2. A set of COMPONENTS must be defined in the code example project's Makefile for this library. 
 
@@ -370,6 +377,41 @@ The iPerf command given in the [iPerf commands for Wi-Fi throughput measurement]
 
 For example, when you run the command `iperf -c 192.168.0.100 -t 60 -u -b 50M` to measure the UDP Tx throughput on the device, if you see the resulting throughput closer to 50 Mbps, you should run the same command again with the `-b 60M` option and measure the throughput again. If the resulting throughput is different (56 Mbps, which is lesser than 60M, for example), the max UDP Tx throughput supported by the device is 56 Mbps. On the contrary, if the resulting throughput is 27 Mbps with the `-b 50M` option, you should run the same command again with the `-b 30M` option and measure the throughput again. If the resulting throughput in this case is 28 Mbps, this is the max UDP Tx throughput supported by the PSoC&trade; device. Use this as a guideline to identify the real max UDP throughput supported by your device.
 
+### Ethernet commands
+
+#### *Basic Ethernet commands*
+
+Use the following Ethernet commands to perform network operations. Enter the following commands after the device boots up and the Ethernet module is initialized and ready.
+
+1. Bring up the network:
+   ```
+   > eth_up <Speed type(MII/GMII/RGMII/RMII)> <Link speed(10M/100M/1000M/AUTO)> <Duplex mode(HALF/FULL/AUTO)> <ethernet interface ID(0/1)>
+   ```
+2. Bring down the network:
+   ```
+   > eth_down
+   ```
+3. Set the filters to the hardware:
+   ```
+   > eth_set_filter
+   ```
+4. Enable MAC address filtering:
+   ```
+   > eth_set_filter_address <1-4 supported Filter numbers> <src/dest(Source/Destination)> <X:X:X:X:X:X(MAC address)> <X(Bytes)>
+   ```
+5. Enable broadcast:
+   ```
+   > eth_broadcast <1/0(Enable=1,Disable=0)>
+   ```
+6. Enable promiscuous mode:
+   ```
+   > eth_set_promiscuous_mode <1/0(Enable=1,Disable=0)>
+   ```
+7. Ping another device on the network:
+   ```
+   > eth_ping <ip address>
+   ```
+
 ## Bluetooth&reg; LE commands
 
 As an example, use the LE connection-oriented channel (CoC) application on a CYW20719B2Q40EVB-01 kit as the Bluetooth&reg; LE peer device to measure the Bluetooth&reg; LE throughput. Ensure that the Bluetooth&reg; LE connection-interval and LE-COC-MTU-size configurations are set to the same value in both the Bluetooth&reg; LE devices that are used for throughput measurement. To modify the Bluetooth&reg; LE connection-interval and MTU, see the [Tuning for optimal Bluetooth&reg; LE performance](#tuning-for-optimal-ble-performance) section.
@@ -584,11 +626,15 @@ The theoretical Bluetooth&reg; LE throughput achievable for  these default value
 
 **ModusToolbox&trade;:**
 
-   By default, `Wifi`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following to the Makefile of the application.
+   By default, `Wifi`, `Ethernet`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following to the Makefile of the application.
    
    To disable Wi-Fi commands:
    ```
    DEFINES+=DISABLE_COMMAND_CONSOLE_WIFI
+   ```
+   To disable Ethernet commands:
+   ```
+   DEFINES+=DISABLE_COMMAND_CONSOLE_ETH
    ```
    To disable iperf command:
    ```
@@ -601,11 +647,15 @@ The theoretical Bluetooth&reg; LE throughput achievable for  these default value
    
 **Mbed OS:**
 
-   By default, `Wifi`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following macros to the *macros* section of the application's *mbed_app.json*. The JSON entry would look like as follows:
+   By default, `Wifi`, `Ethernet`, `bluetooth` and `iperf` utilities are enabled. To disable any of these utilities add the following macros to the *macros* section of the application's *mbed_app.json*. The JSON entry would look like as follows:
 
    To disable Wi-Fi commands:
    ```
    macros : "DISABLE_COMMAND_CONSOLE_WIFI"
+   ```
+   To disable Ethernet commands:
+   ```
+   macros : "DISABLE_COMMAND_CONSOLE_ETH"
    ```
    To disable iperf command:
    ```

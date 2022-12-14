@@ -86,7 +86,7 @@ extern "C" {
  * The data structure cy_rslt_t is part of cy_result.h located in <core_lib/include>.
  *
  * Module base: This base is derived from CY_RSLT_MODULE_MIDDLEWARE_BASE (defined in cy_result.h) and is an offset of the CY_RSLT_MODULE_MIDDLEWARE_BASE.
- *              The details of the offset and the middleware base are defined in cy_result_mw.h, which is part of [GitHub connectivity-utilities] (https://github.com/cypresssemiconductorco/connectivity-utilities).
+ *              The details of the offset and the middleware base are defined in cy_result_mw.h, which is part of [GitHub connectivity-utilities] (https://github.com/infineon/connectivity-utilities).
  *              For example, the Command Console library uses CY_RSLT_MODULE_COMMAND_CONSOLE_BASE as the module base.
  *
  * Type: This type is defined in cy_result.h and can be one of CY_RSLT_TYPE_FATAL, CY_RSLT_TYPE_ERROR, CY_RSLT_TYPE_WARNING, or CY_RSLT_TYPE_INFO. AWS library error codes are of type CY_RSLT_TYPE_ERROR.
