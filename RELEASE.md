@@ -12,6 +12,10 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v4.1.1
+
+- Minor bug fixes
+
 ### v4.1.0
 
 - Added support for KIT-XMC72-EVK kit

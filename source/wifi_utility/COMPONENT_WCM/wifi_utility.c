@@ -182,6 +182,7 @@ int join(int argc, char* argv[], tlv_buffer_t** data)
     WIFI_INFO(("Connecting to AP please wait...\n"));
     for(retry_count = 0; retry_count < CMD_CONSOLE_MAX_WIFI_RETRY_COUNT; retry_count++)
     {
+        memset(&ip_addr, 0x00, sizeof(cy_wcm_ip_address_t));
         res = cy_wcm_connect_ap(&connect_params, &ip_addr);
         if(res != CY_RSLT_SUCCESS)
         {
