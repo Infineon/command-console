@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -57,7 +57,7 @@
 
 #define HAVE_STRINGS_H
 
-#if defined(__ARMCC_VERSION)
+#if defined(__ARMCC_VERSION) && !defined(SSIZE_MAX)
 typedef signed   int  ssize_t;  ///< Signed size type, usually encodes negative errors
 #endif
 

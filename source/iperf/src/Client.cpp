@@ -1,5 +1,5 @@
 /*
-* Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -296,8 +296,9 @@ double Client::Connect( ) {
                   : AF_INET);
     /* IPERF_MODIFIED Start */
     mSettings->mSock = iperf_socket( domain, type, 0 );
+    FAIL_errno( mSettings->mSock == INVALID_SOCKET, "Invalid socket", mSettings );
+//  WARN_errno( mSettings->mSock == INVALID_SOCKET, "socket" );
     /* IPERF_MODIFIED End */
-    WARN_errno( mSettings->mSock == INVALID_SOCKET, "socket" );
 
     /* IPERF_MODIFIED Start */
     IPERF_DEBUGF( SOCKET_DEBUG | IPERF_DBG_TRACE, ("Client is setting socket options for socket %d: {\n"

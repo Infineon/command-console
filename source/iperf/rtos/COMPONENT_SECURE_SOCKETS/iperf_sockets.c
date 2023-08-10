@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -203,7 +203,8 @@ int iperf_socket( int protocolFamily, int type, int protocol )
             if(result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_DEBUG(("cy_socket_create failed with error %d\r\n", result));
-                return -1;
+                id = -1;
+                goto exit;
             }
             break;
 
@@ -214,17 +215,23 @@ int iperf_socket( int protocolFamily, int type, int protocol )
             if(result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_DEBUG(("cy_socket_create failed with error %d\r\n", result));
-                return -1;
+                id = -1;
+                goto exit;
             }
             break;
         default:
             IPERF_SOCKET_DEBUG(("Invalid socket type \n"));
             id = -1;
-            break;
+            goto exit;
     }
 
     IPERF_SOCKET_DEBUG(("iperf_socket : Done \n"));
+    return id;
 
+exit:
+    IPERF_SOCKET_DEBUG(("iperf_socket : Done with error \n"));
+    memset(free_socket,0,sizeof(bsd_socket_t));
+    free_socket->available = true;
     return id;
 }
 
@@ -556,7 +563,7 @@ int iperf_accept(int sockID, struct sockaddr *ClientAddress, uint32_t *addressLe
     }
 
     IPERF_SOCKET_DEBUG(("iperf_accept : Done, Status %d\n", result));
-    return result;
+    return sockID;
 }
 
 int iperf_listen(int sockID, int backlog)

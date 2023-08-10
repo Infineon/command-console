@@ -1,5 +1,5 @@
 /*
-* Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -208,12 +208,7 @@ int usleep(useconds_t usec);
     #include <math.h>
 
 /* IPERF_MODIFIED_Start */
-#if defined(__ICCARM__)
-    typedef socklen_t     Socklen_t;
-#else
-    typedef uint32_t      socklen_t;
-    typedef socklen_t     Socklen_t;
-#endif //__ICCARM__
+typedef socklen_t     Socklen_t;
 /* IPERF_MODIFIED_End */
 
 #endif /* not defined WIN32 */

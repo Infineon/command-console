@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -31,49 +31,37 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#ifndef PLATFORM_CONFIG_H
-#define PLATFORM_CONFIG_H
+#ifndef HAVE_GETTIMEOFDAY
+
+#if defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_)
+/* NOTE: config.h doesn't have guard includes! */
+#define INCLUDED_CONFIG_H_
+#include "config.h"
+#endif /* defined(HAVE_CONFIG_H) && !defined(INCLUDED_CONFIG_H_) */
 
 #include "headers.h"
+#include "gettimeofday.h"
 #include <FreeRTOS.h>
 #include <task.h>
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
-/******************************************************
- *                      Macros
- ******************************************************/
- 
- /******************************************************
- *                    Constants
- ******************************************************/
+int anycloud_gettimeofday(struct timeval* tv, void* timezone)
+{
+    cy_time_t time_ms;
 
-/******************************************************
- *                   Enumerations
- ******************************************************/
+    (void)timezone; /* Unused parameter */
+    (void) cy_rtos_get_time(&time_ms);
+    tv->tv_sec =  ( time_ms / 1000 );
+    tv->tv_usec = ( time_ms - ( tv->tv_sec * 1000 ) ) * 1000;
 
-/******************************************************
- *                 Type Definitions
- ******************************************************/
- 
- /******************************************************
- *                    Structures
- ******************************************************/
- 
- /******************************************************
- *                 Global Variables
- ******************************************************/
-
-/******************************************************
- *               Function Declarations
- ******************************************************/
-
-int usleep(unsigned long time);
+    return 0;
+}
 
 #ifdef __cplusplus
-} /*extern "C" */
+} /* end extern "C" */
 #endif
 
-#endif // PLATFORM_CONFIG_H
+#endif /* !defined(HAVE_GETTIMEOFDAY) */

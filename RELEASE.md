@@ -9,8 +9,14 @@ See the [README.md](./README.md) for a complete description of the command conso
 | ------- | ---------- |
 | Running iperf command in client UDP mode with the `-i 1` (interval) option reports a lower throughput. | Run the iPerf without the `-i` (interval) option (or) use an interval value greater than 1 second. |
 | IAR 9.30 toolchain throws build errors on Debug mode, if application explicitly includes iar_dlmalloc.h file | Add '--advance-heap' to LDFLAGS in application Makefile. |
+| Running iperf command without network connection will lead to memory leak. This memory leak can lead to unpredicted behaviour. | Ensure the network connection is up before issuing any iperf commands. |
 
 ## Changelog
+
+### v5.0.0
+- Removed support for AFR and MBED OS.
+- Added support for new security type wpa2_aes_sha256
+- Minor bug fixes
 
 ### v4.1.1
 
@@ -76,9 +82,8 @@ The current version of the library was validated for compatibility with the foll
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software                            | 3.0     |
-| PSoC&trade; 6 peripheral driver library (PDL)           | 3.0.0   |
-| GCC Compiler                                            | 10.3.1  |
+| ModusToolbox&trade; software                            | 3.1     |
+| ModusToolbox&trade; Device Configurator                 | 4.10    |
+| GCC Compiler                                            | 11.3.1  |
 | IAR Compiler (only for ModusToolbox&trade;)             | 9.30    |
-| Arm® Compiler 6                                         | 6.16   |
-| Mbed OS                                                 | 6.2.0   |
+| Arm® Compiler 6                                         | 6.16    |
