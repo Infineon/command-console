@@ -37,10 +37,39 @@
  */
 #include "cy_secure_sockets.h"
 #include "iperf_sockets.h"
+#ifdef COMPONENT_LWIP
 #include "lwipopts.h"
+#endif
+#ifdef COMPONENT_NETXDUO
+#include "nx_user.h"
+#include "whd.h"
+#endif
 #include "cyabs_rtos_impl.h"
 #include "cyabs_rtos.h"
 #include <time.h>
+
+#ifdef COMPONENT_NETXDUO
+#ifndef DEFAULT_TCP_WINDOW_SIZE
+#define DEFAULT_TCP_WINDOW_SIZE     (16 * 1024)
+#endif
+
+#ifndef NX_TCP_MAXIMUM_TX_QUEUE
+/* Default value set is 20 */
+#define NX_TCP_MAXIMUM_TX_QUEUE     (20)
+#endif /* NX_TCP_MAXIMUM_TX_QUEUE */
+
+#ifndef COMPONENT_CAT5
+#define TX_BUFFER_PAYLOAD_SIZE      (WHD_LINK_MTU)
+#define CY_NX_TCP_SND_BUF           (NX_TCP_MAXIMUM_TX_QUEUE*TX_BUFFER_PAYLOAD_SIZE)
+#endif /* !COMPONENT_CAT5 */
+
+#ifdef COMPONENT_CAT5
+#define TX_BUFFER_PAYLOAD_SIZE      (WHD_LINK_MTU + 20)
+/* NX_TCP_MAXIMUM_TX_QUEUE is not configurable in CAT5(H1-CP) devices. Default value set is 20 */
+#define CY_NX_TCP_SND_BUF           (NX_TCP_MAXIMUM_TX_QUEUE*TX_BUFFER_PAYLOAD_SIZE)
+#endif /* COMPONENT_CAT5 */
+
+#endif
 
 #define IPERF_SOCKET_DEBUG(x) //printf x
 #define IPERF_SOCKET_ERROR(x) //printf x
@@ -375,14 +404,18 @@ int iperf_recvfrom(int sockID, char *buffer, size_t buffersize, int flags,struct
     uint32_t bytes_received = 0;
     uint32_t address_length = 0;
     cy_rslt_t result = CY_RSLT_SUCCESS;
+#ifdef COMPONENT_NETXDUO
+    uint32_t timeout = NX_WAIT_FOREVER;
+#else
     int timeout = 0;
+#endif
 
     IPERF_SOCKET_DEBUG(("iperf_recvfrom : Read data with buffer length : %d \r\n", buffersize));
 
     cy_socket_sockaddr_t src_addr;
     address_length = sizeof(cy_socket_sockaddr_t);
 
-    /* set the receive timeout to 0 to block till UDP datagram is received from Client */
+    /* set the receive timeout to block till UDP datagram is received from Client */
     result = cy_socket_setsockopt(sockets[sockID].socket, CY_SOCKET_SOL_SOCKET, CY_SOCKET_SO_RCVTIMEO, &timeout, sizeof(int));
     if ( result != CY_RSLT_SUCCESS)
     {
@@ -426,9 +459,6 @@ int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags)
 
     IPERF_SOCKET_DEBUG(("iperf_recv : Read data with buffer length : %d\n", bufferLength));
 
-    /* There is no support for MSG_PEEK flag in MBEDOS receive. IPERF calls iperf_recv with MSG_PEEK flag and bufferLength as 4 bytes
-     * Hence buffer the read data to socket buffer and copy it in next recv call.
-     */
     if((flags & MSG_PEEK) != MSG_PEEK)
     {
         if(sockets[sockID].rcv_buffer_len != 0)
@@ -846,11 +876,19 @@ int iperf_getsockopt(int sockID, int option_level, int option_name, void *option
             switch ( option_name )
             {
                 case SO_SNDBUF:
+#ifdef COMPONENT_NETXDUO
+                    *(uint32_t*) option_value = CY_NX_TCP_SND_BUF;
+#else
                     *(uint32_t*) option_value = TCP_SND_BUF;
+#endif
                     *option_length = sizeof(uint32_t);
                     break;
                 case SO_RCVBUF:
+#ifdef COMPONENT_NETXDUO
+                    *(uint32_t*) option_value = DEFAULT_TCP_WINDOW_SIZE;
+#else
                     *(uint32_t*) option_value = TCP_WND;
+#endif
                     *option_length = sizeof(uint32_t);
                     break;
                 default:
@@ -863,7 +901,11 @@ int iperf_getsockopt(int sockID, int option_level, int option_name, void *option
             {
                 case SO_SNDBUF:
                 case SO_RCVBUF:
+#ifdef COMPONENT_NETXDUO
+                    *(uint32_t*) option_value = DEFAULT_TCP_WINDOW_SIZE;
+#else
                     *(uint32_t*) option_value = TCP_WND;
+#endif
                     *option_length = sizeof(uint32_t);
                     break;
                 default:

@@ -31,34 +31,15 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#include "headers.h"
-#include "debug.h"
+#ifndef USLEEP
+#define USLEEP
 
-#if IPERF_DEBUG
-//static Mutex debugprint_mutex;
-static int   debugprint_mutex_init = 0;
+#include "platform_wait_api.h"
 
-void debug_get_mutex() {
-    if (debugprint_mutex_init != 0)
-        Mutex_Lock(&debugprint_mutex);
+int usleep(unsigned long usec)
+{
+    unsigned long xDelay = usec / 1000; // Convert microseconds to milliseconds
+    cy_rtos_delay_milliseconds( (cy_time_t)xDelay );
+    return 0;
 }
-
-void debug_release_mutex() {
-    if (debugprint_mutex_init != 0)
-        Mutex_Unlock(&debugprint_mutex);
-}
-#endif /* IPERF_DEBUG */
-
-void debug_init() {
-#if IPERF_DEBUG
-    Mutex_Initialize(&debugprint_mutex);
-    debugprint_mutex_init = 1;
-#endif /* IPERF_DEBUG */
-}
-
-void debug_destroy() {
-#if IPERF_DEBUG
-    Mutex_Destroy(&debugprint_mutex);
-    debugprint_mutex_init = 0;
-#endif /* IPERF_DEBUG */
-}
+#endif

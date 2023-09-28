@@ -35,6 +35,7 @@
  *
  */
 #ifndef DISABLE_COMMAND_CONSOLE_BT
+#ifndef COMPONENT_CAT5
 #include "command_console.h"
 #include "bt_cfg.h"
 #include "wiced_bt_stack.h"
@@ -309,7 +310,7 @@ void start_data_thread()
     }
 
     /* start BLE TX/RX data Thread */
-    if (cy_rtos_create_thread(&ble_thread, send_data_thread, "BLE Data Thread", NULL, BLE_WORKER_THREAD_STACK_SIZE, BLE_WORKER_THREAD_PRIORITY, NULL) != CY_RSLT_SUCCESS)
+    if (cy_rtos_create_thread(&ble_thread, send_data_thread, "BLE Data Thread", NULL, BLE_WORKER_THREAD_STACK_SIZE, BLE_WORKER_THREAD_PRIORITY, 0) != CY_RSLT_SUCCESS)
     {
         BT_LE_ERROR(("unable to create the thread \n"));
     }
@@ -746,4 +747,5 @@ WICED_BLE_WEAK_FUNC void bt_utility_init(void)
 {
     cy_command_console_add_table (bt_coex_command_table);
 }
+#endif /* !COMPONENT_CAT5 */
 #endif

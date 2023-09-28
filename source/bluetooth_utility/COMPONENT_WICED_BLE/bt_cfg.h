@@ -34,12 +34,16 @@
 #ifndef APP_BT_CFG_H_
 #define APP_BT_CFG_H_
 
+#ifndef COMPONENT_CAT5
+
 #include "wiced_bt_cfg.h"
 #include "cybt_platform_config.h"
 #include "cybsp_types.h"
 
 extern const wiced_bt_cfg_settings_t wiced_bt_command_console_cfg_settings;
 extern const cybt_platform_config_t bt_platform_cfg_settings;
+
+#endif /* ! COMPONENT_CAT5 */
 
 #endif /* APP_BT_CFG_H_ */
 

@@ -78,29 +78,31 @@ extern "C" {
  ******************************************************/
 
 /* Wi-Fi commands */
-int join         (int argc, char* argv[], tlv_buffer_t** data);
-int leave        (int argc, char* argv[], tlv_buffer_t** data);
-int scan         (int argc, char* argv[], tlv_buffer_t** data);
-int ping         (int argc, char* argv[], tlv_buffer_t** data);
-int get_rssi     (int argc, char* argv[], tlv_buffer_t** data);
-int start_ap     (int argc, char* argv[], tlv_buffer_t** data);
-int stop_ap      (int argc, char* argv[], tlv_buffer_t** data);
+int join               (int argc, char* argv[], tlv_buffer_t** data);
+int leave              (int argc, char* argv[], tlv_buffer_t** data);
+int scan               (int argc, char* argv[], tlv_buffer_t** data);
+int ping               (int argc, char* argv[], tlv_buffer_t** data);
+int get_rssi           (int argc, char* argv[], tlv_buffer_t** data);
+int start_ap           (int argc, char* argv[], tlv_buffer_t** data);
+int stop_ap            (int argc, char* argv[], tlv_buffer_t** data);
+int get_sta_ifconfig   (int argc, char* argv[], tlv_buffer_t** data);
 
 #define WIFI_COMMANDS_LIMITED_SET \
-    { (char*) "join",           join,       2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
-    { (char*) "leave",          leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
-    { (char*) "scan",           scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
-    { (char*) "ping",           ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
-    { (char*) "get_rssi",       get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
-    { (char*) "wifi_join",      join,       2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
-    { (char*) "wifi_leave",     leave,      0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
-    { (char*) "wifi_scan",      scan,       0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
-    { (char*) "wifi_ping",      ping,       0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
-    { (char*) "wifi_get_rssi",  get_rssi,   0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
-    { (char*) "start_ap",       start_ap,   4, NULL, NULL, \
+    { (char*) "join",               join,             2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
+    { (char*) "leave",              leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
+    { (char*) "scan",               scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
+    { (char*) "ping",               ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
+    { (char*) "get_rssi",           get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
+    { (char*) "wifi_join",          join,             2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
+    { (char*) "wifi_leave",         leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
+    { (char*) "wifi_scan",          scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
+    { (char*) "wifi_ping",          ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
+    { (char*) "wifi_get_rssi",      get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
+    { (char*) "start_ap",           start_ap,         4, NULL, NULL, \
       (char*) "<ssid> <open|wpa2|wpa2_aes|wpa3|wpa3_wpa2|wep|wep_shared> <key> <channel> [band<0=auto,1=5G,2=2.4G,3=6G>] <bandwidth> [ip] [netmask]\n-->When any parameter has spaces, use quotes.\n\tE.g. start_ap \"my ssid\" wpa2 \"my wpa2 key \" 11 20 192.168.2.1 255.255.255.0.  Default settings for ip and subnet mask are 192.168.0.1 and 255.255.255.0, or the last ip and subnet specified through this command if applicable.", \
       (char*) "Start AP mode."}, \
-    { (char*) "stop_ap",        stop_ap,    0, NULL, NULL, (char*) "", (char*) "Stop AP mode."}, \
+    { (char*) "stop_ap",            stop_ap,          0, NULL, NULL, (char*) "", (char*) "Stop AP mode."}, \
+    { (char*) "get_sta_ifconfig",   get_sta_ifconfig, 0, NULL, NULL, (char*) "", (char*) "Get IP & MAC address of STA."}, \
 
 /******************************************************
  *                    Constants
@@ -344,6 +346,33 @@ int stop_ap(int argc, char* argv[], tlv_buffer_t** data)
     }
 
     WIFI_INFO(("stop_ap successful!\n"));
+    return 0;
+}
+
+int get_sta_ifconfig(int argc, char* argv[], tlv_buffer_t** data)
+{
+    cy_rslt_t res, result;
+    cy_wcm_ip_address_t ip_addr;
+    uint8_t mac[6] = {0};
+
+    res = cy_wcm_get_ip_addr(CY_WCM_INTERFACE_TYPE_STA, &ip_addr);
+    if (res != CY_RSLT_SUCCESS)
+    {
+         WIFI_INFO(("cy_wcm_get_ip_addr failed...! with error: [0x%X]\n", (unsigned int)res));
+    }
+    else
+    {
+         print_ip4(ip_addr.ip.v4);
+    }
+    result = cy_wcm_get_mac_addr(CY_WCM_INTERFACE_TYPE_STA, &mac);
+    if (result != CY_RSLT_SUCCESS)
+    {
+         WIFI_INFO(("STA MAC Address failed result:%u\n", (unsigned int)result));
+    }
+    else
+    {
+         WIFI_INFO(("MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]));
+    }
     return 0;
 }
 

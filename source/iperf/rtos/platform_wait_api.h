@@ -31,12 +31,13 @@
  * so agrees to indemnify Cypress against all liability.
  */
 
-#ifndef IPERF_SOCKETS_H
-#define IPERF_SOCKETS_H
+#ifndef PLATFORM_CONFIG_H
+#define PLATFORM_CONFIG_H
 
-#include "lwip/sockets.h"
-#include "iperf_utility.h"
-#include <stdbool.h>
+#include "headers.h"
+#include "cyabs_rtos.h"
+#include "cyabs_rtos_impl.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,8 +45,8 @@ extern "C" {
 /******************************************************
  *                      Macros
  ******************************************************/
-
-/******************************************************
+ 
+ /******************************************************
  *                    Constants
  ******************************************************/
 
@@ -56,8 +57,12 @@ extern "C" {
 /******************************************************
  *                 Type Definitions
  ******************************************************/
-
-/******************************************************
+ 
+ /******************************************************
+ *                    Structures
+ ******************************************************/
+ 
+ /******************************************************
  *                 Global Variables
  ******************************************************/
 
@@ -65,30 +70,10 @@ extern "C" {
  *               Function Declarations
  ******************************************************/
 
-void sockets_layer_init(void);
-void iperf_network_init( void * networkInterface );
-int iperf_socket( int protocolFamily, int type, int protocol );
-int iperf_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
-int iperf_close( int sockID);
-int iperf_write( int sockID, const char *msg, size_t msgLength );
-int iperf_read(int s, void *mem, size_t len);
-bool iperf_setsock_blocking (int fd, bool blocking);
-int iperf_send(int sockID, const char *msg, size_t msgLength, int flags);
+int usleep(unsigned long time);
 
-int iperf_getpeername(int sockID, struct sockaddr *remoteAddress, uint32_t *addressLength);
-int iperf_getsockname(int sockID, struct sockaddr *localAddress, uint32_t *addressLength);
-int iperf_recvfrom(int sockID, char *buffer, size_t buffersize, int flags,struct sockaddr *fromAddr, uint32_t *fromAddrLen);
-int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags);
-int iperf_accept(int sockID, struct sockaddr *ClientAddress, uint32_t *addressLength);
-int iperf_listen(int sockID, int backlog);
-int iperf_bind(int sockID, struct sockaddr *localAddress, uint32_t addressLength);
-int iperf_connect(int sockID, struct sockaddr *remoteAddress, uint32_t addressLength);
-int iperf_setsockopt(int sockID, int option_level, int option_name, const void *option_value, uint32_t option_length);
-int iperf_getsockopt(int sockID, int option_level, int option_name, void *option_value,uint32_t *option_length);
-int iperf_sendto(int sockID, char *msg, size_t msgLength, int flags, struct sockaddr *destAddr, uint32_t destAddrLen);
-struct hostent* iperf_gethostbyname(const char *name);
 #ifdef __cplusplus
 } /*extern "C" */
 #endif
 
-#endif //IPERF_SOCKETS_H
+#endif // PLATFORM_CONFIG_H

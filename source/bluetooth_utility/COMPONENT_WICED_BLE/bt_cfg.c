@@ -31,6 +31,7 @@
  * so agrees to indemnify Cypress against all liability.
  */
 #ifndef DISABLE_COMMAND_CONSOLE_BT
+#ifndef COMPONENT_CAT5
 #include "bt_cfg.h"
 #include "wiced_bt_dev.h"
 #include "wiced_bt_ble.h"
@@ -181,4 +182,5 @@ const cybt_platform_config_t bt_platform_cfg_settings =
 
     .task_mem_pool_size    = 2048
 };
+#endif /* ! COMPONENT_CAT5 */
 #endif

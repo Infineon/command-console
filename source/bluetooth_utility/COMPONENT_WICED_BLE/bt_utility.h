@@ -35,7 +35,7 @@
  *
  */
 #pragma once
-
+#ifndef COMPONENT_CAT5
 /* add header files here */
 
 #ifdef __cplusplus
@@ -47,3 +47,4 @@ void bt_utility_init(void);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+#endif /* !COMPONENT_CAT5 */

@@ -1011,6 +1011,7 @@ void Listener::Accept( thread_Settings *server ) {
 	    timeout.tv_sec = mSettings->mAmount / 100;
 	    timeout.tv_usec = (mSettings->mAmount % 100) * 10000;
 	    fd_set set;
+
 	    FD_ZERO(&set);
 	    FD_SET(mSettings->mSock, &set);
 	    /* IPERF_MODIFIED Start */
@@ -1198,6 +1199,7 @@ void Listener::UDPSingleServer( ) {
 		timeout.tv_sec = mSettings->mAmount / 100;
 		timeout.tv_usec = (mSettings->mAmount % 100) * 10000;
 		fd_set set;
+
 		FD_ZERO(&set);
 		FD_SET(mSettings->mSock, &set);
                 /* IPERF_MODIFIED Start */

@@ -99,9 +99,8 @@
 extern "C" {
 #endif
 
-#include "lwip/netdb.h"
+#include "iperf_netdb_internal.h"
 #include "iperf_sockets.h"
-#include "lwip/netdb.h"
 
 #ifdef __cplusplus
 }
@@ -184,7 +183,6 @@ int usleep(useconds_t usec);
         #define NO_ITIMER
     #endif /* NO_ITIMER */
 
-    /* MBEDOS threads not yet implemented */
     #ifndef NO_THREADS
         #define NO_THREADS
     #endif /* NO_THREADS */

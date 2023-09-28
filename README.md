@@ -38,8 +38,9 @@ This library is supported on the following list of platforms/frameworks.
 
 - [CYW954907AEVAL1F evaluation kit (CYW954907AEVAL1F)](https://www.infineon.com/cms/en/product/evaluation-boards/cyw954907aeval1f)
 
-- [XMC7200D-E272K8384 kit (KIT-XMC72-EVK)](https://www.infineon.com/KIT_XMC72_EVK)
+- [XMC7200D-E272K8384 kit (KIT-XMC72-EVK)](https://www.infineon.com/cms/en/product/evaluation-boards/kit_xmc72_evk/)
 
+- [XMC7200D-E272K8384 kit (KIT_XMC72_EVK_MUR_43439M2)](https://www.infineon.com/cms/en/product/evaluation-boards/kit_xmc72_evk/)
 
 ## Supported frameworks
 
@@ -161,9 +162,11 @@ The following options are supported by the iPerf software integrated into this l
                              are just an example for reference, the actual values of the macros/configuration may vary with your *lwipopts.h* file.
    ```
 
-   #### ModusToolbox&trade;:
+#### ModusToolbox&trade;:
 
-   Update the following configurations in the application's config file (For example, *mtb-anycloud-wifi-bluetooth-tester/lwipopts.h*)
+Update the following configurations in the application's config file 
+   
+ - FreeRTOS application can make the following configurations in config files (For example, *lwipopts.h*)
 
    1. For the server, modify/add the following macros with a suitable value to change the TCP window size and pbuf pool size:
       ```
@@ -177,6 +180,18 @@ The following options are supported by the iPerf software integrated into this l
       #define TCP_SND_BUF (TCP_MSS * 20)
       #define MEMP_NUM_TCP_SEG 127
       ```
+ - Threadx application can modify/add the following *DEFINES* in *Makefile*.
+	
+   1. For the server, modify/add *DEFAULT_TCP_WINDOW_SIZE* with a suitable value to change the TCP window size:
+      ```
+      DEFINES+=DEFAULT_TCP_WINDOW_SIZE=16*1024
+      ```
+
+   2. For the client, modify the *NX_TCP_MAXIMUM_TX_QUEUE* with a suitable value to change the TCP send buffer queue size:
+      ```
+      DEFINES+=NX_TCP_MAXIMUM_TX_QUEUE=20
+	  ```
+	  **Note:** *NX_TCP_MAXIMUM_TX_QUEUE* is not configurable in CAT5(H1-CP) devices.
 
    *Server-specific:*
 

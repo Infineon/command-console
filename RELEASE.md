@@ -13,6 +13,10 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v5.1.0
+- Added new command get_sta_ifconfig which will provide IP & MAC address of STA.
+- Added support for KIT_XMC72_EVK_MUR_43439M2 kit
+
 ### v5.0.0
 - Removed support for AFR and MBED OS.
 - Added support for new security type wpa2_aes_sha256

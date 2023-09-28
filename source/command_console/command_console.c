@@ -513,6 +513,9 @@ void console_thread_func( cy_thread_arg_t arg )
                 cy_rtos_exit_thread();
             }
        }
+#ifdef COMPONENT_CAT5
+       tx_thread_relinquish();
+#endif
 #endif
     }
 }
@@ -590,7 +593,7 @@ cy_rslt_t cy_command_console_init( cy_command_console_cfg_t *cfg )
     }
 
     result = cy_rtos_create_thread(&cons.console_thread, console_thread_func, "Console Thread", command_console_thread_stack,
-                                    CONSOLE_THREAD_STACK_SIZE, cfg->thread_priority, NULL);
+                                    CONSOLE_THREAD_STACK_SIZE, cfg->thread_priority, 0);
     if( result != CY_RSLT_SUCCESS)
     {
         printf(" cy_rtos_create_thread failed %lu \n", (unsigned long)result);
@@ -613,6 +616,11 @@ cy_rslt_t cy_command_console_deinit(void)
         return CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }
 #endif
+    result = cy_rtos_thread_terminate(&cons.console_thread);
+    if ( result != CY_RSLT_SUCCESS )
+    {
+        return CY_RSLT_COMMAND_CONSOLE_FAILURE;
+    }
     result = cy_rtos_join_thread(&cons.console_thread);
     if ( result != CY_RSLT_SUCCESS )
     {
