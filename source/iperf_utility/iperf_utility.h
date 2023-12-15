@@ -37,7 +37,11 @@
 extern "C" {
 #endif
 
+#ifdef COMPONENT_CAT5
+#define MAX_SIMULTANEOUS_COMMANDS 1
+#else
 #define MAX_SIMULTANEOUS_COMMANDS 5
+#endif
 
 void iperf_utility_init(void *network);
 

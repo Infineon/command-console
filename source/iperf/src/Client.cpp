@@ -1136,8 +1136,14 @@ void Client::write_UDP_FIN (void) {
     fd_set readSet;
     struct timeval timeout;
 
+    /* IPERF_MODIFIED Start */
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 500000; //500ms
+    iperf_setsockopt(mSettings->mSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    /* IPERF_MODIFIED End */
+
     int count = 0;
-    while ( count < 10 ) {
+    while ( count < 3 ) {
         count++;
 
         // write data

@@ -158,6 +158,9 @@ static int loop_command( const char * line );
 static int help_command( int argc, char* argv[], tlv_buffer_t** tlv_buf );
 static int retval_command( int argc, char* argv[], tlv_buffer_t** tlv_buf );
 static cy_command_console_err_t console_parse_cmd( const char* line );
+#ifndef ENABLE_UART_POLLING
+static void uart_callback(void *callback_arg, cyhal_uart_event_t event);
+#endif
 
 /******************************************************
  *               Variables Definitions
@@ -485,6 +488,13 @@ void console_thread_func( cy_thread_arg_t arg )
 
     cons.console_thread_is_running = true;
 
+#ifndef ENABLE_UART_POLLING
+    cyhal_uart_register_callback(cons.uart, uart_callback, NULL);
+    cyhal_uart_enable_event(cons.uart,
+                            (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
+                            CYHAL_ISR_PRIORITY_DEFAULT, true);
+#endif
+
     while ( 1 )
     {
 #ifndef ENABLE_UART_POLLING
@@ -493,9 +503,15 @@ void console_thread_func( cy_thread_arg_t arg )
         if(wait_bits & FLAGS_MSK_RECV)
         {
             console_process_char( received_character );
+            cyhal_uart_enable_event(cons.uart,
+                                    (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
+                                    CYHAL_ISR_PRIORITY_DEFAULT, true);
         }
         if(wait_bits & FLAGS_MSK_DEINIT)
         {
+            cyhal_uart_enable_event(cons.uart,
+                                    (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
+                                    CYHAL_ISR_PRIORITY_DEFAULT, false);
             cy_rtos_exit_thread();
         }
 #else
@@ -520,11 +536,20 @@ void console_thread_func( cy_thread_arg_t arg )
     }
 }
 
-void uart_callback() {
-    // Note: you need to actually read from the serial to clear the RX interrupt
-    received_character = cy_read( cons.uart );
-    cy_rtos_setbits_event(&ef_id, FLAGS_MSK_RECV, 0);
+#ifndef ENABLE_UART_POLLING
+static void uart_callback(void *callback_arg, cyhal_uart_event_t event)
+{
+    if((event & CYHAL_UART_IRQ_RX_NOT_EMPTY) == CYHAL_UART_IRQ_RX_NOT_EMPTY)
+    {
+        cyhal_uart_enable_event(cons.uart,
+                                (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
+                                CYHAL_ISR_PRIORITY_DEFAULT, false);
+        // Note: you need to actually read from the serial to clear the RX interrupt
+        received_character = cy_read( cons.uart );
+        cy_rtos_setbits_event(&ef_id, FLAGS_MSK_RECV, 0);
+    }
 }
+#endif
 
 cy_rslt_t cy_command_console_status( void )
 {

@@ -168,6 +168,7 @@ wiced_bt_l2cap_le_appl_information_t l2c_appl_info =
  *               Variable Definitions
  ******************************************************/
 bool bt_state         = WICED_FALSE;
+static bool           bt_on_init_done = false;
 cy_thread_t           ble_thread;
 static volatile bool  send_data;
 static uint32_t       data_le_tx_counter;
@@ -211,6 +212,14 @@ int handle_bt_off(int argc, char *argv[], tlv_buffer_t** data)
 
     wiced_bt_stack_deinit( );
     bt_state = WICED_FALSE;
+
+    if(bt_on_init_done)
+    {
+        cy_rtos_terminate_thread(&ble_thread);
+        cy_rtos_deinit_semaphore(&send_data_semaphore);
+        cy_rtos_deinit_mutex(&bt_mutex);
+        bt_on_init_done = false;
+    }
 
     return result;
 }
@@ -304,16 +313,28 @@ int handle_ble_get_throughput(int argc, char *argv[], tlv_buffer_t** data)
 }
 void start_data_thread()
 {
+    if (cy_rtos_init_mutex(&bt_mutex) != CY_RSLT_SUCCESS)
+    {
+        BT_LE_INFO(("Unable to init the mutex \n"));
+        return;
+    }
+
     if(cy_rtos_init_semaphore(&send_data_semaphore, MAX_SEMA_COUNT, 0) != CY_RSLT_SUCCESS)
     {
         BT_LE_ERROR(("unable to create semaphore \n"));
+        cy_rtos_deinit_mutex(&bt_mutex);
+        return;
     }
 
     /* start BLE TX/RX data Thread */
     if (cy_rtos_create_thread(&ble_thread, send_data_thread, "BLE Data Thread", NULL, BLE_WORKER_THREAD_STACK_SIZE, BLE_WORKER_THREAD_PRIORITY, 0) != CY_RSLT_SUCCESS)
     {
         BT_LE_ERROR(("unable to create the thread \n"));
+        cy_rtos_deinit_semaphore(&send_data_semaphore);
+        cy_rtos_deinit_mutex(&bt_mutex);
+        return;
     }
+    bt_on_init_done = true;
 }
 
 wiced_bt_dev_status_t bt_management_cback( wiced_bt_management_evt_t event, wiced_bt_management_evt_data_t *p_event_data )
@@ -336,11 +357,6 @@ wiced_bt_dev_status_t bt_management_cback( wiced_bt_management_evt_t event, wice
                 wiced_bt_dev_read_local_addr( bda );
                 BT_LE_INFO(("Local Bluetooth Address: [%02X:%02X:%02X:%02X:%02X:%02X]\n", bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]));
 
-            }
-
-            if (cy_rtos_init_mutex(&bt_mutex) != CY_RSLT_SUCCESS)
-            {
-                BT_LE_INFO(("Unable to init the mutex \n"));
             }
 
             start_data_thread();

@@ -13,12 +13,15 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v5.2.0
+- Added support for CY8CEVAL-062S2-CYW43022CUB kit
+
 ### v5.1.0
-- Added new command get_sta_ifconfig which will provide IP & MAC address of STA.
+- Added new command get_sta_ifconfig which will provide IP & MAC address of STA
 - Added support for KIT_XMC72_EVK_MUR_43439M2 kit
 
 ### v5.0.0
-- Removed support for AFR and MBED OS.
+- Removed support for AFR and MBED OS
 - Added support for new security type wpa2_aes_sha256
 - Minor bug fixes
 

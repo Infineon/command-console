@@ -349,7 +349,7 @@ const char report_bw_jitter_loss_header[] =
 
 /* IPERF_MODIFIED Start */
 const char report_bw_jitter_loss_format[] =
-"[%3d] %4.1f-%4.1f sec  %ss  %ss/sec  %6.3f ms %4d/%5d (%.2g%%)\n";
+"[%3d] %4.1f-%4.1f sec  %ss  %ss/sec  %6.3f ms %4ld/%5ld (%.2g%%)\n";
 
 const char report_sum_bw_jitter_loss_format[] =
 "[SUM] %4.1f-%4.1f sec  %ss  %ss/sec  %6.3f ms %4d/%5d (%.2g%%)\n";

@@ -79,7 +79,11 @@
 #endif
 
 #define BUFFER_LENGTH                        (100)
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+#define UDP_RECEIVE_TIMEOUT                  (500)
+#else
 #define UDP_RECEIVE_TIMEOUT                  (10000)
+#endif
 /* convert into ms */
 #define CONVERT_TO_MS                        (1000)
 #define ANYCLOUD_RECV_SOCKET_TIMEOUT_ERROR   (-3)
@@ -111,6 +115,9 @@ typedef struct
 static bsd_socket_t   sockets[MAX_BSD_SOCKETS];
 static bool           socket_layer_inited = false;
 cy_mutex_t            sockets_mutex;
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+static uint32_t       udp_recv_retry = 0;
+#endif
 
 void iperf_network_init( void * networkInterface )
 {
@@ -235,6 +242,9 @@ int iperf_socket( int protocolFamily, int type, int protocol )
                 id = -1;
                 goto exit;
             }
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+            udp_recv_retry = 0;
+#endif
             break;
 
         case SOCK_STREAM:
@@ -404,12 +414,16 @@ int iperf_recvfrom(int sockID, char *buffer, size_t buffersize, int flags,struct
     uint32_t bytes_received = 0;
     uint32_t address_length = 0;
     cy_rslt_t result = CY_RSLT_SUCCESS;
+
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+    uint32_t timeout = DEFAULT_IPERF_SERVER_TIMEOUT_SEC*1000;
+#else
 #ifdef COMPONENT_NETXDUO
     uint32_t timeout = NX_WAIT_FOREVER;
 #else
     int timeout = 0;
 #endif
-
+#endif
     IPERF_SOCKET_DEBUG(("iperf_recvfrom : Read data with buffer length : %d \r\n", buffersize));
 
     cy_socket_sockaddr_t src_addr;
@@ -437,7 +451,7 @@ int iperf_recvfrom(int sockID, char *buffer, size_t buffersize, int flags,struct
 
     IPERF_SOCKET_DEBUG(("iperf_recvfrom : Done, Status : %d \r\n", bytes_received));
 
-    /* set the receive timeout to 10seconds again */
+    /* set the UDP receive timeout */
     timeout = UDP_RECEIVE_TIMEOUT;
     result = cy_socket_setsockopt(sockets[sockID].socket, CY_SOCKET_SOL_SOCKET, CY_SOCKET_SO_RCVTIMEO, &timeout, sizeof(int));
     if ( result != CY_RSLT_SUCCESS)
@@ -514,6 +528,13 @@ int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags)
                     if(result == CY_RSLT_MODULE_SECURE_SOCKETS_TIMEOUT)
                     {
                         IPERF_SOCKET_ERROR(("cy_socket_recvfrom failed with Timeout error : %d \n", result));
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+                        udp_recv_retry ++;
+                        if(udp_recv_retry >= (DEFAULT_IPERF_SERVER_TIMEOUT_SEC*2))
+                        {
+                            return -1;
+                        }
+#endif
                         return ANYCLOUD_RECV_SOCKET_TIMEOUT_ERROR;
                     } else if(result != CY_RSLT_SUCCESS)
                     {
@@ -523,7 +544,9 @@ int iperf_recv(int sockID, void *rcvBuffer, size_t bufferLength, int flags)
                     {
                       //DO Nothing
                     }
-
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+                    udp_recv_retry = 0;
+#endif
                     remaining_data_length -= bytes_received;
                     received_data_length += bytes_received;
                 }
@@ -564,6 +587,10 @@ int iperf_accept(int sockID, struct sockaddr *ClientAddress, uint32_t *addressLe
         {
             struct sockaddr* socket_addr = ClientAddress;
 
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+            uint32_t time_ms = (DEFAULT_IPERF_SERVER_TIMEOUT_SEC*1000)/2;
+#endif
+
             /* Fill port number, IP address into cy_socket_sockaddr_t format */
             address.port = ((uint16_t)socket_addr->sa_data[0]) << 8;
             address.port |= socket_addr->sa_data[1];
@@ -577,6 +604,14 @@ int iperf_accept(int sockID, struct sockaddr *ClientAddress, uint32_t *addressLe
                 IPERF_SOCKET_ERROR(("cy_socket_accept failed with error : %d \n", result));
                 return -1;
             }
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+            result = cy_socket_setsockopt(sockets[sockID].client_socket, CY_SOCKET_SOL_SOCKET, CY_SOCKET_SO_RCVTIMEO, &time_ms, sizeof(time_ms));
+            if ( result != CY_RSLT_SUCCESS)
+            {
+               IPERF_SOCKET_ERROR(("Failed to set RCV timeout option for client_socket: %d \n", result));
+               return -1;
+            }
+#endif
             break;
         }
         case CY_SOCKET_IPPROTO_UDP:

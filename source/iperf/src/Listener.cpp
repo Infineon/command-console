@@ -126,6 +126,7 @@
 #if (defined HAVE_SSM_MULTICAST) && (defined HAVE_NET_IF_H)
 #include <net/if.h>
 #endif
+
 /* -------------------------------------------------------------------
  * Stores local hostname and socket info.
  * ------------------------------------------------------------------- */
@@ -1034,9 +1035,17 @@ void Listener::Accept( thread_Settings *server ) {
         IPERF_DEBUGF( LISTENER_DEBUG | SOCKET_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Listener is waiting while listening on a UDP socket.\n") );
         rc = iperf_recvfrom( mSettings->mSock, mBuf, mSettings->mBufLen, 0,
 			                 (struct sockaddr*) &server->peer, &server->size_peer );
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+        if(rc == SOCKET_ERROR)
+        {
+            WARN(1, "iperf client did not connect. Exiting!!");
+            break;
+        }
+#else
+        FAIL_errno( rc == SOCKET_ERROR, "recvfrom", mSettings );
+#endif
         /* IPERF_MODIFIED End */
 
-	    FAIL_errno( rc == SOCKET_ERROR, "recvfrom", mSettings );
         /* IPERF_MODIFIED Start */
 #ifndef NO_INTERRUPTS
         if (sInterupted != 0)
@@ -1084,20 +1093,29 @@ void Listener::Accept( thread_Settings *server ) {
 	} else {
 	    // accept a TCP  connection
         /* IPERF_MODIFIED Start */
+#ifdef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+        struct timeval time;
+        time.tv_sec = DEFAULT_IPERF_SERVER_TIMEOUT_SEC;
+        time.tv_usec = 0;
+        iperf_setsockopt(mSettings->mSock, 0, SO_RCVTIMEO, (void*)&time, 0);
+#endif
         IPERF_DEBUGF( LISTENER_DEBUG | SOCKET_DEBUG | IPERF_DBG_TRACE | IPERF_DBG_STATE, ( "Listener is waiting while listening on a TCP socket.\n") );
         server->mSock = iperf_accept( mSettings->mSock,  (sockaddr*) &server->peer, &server->size_peer );
         /* IPERF_MODIFIED End */
-	    if ( server->mSock == INVALID_SOCKET &&
+	    if ( server->mSock == INVALID_SOCKET
+#ifndef DEFAULT_IPERF_SERVER_TIMEOUT_SEC
+	    		&&
 #if WIN32
 		 WSAGetLastError() == WSAEINTR
 #else
 		 errno == EINTR
 #endif
+#endif
 		) {
                 /* IPERF_MODIFIED Start */
-                IPERF_DEBUGF( LISTENER_DEBUG | SOCKET_DEBUG | IPERF_DBG_TRACE, ( "Listener accepted a connection.\n" ) );
+                WARN(1, "iperf client did not connect. Exiting!!");
                 /* IPERF_MODIFIED End */
-		break;
+		        break;
 	    }
 	}
     }
@@ -1130,6 +1148,7 @@ void Listener::UDPSingleServer( ) {
                               (client_hdr*) mBuf);
     /* IPERF_MODIFIED Start */
     ReportStruct *reportstruct = (ReportStruct*) malloc( sizeof( ReportStruct ) );
+    memset(reportstruct, 0, sizeof(ReportStruct));
     IPERF_DEBUGF( MEMALLOC_DEBUG | IPERF_DBG_TRACE, IPERF_MEMALLOC_MSG( reportstruct, sizeof( ReportStruct ) ) );
     /* IPERF_MODIFIED End */
     FAIL_errno( reportstruct == NULL, "No memory for report structure\n", mSettings );

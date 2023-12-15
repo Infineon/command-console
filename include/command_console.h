@@ -52,8 +52,12 @@ extern "C" {
 #define MAX_LINE_LENGTH    (128)
 #define MAX_HISTORY_LENGTH (20)
 
-/* Enable polling; comment this line to use a serial interrupts mechanism. */
+/* To enable polling; uncomment the below line. */
+//#define ENABLE_UART_POLLING
+
+#if !defined(COMPONENT_CAT5)
 #define ENABLE_UART_POLLING
+#endif
 
 /**
  * \defgroup group_cmd_console_macros Macros

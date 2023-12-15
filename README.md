@@ -42,6 +42,8 @@ This library is supported on the following list of platforms/frameworks.
 
 - [XMC7200D-E272K8384 kit (KIT_XMC72_EVK_MUR_43439M2)](https://www.infineon.com/cms/en/product/evaluation-boards/kit_xmc72_evk/)
 
+- [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-CYW43022CUB)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
+
 ## Supported frameworks
 
 This library supports the following frameworks:
@@ -192,6 +194,17 @@ Update the following configurations in the application's config file
       DEFINES+=NX_TCP_MAXIMUM_TX_QUEUE=20
 	  ```
 	  **Note:** *NX_TCP_MAXIMUM_TX_QUEUE* is not configurable in CAT5(H1-CP) devices.
+
+ - For an iperf server, DEFAULT_IPERF_SERVER_TIMEOUT_SEC can be used to configure following timeouts
+   
+    - Amount of time an iperf server waits for a client to connect
+   
+    - Socket receive timeout of the iperf server
+
+   DEFAULT_IPERF_SERVER_TIMEOUT_SEC can be configured by adding the following *DEFINES* in *Makefile*.
+      ```
+      DEFINES+=DEFAULT_IPERF_SERVER_TIMEOUT_SEC=10
+      ```
 
    *Server-specific:*
 
