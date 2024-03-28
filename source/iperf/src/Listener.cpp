@@ -1,5 +1,5 @@
 /*
-* Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -399,7 +399,7 @@ sInterupted == SIGALRM
 		}
 	    }
             // Store entry in connection list
-	    if (mSettings->mSock > 0)
+	    if (mSettings->mSock >= 0)
 		Iperf_pushback( listtemp, &clients );
             Mutex_Unlock( &clients_mutex );
 

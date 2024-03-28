@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -783,7 +783,6 @@ int iperf_close( int sockID)
                 if(result != CY_RSLT_SUCCESS)
                 {
                     IPERF_SOCKET_ERROR(("cy_socket_disconnect failed with error : %d \n", result));
-                    return -1;
                 }
 
                 result = cy_socket_delete(sockets[sockID].socket);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -72,6 +72,11 @@ extern "C" {
 #else
 #define WIFI_WEAK_FUNC           __attribute__((weak))
 #endif
+
+/******************************************************
+ *               External Function Declarations
+ ******************************************************/
+extern char *strtok_r( char *, const char *, char ** );
 
 /******************************************************
  *               Function Declarations
@@ -165,7 +170,7 @@ WIFI_WEAK_FUNC cy_rslt_t wifi_utility_init(void)
     res = cy_wcm_init(&wcm_config);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to initialize Wi-Fi module. Res:%u\n", (unsigned int)res));
+        WIFI_ERROR(("Failed to initialize Wi-Fi module. Res:0x%X\n", (unsigned int)res));
         return res;
     }
     WIFI_INFO(("Wi-Fi module initialized...\n"));
@@ -201,7 +206,7 @@ int join(int argc, char* argv[], tlv_buffer_t** data)
         res = cy_wcm_connect_ap(&connect_params, &ip_addr);
         if(res != CY_RSLT_SUCCESS)
         {
-            WIFI_INFO(("Failed to join AP [%u]. Retrying...\n", (unsigned int)res));
+            WIFI_INFO(("Failed to join AP [0x%X]. Retrying...\n", (unsigned int)res));
             continue;
         }
         wifi_connected = true;
@@ -232,7 +237,7 @@ int leave(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_disconnect_ap();
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to disconnect from AP. Res:%u", (unsigned int)res));
+        WIFI_ERROR(("Failed to disconnect from AP. Res:0x%X", (unsigned int)res));
         return -1;
     }
 
@@ -251,7 +256,7 @@ int scan(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_start_scan(scan_result_cb, NULL, NULL);
     if(res != CY_RSLT_SUCCESS && res != CY_RSLT_WCM_SCAN_IN_PROGRESS)
     {
-        WIFI_ERROR(("Error while scanning. Res: %u", (unsigned int)res));
+        WIFI_ERROR(("Error while scanning. Res: 0x%X", (unsigned int)res));
         return -1;
     }
 
@@ -290,7 +295,7 @@ int ping(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_ping(CY_WCM_INTERFACE_TYPE_STA, &ip_addr, timeout_ms, &elapsed_ms);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Ping failed. Error: %u\n", (unsigned int)res));
+        WIFI_ERROR(("Ping failed. Error: 0x%X\n", (unsigned int)res));
         return -1;
     }
 
@@ -307,7 +312,7 @@ int get_rssi(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_wcm_get_associated_ap_info(&ap_info);
     if(res != CY_RSLT_SUCCESS)
     {
-        WIFI_ERROR(("Failed to get RSSI. Res:%u\n", (unsigned int)res));
+        WIFI_ERROR(("Failed to get RSSI. Res:0x%X\n", (unsigned int)res));
         return -1;
     }
     WIFI_INFO(("RSSI: %d dBm\n", ap_info.signal_strength));
@@ -367,7 +372,7 @@ int get_sta_ifconfig(int argc, char* argv[], tlv_buffer_t** data)
     result = cy_wcm_get_mac_addr(CY_WCM_INTERFACE_TYPE_STA, &mac);
     if (result != CY_RSLT_SUCCESS)
     {
-         WIFI_INFO(("STA MAC Address failed result:%u\n", (unsigned int)result));
+         WIFI_INFO(("STA MAC Address failed result:0x%X\n", (unsigned int)result));
     }
     else
     {
@@ -672,6 +677,26 @@ const char* wifi_utils_authtype_to_str(cy_wcm_security_t sec)
             return "wpa3";
         case CY_WCM_SECURITY_WPA3_WPA2_PSK:
             return "wpa3_wpa2";
+        case CY_WCM_SECURITY_WPA_AES_ENT:
+            return "wpa_aes_ent";
+        case CY_WCM_SECURITY_WPA_MIXED_ENT:
+            return "wpa_mixed_ent";
+        case CY_WCM_SECURITY_WPA2_TKIP_ENT:
+            return "wpa2_tkip_ent";
+        case CY_WCM_SECURITY_WPA2_AES_ENT:
+            return "wpa2_aes_ent";
+        case CY_WCM_SECURITY_WPA2_MIXED_ENT:
+            return "wpa2_mixed_ent";
+        case CY_WCM_SECURITY_WPA2_FBT_ENT:
+            return "wpa2_fbt_ent";
+#ifdef COMPONENT_CAT5
+        case CY_WCM_SECURITY_WPA3_192BIT_ENT:
+            return "wpa3_192bit_ent";
+        case CY_WCM_SECURITY_WPA3_ENT:
+            return "wpa3_aes_gcm_256_ent";
+        case CY_WCM_SECURITY_WPA3_ENT_AES_CCMP:
+            return "wpa3_aes_ccm_128_ent";
+#endif
         case CY_WCM_SECURITY_UNKNOWN:
             return "Unknown";
         default:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -124,6 +124,11 @@ typedef struct
 /******************************************************
  *                    Structures
  ******************************************************/
+
+/******************************************************
+ *               External Function Declarations
+ ******************************************************/
+extern char *strtok_r( char *, const char *, char ** );
 
 /******************************************************
  *               Function Declarations
@@ -482,7 +487,7 @@ void console_thread_func( cy_thread_arg_t arg )
     res = cy_rtos_delay_milliseconds(CY_CMD_CONSOLE_THREAD_DELAY_IN_MSEC);
     if(res != CY_RSLT_SUCCESS)
     {
-        printf(" cy_rtos_delay_milliseconds failed, result =  %lu \n", (unsigned long)res);
+        printf(" cy_rtos_delay_milliseconds failed, result =  0x%X \n", (unsigned int)res);
         return;
     }
 
@@ -621,7 +626,7 @@ cy_rslt_t cy_command_console_init( cy_command_console_cfg_t *cfg )
                                     CONSOLE_THREAD_STACK_SIZE, cfg->thread_priority, 0);
     if( result != CY_RSLT_SUCCESS)
     {
-        printf(" cy_rtos_create_thread failed %lu \n", (unsigned long)result);
+        printf(" cy_rtos_create_thread failed 0x%X \n", (unsigned int)result);
         cy_rtos_deinit_event(&ef_id);
         result = CY_RSLT_COMMAND_CONSOLE_FAILURE;
     }

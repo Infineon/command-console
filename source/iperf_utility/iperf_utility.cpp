@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -172,6 +172,7 @@ void iperf_util_thread(cy_thread_arg_t arg)
     cy_rtos_setbits_event(&event, wait_bits, false);
     iperf ( iperf_util_threads[index].args.argc, iperf_util_threads[index].args.argv, NULL);
     iperf_util_threads[index].available = true;
+    printf("IPERF[%d] EXITED\n", index);
     cy_rtos_exit_thread();
 }
 

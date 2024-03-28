@@ -77,7 +77,7 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
       - See the "Quick Start" section in [README.md](https://github.com/Infineon/ethernet-core-freertos-lwip-mbedtls/blob/master/README.md) of Ethernet core freertos lwip mbedtls library for Ethernet kits
 
     - If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using Wi-Fi core freertos lwip mbedtls bundle library, the configuration files are in wifi-core-freertos-lwip-mbedtls/configs folder. Similarly if the application is using Ethernet Core FreeRTOS lwIP mbedtls library, the configuration files are in ethernet-core-freertos-lwip-mbedtls/configs folder.
-
+	
 2. A set of COMPONENTS must be defined in the code example project's Makefile for this library.
 
    ```

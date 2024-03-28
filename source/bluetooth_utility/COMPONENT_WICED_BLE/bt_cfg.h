@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -34,16 +34,18 @@
 #ifndef APP_BT_CFG_H_
 #define APP_BT_CFG_H_
 
-#ifndef COMPONENT_CAT5
 
 #include "wiced_bt_cfg.h"
+#ifndef COMPONENT_CAT5
 #include "cybt_platform_config.h"
+#endif
 #include "cybsp_types.h"
 
 extern const wiced_bt_cfg_settings_t wiced_bt_command_console_cfg_settings;
+#ifndef COMPONENT_CAT5
 extern const cybt_platform_config_t bt_platform_cfg_settings;
 
-#endif /* ! COMPONENT_CAT5 */
+#endif
 
 #endif /* APP_BT_CFG_H_ */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -417,7 +417,7 @@ int eth_ping(int argc, char* argv[], tlv_buffer_t** data)
     res = cy_ecm_ping(ecm_handle, &ip_addr, timeout_ms, &elapsed_ms);
     if(res != CY_RSLT_SUCCESS)
     {
-        ETH_ERROR(("Ping failed. Error: %u\n", (unsigned int)res));
+        ETH_ERROR(("Ping failed. Error: 0x%X\n", (unsigned int)res));
         return 1;
     }
 

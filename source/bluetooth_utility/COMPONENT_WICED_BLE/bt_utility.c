@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Cypress Semiconductor Corporation (an Infineon company) or
+ * Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
  * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
  *
  * This software, including source code, documentation and related
@@ -35,11 +35,13 @@
  *
  */
 #ifndef DISABLE_COMMAND_CONSOLE_BT
-#ifndef COMPONENT_CAT5
+
 #include "command_console.h"
 #include "bt_cfg.h"
 #include "wiced_bt_stack.h"
+#ifndef COMPONENT_CAT5
 #include "cybt_platform_trace.h"
+#endif
 #include "wiced_memory.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -196,7 +198,9 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
         BT_LE_DEBUG(("BT is already ON \n"));
         return result;
     }
+#ifndef COMPONENT_CAT5
     cybt_platform_config_init(&bt_platform_cfg_settings);
+#endif
     wiced_bt_stack_init(bt_management_cback, &wiced_bt_command_console_cfg_settings);
     // create application heap for BT
     wiced_bt_create_heap ("app", NULL, 0x1000, NULL, WICED_TRUE);\
@@ -233,7 +237,7 @@ int handle_ble_start_adv(int argc, char *argv[], tlv_buffer_t** data)
 
     BT_LE_INFO(("Starting advertisement \n"));
     result = wiced_bt_start_advertisements(BTM_BLE_ADVERT_UNDIRECTED_HIGH, 0, NULL);
-    BT_LE_INFO(("Start advertisement,  result =  %d\n", result));
+    BT_LE_INFO(("Start advertisement,  result =  0x%X\n", (unsigned int)result));
 
     return result;
 }
@@ -245,7 +249,7 @@ int handle_ble_stop_adv(int argc, char *argv[], tlv_buffer_t** data)
 
     BT_LE_INFO(("Stopping advertisement \n"));
     result = wiced_bt_start_advertisements(BTM_BLE_ADVERT_OFF, 0, NULL);
-    BT_LE_INFO(("Stop advertisement, result = %d\n", result));
+    BT_LE_INFO(("Stop advertisement, result = 0x%X\n", (unsigned int)result));
 
     return result;
 }
@@ -257,7 +261,7 @@ int handle_ble_start_scan(int argc, char *argv[], tlv_buffer_t** data)
 
     BT_LE_INFO(("Starting scan operation \n"));
     result = wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_HIGH_DUTY, WICED_TRUE, scan_result_cback);
-    BT_LE_INFO(("Start Scan, result = %d\n", result));
+    BT_LE_INFO(("Start Scan, result = 0x%X\n", (unsigned int)result));
 
     return result;
 }
@@ -267,7 +271,7 @@ int handle_ble_stop_scan(int argc, char *argv[], tlv_buffer_t** data)
     int result = 0;
     IS_BT_ON();
     result = wiced_bt_ble_scan(BTM_BLE_SCAN_TYPE_NONE, WICED_TRUE, NULL);
-    BT_LE_DEBUG(("Stop Scan result = %d\n", result) );
+    BT_LE_DEBUG(("Stop Scan result = 0x%X\n", (unsigned int)result) );
     return result;
 }
 
@@ -763,5 +767,4 @@ WICED_BLE_WEAK_FUNC void bt_utility_init(void)
 {
     cy_command_console_add_table (bt_coex_command_table);
 }
-#endif /* !COMPONENT_CAT5 */
 #endif
