@@ -44,6 +44,8 @@ This library is supported on the following list of platforms/frameworks.
 
 - [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-CYW43022CUB)](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
 
+- [CYW955913EVK-01 Wi-Fi Bluetooth&reg; Prototyping Kit (CYW955913EVK-01)](https://www.infineon.com/CYW955913EVK-01)
+
 ## Supported frameworks
 
 This library supports the following frameworks:
@@ -69,7 +71,30 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
 
 ### ModusToolbox&trade;
 
-1. Review and make the required changes to the pre-defined configuration files and Makefile COMPONENTS in the application.
+1. For Wi-Fi kits, 
+   - To include wifi-connection-manager library, the application should pull [wifi-core-freertos-lwip-mbedtls](https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls) library which will internally pull wifi-connection-manager and other dependent modules.
+     To pull wifi-core-freertos-lwip-mbedtls create the following *.mtb* file in deps folder.
+     - *wifi-core-freertos-lwip-mbedtls.mtb:*
+       `https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls#latest-v1.X#$$ASSET_REPO$$/wifi-core-freertos-lwip-mbedtls/latest-v1.X`
+
+   **Note:** For CYW955913EVK-01, to include wifi-connection-manager library, the application should pull [wifi-core-freertos-lwip-mbedtls](https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls) library which will internally pull wifi-connection-manager and other dependent modules.
+     To pull wifi-core-threadx-cat5 create the following *.mtb* file in deps folder.
+     - *wifi-core-threadx-cat5.mtb:*
+       `https://github.com/Infineon/wifi-core-threadx-cat5#latest-v1.X#$$ASSET_REPO$$/wifi-core-threadx-cat5/latest-v1.X`
+
+2. For Ethernet kits, 
+   - To include ethernet-connection-manager library, the application should pull [ethernet-core-freertos-lwip-mbedtls](https://github.com/Infineon/ethernet-core-freertos-lwip-mbedtls) library which will internally pull ethernet-connection-manager and other dependent modules.
+     To pull ethernet-core-freertos-lwip-mbedtls create the following *.mtb* file in deps folder.
+     - *ethernet-core-freertos-lwip-mbedtls.mtb:*
+       `https://github.com/Infineon/ethernet-core-freertos-lwip-mbedtls#latest-v1.X#$$ASSET_REPO$$/ethernet-core-freertos-lwip-mbedtls/latest-v1.X`
+
+3. To pull BT stack Integration create the following *.mtb* file in deps folder.
+     - *btstack-integration.mtb:*
+       `https://github.com/Infineon/btstack-integration#latest-v4.X#$$ASSET_REPO$$/btstack-integration/latest-v4.X`
+
+   **Note:** BT stack Integration should not be included for CYW955913EVK-01.
+
+4. Review and make the required changes to the pre-defined configuration files and Makefile COMPONENTS in the application.
 
     - The configuration files for FreeRTOS, lwIP, and Mbed TLS combination are bundled in Wi-Fi core freertos lwip mbedtls library for Wi-Fi kits and in Ethernet core freertos lwip mbedtls library for Ethernet kits.
 
@@ -78,25 +103,40 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
 
     - If the application is using bundle library then the configuration files are in the bundle library. For example if the application is using Wi-Fi core freertos lwip mbedtls bundle library, the configuration files are in wifi-core-freertos-lwip-mbedtls/configs folder. Similarly if the application is using Ethernet Core FreeRTOS lwIP mbedtls library, the configuration files are in ethernet-core-freertos-lwip-mbedtls/configs folder.
 	
-2. A set of COMPONENTS must be defined in the code example project's Makefile for this library.
+5. A set of COMPONENTS must be defined in the code example project's Makefile for this library
 
    ```
-   COMPONENTS=FREERTOS MBEDTLS LWIP SECURE_SOCKETS
+   COMPONENTS=FREERTOS MBEDTLS LWIP
+   ```
+   **Note:** For CYW955913EVK-01 the above defines are not applicable.
+
+6. For Wi-Fi kits, to enable the Wi-Fi functionality, add `WCM` to the `COMPONENTS` section in the application's Makefile:
+
+   ```
+   COMPONENTS=WCM
    ```
 
-3. To enable the Bluetooth&reg; LE functionality, add `WICED_BLE` to the `COMPONENTS` section in the application's Makefile:
+7. For Ethernet kits, to enable the Ethernet functionality, add `ECM` to the `COMPONENTS` section in the application's Makefile:
+
+   ```
+   COMPONENTS=ECM
+   ```
+
+8. To enable the Bluetooth&reg; LE functionality, add `WICED_BLE` to the `COMPONENTS` section in the application's Makefile:
 
    ```
    COMPONENTS=WICED_BLE
    ```
 
-4. Add the following compiler directives to the `DEFINES` section in the application's Makefile:
+9. Add the following compiler directives to the `DEFINES` section in the application's Makefile:
 
    ```
    DEFINES=HAVE_SNPRINTF
    ```
 
-5. Tune the lwIP configuration parameters listed in application's *lwipopts.h* file, depending on the required Wi-Fi throughput and use case.
+10. Tune the lwIP configuration parameters listed in application's *lwipopts.h* file, depending on the required Wi-Fi throughput and use case.
+
+    **Note:** For CYW955913EVK-01 the above configuration is not applicable.
 
 ## Commands supported
 

@@ -13,6 +13,10 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.0.0
+- Removed btstack-integration from command-console dependency.
+- Added support for CYW955913EVK-01 kit
+
 ### v5.2.1
 - Fixed minor compilation warning for ARM compiler with Keil IDE.
 

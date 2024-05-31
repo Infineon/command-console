@@ -211,6 +211,10 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
 
 int handle_bt_off(int argc, char *argv[], tlv_buffer_t** data)
 {
+#ifdef COMPONENT_CAT5
+    BT_LE_INFO(("BT OFF is not supported on CAT5 devices \n"));
+    return 0;
+#endif
     int result = 0;
     BT_LE_DEBUG(("bt_off\n"));
 

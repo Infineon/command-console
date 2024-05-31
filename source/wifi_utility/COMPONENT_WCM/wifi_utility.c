@@ -143,7 +143,7 @@ static cy_wcm_security_t wifi_utils_str_to_authtype(char* auth_str);
 static const char* wifi_utils_authtype_to_str(cy_wcm_security_t sec);
 
 static void print_ip4(uint32_t ip);
-static cy_rslt_t start_ap_common(const char *ssid, const char *key, uint8_t channel, cy_wcm_security_t security_type, cy_wcm_custom_ie_info_t *custom_ie, uint8_t band);
+static cy_rslt_t start_ap_common(const char *ssid, const char *key, uint8_t channel, cy_wcm_security_t security_type, cy_wcm_custom_ie_info_t *custom_ie, cy_wcm_wifi_band_t band);
 
 /******************************************************
  *               Variables Definitions
@@ -326,7 +326,7 @@ int start_ap(int argc, char* argv[], tlv_buffer_t** data)
     cy_wcm_security_t auth_type = wifi_utils_str_to_authtype(argv[2]);
     char *security_key = argv[3];
     uint8_t channel = atoi(argv[4]);
-    uint8_t band = atoi(argv[5]);
+    cy_wcm_wifi_band_t band = (cy_wcm_wifi_band_t)(atoi(argv[5]));
     cy_rslt_t res;
 
     res = start_ap_common(ssid, security_key, channel, auth_type, NULL, band);
@@ -381,7 +381,7 @@ int get_sta_ifconfig(int argc, char* argv[], tlv_buffer_t** data)
     return 0;
 }
 
-static cy_rslt_t start_ap_common(const char *ssid, const char *key, uint8_t channel, cy_wcm_security_t security_type, cy_wcm_custom_ie_info_t *custom_ie, uint8_t band)
+static cy_rslt_t start_ap_common(const char *ssid, const char *key, uint8_t channel, cy_wcm_security_t security_type, cy_wcm_custom_ie_info_t *custom_ie, cy_wcm_wifi_band_t band)
 {
     cy_rslt_t result;
     cy_wcm_ap_config_t ap_params;
