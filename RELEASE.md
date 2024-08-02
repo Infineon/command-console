@@ -13,6 +13,9 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.1.0
+- Added support for CY8CEVAL-062S2-CYW955513SDM2WLIPA kit
+
 ### v6.0.0
 - Removed btstack-integration from command-console dependency.
 - Added support for CYW955913EVK-01 kit
