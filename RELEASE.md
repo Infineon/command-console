@@ -13,6 +13,11 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.2.0
+- Added OWE (Enhanced Open) security type support.
+- Minor bug fixes
+- Documentation updates
+
 ### v6.1.0
 - Added support for CY8CEVAL-062S2-CYW955513SDM2WLIPA kit
 

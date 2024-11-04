@@ -101,6 +101,9 @@ extern "C" {
 
 #include "iperf_netdb_internal.h"
 #include "iperf_sockets.h"
+/* IPERF_MODIFIED Start */
+#include "whd_types.h"
+/* IPERF_MODIFIED End */
 
 #ifdef __cplusplus
 }
@@ -256,7 +259,10 @@ typedef uint64_t max_size_t;
     #define SHUT_RDWR 2
 #endif /* SHUT_RD */
 
-#define IPERF_BUFFERLEN             (2 * 1024)
+/* IPERF_MODIFIED Start */
+/* Buffer length will be multiple of Total MTU -  TCP/IP header size (40) */
+#define IPERF_BUFFERLEN             (1 * (WHD_PAYLOAD_MTU - 40))
+/* IPERF_MODIFIED End */
 #define NUM_REPORT_STRUCTS          (10)
 #define NUM_MULTI_SLOTS             (5)
 

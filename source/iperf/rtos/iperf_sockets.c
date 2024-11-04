@@ -319,7 +319,15 @@ int iperf_write( int sockID, const char *msg, size_t msgLength )
             if(result != CY_RSLT_SUCCESS)
             {
                 IPERF_SOCKET_ERROR(("cy_socket_sendto failed with error : %ld \n", result));
+#ifdef IPERF_UDP_CLIENT_NEVER_TIMEOUT
+                if(result == CY_RSLT_MODULE_SECURE_SOCKETS_NOMEM)
+                {
+                    bytes_sent = 0;
+                    break;
+                }
+#else
                 return -1;
+#endif
             }
 
             break;

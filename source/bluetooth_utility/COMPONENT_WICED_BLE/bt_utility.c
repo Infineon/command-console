@@ -535,7 +535,7 @@ static void le_coc_tx_complete_cback(uint16_t local_cid, void *p_data)
 
 static void l2cap_test_release_drb (tDRB *p_drb)
 {
-    BT_LE_DEBUG(("l2cap_test_release_drb: 0x%08x", p_drb));
+    BT_LE_DEBUG(("l2cap_test_release_drb: %p", p_drb));
 }
 
 

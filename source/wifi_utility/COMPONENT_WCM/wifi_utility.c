@@ -93,18 +93,18 @@ int stop_ap            (int argc, char* argv[], tlv_buffer_t** data);
 int get_sta_ifconfig   (int argc, char* argv[], tlv_buffer_t** data);
 
 #define WIFI_COMMANDS_LIMITED_SET \
-    { (char*) "join",               join,             2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
+    { (char*) "join",               join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
     { (char*) "leave",              leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
     { (char*) "scan",               scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
     { (char*) "ping",               ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
     { (char*) "get_rssi",           get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
-    { (char*) "wifi_join",          join,             2, NULL, NULL, (char*) "<ssid> <open|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa2_fbt|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
+    { (char*) "wifi_join",          join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
     { (char*) "wifi_leave",         leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
     { (char*) "wifi_scan",          scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
     { (char*) "wifi_ping",          ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
     { (char*) "wifi_get_rssi",      get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
-    { (char*) "start_ap",           start_ap,         4, NULL, NULL, \
-      (char*) "<ssid> <open|wpa2|wpa2_aes|wpa3|wpa3_wpa2|wep|wep_shared> <key> <channel> [band<0=auto,1=5G,2=2.4G,3=6G>] <bandwidth> [ip] [netmask]\n-->When any parameter has spaces, use quotes.\n\tE.g. start_ap \"my ssid\" wpa2 \"my wpa2 key \" 11 20 192.168.2.1 255.255.255.0.  Default settings for ip and subnet mask are 192.168.0.1 and 255.255.255.0, or the last ip and subnet specified through this command if applicable.", \
+    { (char*) "start_ap",           start_ap,         5, NULL, NULL, \
+      (char*) "<ssid> <open|wpa2|wpa2_aes|wpa3|wpa3_wpa2|wep|wep_shared> <key> <channel> [band<0=auto,1=5G,2=2.4G,3=6G>]\n-->When any parameter has spaces, use quotes.\n\tE.g. start_ap \"my ssid\" wpa2 \"my wpa2 key \" 11 2.  IP and subnet mask are 192.168.0.1 and 255.255.255.0. Note: <key> is a mandatory parameter, hence for 'open' security type, a dummy value needs to be provided. E.g. start_ap my_ssid open x 11 2 ", \
       (char*) "Start AP mode."}, \
     { (char*) "stop_ap",            stop_ap,          0, NULL, NULL, (char*) "", (char*) "Stop AP mode."}, \
     { (char*) "get_sta_ifconfig",   get_sta_ifconfig, 0, NULL, NULL, (char*) "", (char*) "Get IP & MAC address of STA."}, \
@@ -392,9 +392,8 @@ static cy_rslt_t start_ap_common(const char *ssid, const char *key, uint8_t chan
     memcpy(ap_params.ap_credentials.password, key, strlen(key) + 1);
     ap_params.ap_credentials.security = security_type;
     ap_params.channel = channel;
-#ifdef WIFI_6G_CAPABLE 
     ap_params.band = band;
-#endif
+
     ap_params.ip_settings.ip_address = ap_ip_settings.ip_address;
     ap_params.ip_settings.gateway = ap_ip_settings.gateway;
     ap_params.ip_settings.netmask = ap_ip_settings.netmask;
@@ -490,7 +489,11 @@ int convert_to_wcm_connect_params(int argc, char* argv[], cy_wcm_connect_params_
     }
 
     // passkey
-    if(connect_params->ap_credentials.security != CY_WCM_SECURITY_OPEN)
+    if((connect_params->ap_credentials.security != CY_WCM_SECURITY_OPEN)
+#ifdef COMPONENT_WIFI6
+        && (connect_params->ap_credentials.security != CY_WCM_SECURITY_OWE)
+#endif
+    )
     {
         if(argc < 4)
         {
@@ -590,16 +593,14 @@ int wifi_utils_str_to_band(char* channel_str, char* band_str, cy_wcm_wifi_band_t
     {
         *band = CY_WCM_WIFI_BAND_5GHZ;
     }
-#if defined(WIFI_6G_CAPABLE)
     else if((band_arg == CY_WCM_WIFI_BAND_ANY || band_arg == CY_WCM_WIFI_BAND_6GHZ) &&
         (channel >= 1 && channel <= 233))
     {
         *band = CY_WCM_WIFI_BAND_6GHZ;
     }
-#endif // defined(WIFI_6G_CAPABLE)
     else
     {
-        WIFI_ERROR(("Invalid channel(%d) band(%d). Valid values: 1 to 14 - 2.4GHz, 32 to 165 - 5GHz, 1 to 233 - 6GHz(Please define WIFI_6G_CAPABLE in Makefile)\n",
+        WIFI_ERROR(("Invalid channel(%d) band(%d). Valid values: 1 to 14 - 2.4GHz, 32 to 165 - 5GHz, 1 to 233 - 6GHz\n",
             channel, band_arg));
         return -1;
     }
@@ -633,6 +634,10 @@ cy_wcm_security_t wifi_utils_str_to_authtype(char* auth_str)
     {
         return CY_WCM_SECURITY_WPA_AES_PSK;
     }
+    else if(strcmp(auth_str, "wpa2-ft") == 0)
+    {
+        return CY_WCM_SECURITY_WPA2_FBT_PSK;
+    }
     else if (strcmp(auth_str, "wpa_tkip") == 0)
     {
         return CY_WCM_SECURITY_WPA_TKIP_PSK;
@@ -644,6 +649,15 @@ cy_wcm_security_t wifi_utils_str_to_authtype(char* auth_str)
     else if(strcmp(auth_str, "wpa3_wpa2") == 0)
     {
         return CY_WCM_SECURITY_WPA3_WPA2_PSK;
+    }
+    else if(strcmp(auth_str, "owe") == 0)
+    {
+#ifdef COMPONENT_WIFI6
+        return CY_WCM_SECURITY_OWE;
+#else
+        WIFI_ERROR(("OWE is not supported for this platform\r\n"));
+        return CY_WCM_SECURITY_UNKNOWN;
+#endif
     }
     else
     {
@@ -673,6 +687,8 @@ const char* wifi_utils_authtype_to_str(cy_wcm_security_t sec)
             return "wpa_tkip";
         case CY_WCM_SECURITY_WPA2_TKIP_PSK:
             return "wpa2_tkip";
+        case CY_WCM_SECURITY_WPA2_FBT_PSK:
+            return "wpa2-ft";
         case CY_WCM_SECURITY_WPA3_SAE:
             return "wpa3";
         case CY_WCM_SECURITY_WPA3_WPA2_PSK:
@@ -697,8 +713,13 @@ const char* wifi_utils_authtype_to_str(cy_wcm_security_t sec)
         case CY_WCM_SECURITY_WPA3_ENT_AES_CCMP:
             return "wpa3_aes_ccm_128_ent";
 #endif
+#ifdef COMPONENT_WIFI6
+        case CY_WCM_SECURITY_OWE:
+            return "owe";
+#endif
         case CY_WCM_SECURITY_UNKNOWN:
             return "Unknown";
+
         default:
             return "Unsupported";
     }

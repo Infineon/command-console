@@ -248,6 +248,13 @@ Update the following configurations in the application's config file
       DEFINES+=DEFAULT_IPERF_SERVER_TIMEOUT_SEC=10
       ```
 
+ - For an iperf UDP client, IPERF_UDP_CLIENT_NEVER_TIMEOUT can be used to configure the UDP client to never terminate when the device is unable to transmit the packets.
+   
+   IPERF_UDP_CLIENT_NEVER_TIMEOUT can be configured by adding the following *DEFINES* in *Makefile*.
+     ```
+      DEFINES+=IPERF_UDP_CLIENT_NEVER_TIMEOUT
+      ```
+ 
    *Server-specific:*
 
    ```
