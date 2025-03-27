@@ -92,7 +92,7 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
 
 3. To pull BT stack Integration create the following *.mtb* file in deps folder.
      - *btstack-integration.mtb:*
-       `https://github.com/Infineon/btstack-integration#latest-v4.X#$$ASSET_REPO$$/btstack-integration/latest-v4.X`
+       `https://github.com/Infineon/btstack-integration#latest-v5.X#$$ASSET_REPO$$/btstack-integration/latest-v5.X`
 
    **Note:** BT stack Integration should not be included for CYW955913EVK-01.
 

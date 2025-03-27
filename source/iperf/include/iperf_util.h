@@ -1,5 +1,5 @@
 /*
-* Copyright 2024, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2025, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -198,7 +198,9 @@ void warn_errno( const char *inMessage, const char *inFile, int inLine );
             do {                           \
                 if (cond) {                \
                     printf((msg));         \
-                    cy_rtos_exit_thread(); \
+                    /* IPERF_MODIFIED Start */ \
+                    /*cy_rtos_exit_thread();*/ \
+                    /* IPERF_MODIFIED End */   \
                 }                          \
             } while (0)
     #endif /* HAVE_THREAD */
@@ -225,7 +227,9 @@ void warn_errno( const char *inMessage, const char *inFile, int inLine );
             do {                                \
                 if (cond) {                     \
                     printf((msg));              \
-                    cy_rtos_exit_thread();      \
+                    /* IPERF_MODIFIED Start */  \
+                    /*cy_rtos_exit_thread();*/  \
+                    /* IPERF_MODIFIED End */    \
                 }                               \
             } while (0)
     #endif /* HAVE_THREAD */

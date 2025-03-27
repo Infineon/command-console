@@ -13,6 +13,9 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.2.1
+- Minor bug fixes.
+
 ### v6.2.0
 - Added OWE (Enhanced Open) security type support.
 - Minor bug fixes
@@ -104,8 +107,8 @@ The current version of the library was validated for compatibility with the foll
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software                            | 3.2     |
-| ModusToolbox&trade; Device Configurator                 | 4.20    |
+| ModusToolbox&trade; software                            | 3.4     |
+| ModusToolbox&trade; Device Configurator                 | 5.20.0  |
 | GCC Compiler                                            | 11.3.1  |
-| IAR Compiler (only for ModusToolbox&trade;)             | 9.40.2  |
-| Arm® Compiler 6                                         | 6.16    |
+| IAR Compiler (only for ModusToolbox&trade;)             | 9.50.2  |
+| Arm® Compiler 6                                         | 6.22    |
