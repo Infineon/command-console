@@ -39,7 +39,7 @@
 #include "command_console.h"
 #include "bt_cfg.h"
 #include "wiced_bt_stack.h"
-#ifndef COMPONENT_CAT5
+#ifndef COMPONENT_55900
 #include "cybt_platform_trace.h"
 #endif
 #include "wiced_memory.h"
@@ -198,9 +198,12 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
         BT_LE_DEBUG(("BT is already ON \n"));
         return result;
     }
-#ifndef COMPONENT_CAT5
+#ifndef COMPONENT_55900
+#ifndef COMPONENT_MTB_HAL
     cybt_platform_config_init(&bt_platform_cfg_settings);
-#endif
+#endif /* COMPONENT_MTB_HAL */
+#endif /* COMPONENT_55900 */
+
     wiced_bt_stack_init(bt_management_cback, &wiced_bt_command_console_cfg_settings);
     // create application heap for BT
     wiced_bt_create_heap ("app", NULL, 0x1000, NULL, WICED_TRUE);\
@@ -211,8 +214,8 @@ int handle_bt_on(int argc, char *argv[], tlv_buffer_t** data)
 
 int handle_bt_off(int argc, char *argv[], tlv_buffer_t** data)
 {
-#ifdef COMPONENT_CAT5
-    BT_LE_INFO(("BT OFF is not supported on CAT5 devices \n"));
+#ifdef COMPONENT_55900
+    BT_LE_INFO(("BT OFF is not supported on 55900 devices \n"));
     return 0;
 #endif
     int result = 0;
@@ -695,18 +698,18 @@ static void le_coc_scan_result_cback( wiced_bt_ble_scan_results_t *p_scan_result
     if(p_scan_result)
     {
         p_data = wiced_bt_ble_check_advertising_data(p_adv_data, BTM_BLE_ADVERT_TYPE_NAME_SHORT, &length);
-        if (memcmp(p_data, wiced_bt_command_console_cfg_settings.device_name, strlen( (const char *) wiced_bt_command_console_cfg_settings.device_name ) ) == 0 )
+        if((p_data != NULL) && (length > 0))
         {
-            BT_LE_INFO( ("Found LE COC Server \n") );
-            /* Initiate the connection L2CAP connection */
-            wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_NONE, 0, NULL );
-            le_coc_connect( p_scan_result->remote_bd_addr, p_scan_result->ble_addr_type );
-        }
-        else
-        {
-            return;
+            if (memcmp(p_data, wiced_bt_command_console_cfg_settings.device_name, strlen( (const char *) wiced_bt_command_console_cfg_settings.device_name ) ) == 0 )
+            {
+                BT_LE_INFO( ("Found LE COC Server \n") );
+                /* Initiate the connection L2CAP connection */
+                wiced_bt_ble_scan( BTM_BLE_SCAN_TYPE_NONE, 0, NULL );
+                le_coc_connect( p_scan_result->remote_bd_addr, p_scan_result->ble_addr_type );
+            }
         }
     }
+    return;
 }
 
 static void send_data_thread(cy_thread_arg_t thread_input)

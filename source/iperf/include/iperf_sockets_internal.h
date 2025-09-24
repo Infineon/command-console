@@ -466,7 +466,7 @@ struct pollfd
 #define LWIP_TIMEVAL_PRIVATE 1
 #endif
 
-#if !( defined(__GNUC__) && !defined(__ARMCC_VERSION) )
+#if !( !defined(__llvm__) && defined(__GNUC__) && !defined(__ARMCC_VERSION) )
 struct timeval {
   long    tv_sec;         /* seconds */
   long    tv_usec;        /* and microseconds */

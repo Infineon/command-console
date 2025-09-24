@@ -13,6 +13,11 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.3.0
+- Added support for PSOC&trade; Edge E84 (PSE84) platform.
+- Enabled LLVM_ARM toolchain support.
+- Updated to use MTB_HAL apis.
+
 ### v6.2.1
 - Minor bug fixes.
 
@@ -107,8 +112,9 @@ The current version of the library was validated for compatibility with the foll
 
 | Software and tools                                      | Version |
 | :---                                                    | :----:  |
-| ModusToolbox&trade; software                            | 3.4     |
-| ModusToolbox&trade; Device Configurator                 | 5.20.0  |
-| GCC Compiler                                            | 11.3.1  |
+| ModusToolbox&trade; software                            | 3.6     |
+| ModusToolbox&trade; Device Configurator                 | 5.50.0  |
+| GCC Compiler                                            | 14.2.1  |
 | IAR Compiler (only for ModusToolbox&trade;)             | 9.50.2  |
 | Arm® Compiler 6                                         | 6.22    |
+| LLVM compiler                                           | 19.1.5  |

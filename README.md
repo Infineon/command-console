@@ -48,6 +48,8 @@ This library is supported on the following list of platforms/frameworks.
 
 - [PSoC&trade; 62S2 evaluation kit (CY8CEVAL-062S2-CYW955513SDM2WLIPA)]( https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/ )
 
+- PSOC&trade; Edge E84 Evaluation Kit.
+
 ## Supported frameworks
 
 This library supports the following frameworks:
@@ -77,7 +79,7 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
    - To include wifi-connection-manager library, the application should pull [wifi-core-freertos-lwip-mbedtls](https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls) library which will internally pull wifi-connection-manager and other dependent modules.
      To pull wifi-core-freertos-lwip-mbedtls create the following *.mtb* file in deps folder.
      - *wifi-core-freertos-lwip-mbedtls.mtb:*
-       `https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls#latest-v1.X#$$ASSET_REPO$$/wifi-core-freertos-lwip-mbedtls/latest-v1.X`
+       `https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls#latest-v3.X#$$ASSET_REPO$$/wifi-core-freertos-lwip-mbedtls/latest-v3.X`
 
    **Note:** For CYW955913EVK-01, to include wifi-connection-manager library, the application should pull [wifi-core-freertos-lwip-mbedtls](https://github.com/Infineon/wifi-core-freertos-lwip-mbedtls) library which will internally pull wifi-connection-manager and other dependent modules.
      To pull wifi-core-threadx-cat5 create the following *.mtb* file in deps folder.
@@ -92,7 +94,7 @@ This library is supported on ModusToolbox&trade; frameworks. See the following s
 
 3. To pull BT stack Integration create the following *.mtb* file in deps folder.
      - *btstack-integration.mtb:*
-       `https://github.com/Infineon/btstack-integration#latest-v5.X#$$ASSET_REPO$$/btstack-integration/latest-v5.X`
+       `https://github.com/Infineon/btstack-integration#latest-v6.X#$$ASSET_REPO$$/btstack-integration/latest-v6.X`
 
    **Note:** BT stack Integration should not be included for CYW955913EVK-01.
 
@@ -235,7 +237,7 @@ Update the following configurations in the application's config file
       ```
       DEFINES+=NX_TCP_MAXIMUM_TX_QUEUE=20
 	  ```
-	  **Note:** *NX_TCP_MAXIMUM_TX_QUEUE* is not configurable in CAT5(H1-CP) devices.
+	  **Note:** *NX_TCP_MAXIMUM_TX_QUEUE* is not configurable in 55900 devices.
 
  - For an iperf server, DEFAULT_IPERF_SERVER_TIMEOUT_SEC can be used to configure following timeouts
    

@@ -40,8 +40,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(COMPONENT_MTB_HAL)
+#include "mtb_hal_uart.h"
+#include "mtb_hal_hw_types.h"
+#else
 #include "cyhal_uart.h"
 #include "cyhal_hw_types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,16 +86,27 @@ extern "C" {
 
 bool cy_isreadable( void* serial )
 {
+#if defined(COMPONENT_MTB_HAL)
+    mtb_hal_uart_t *uart = (mtb_hal_uart_t *)serial;
+    bool is_readable = mtb_hal_uart_readable(uart) > 0;
+#else
     cyhal_uart_t *uart = (cyhal_uart_t *)serial;
     bool is_readable = cyhal_uart_readable(uart) > 0;
+#endif
     return is_readable;
 }
 
 int cy_read( void* serial )
 {
+#if defined(COMPONENT_MTB_HAL)
+    mtb_hal_uart_t *uart = (mtb_hal_uart_t *)serial;
+	uint8_t value;
+	mtb_hal_uart_get( uart, &value, 0);
+#else
 	cyhal_uart_t *uart = (cyhal_uart_t *)serial;
 	uint8_t value;
 	cyhal_uart_getc( uart, &value, 0);
+#endif
     return value;
 }
 

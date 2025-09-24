@@ -117,8 +117,8 @@ typedef struct
     cy_thread_t  *thread;
 } iperf_thread_t;
 
-#ifdef COMPONENT_CAT5
-/* MAX_SIMULTANEOUS_COMMANDS is 1 for CAT5 devices. Hence a single thread is sufficient */
+#ifdef COMPONENT_55900
+/* MAX_SIMULTANEOUS_COMMANDS is 1 for 55900 devices. Hence a single thread is sufficient */
 cy_thread_t iperf_thread;
 #endif
 
@@ -152,7 +152,7 @@ int iperf_util_find_free_thread()
             if(iperf_util_threads[i].thread != NULL)
             {
                 cy_rtos_join_thread(iperf_util_threads[i].thread);
-#ifndef COMPONENT_CAT5
+#ifndef COMPONENT_55900
                 delete iperf_util_threads[i].thread;
 #endif
                 iperf_util_threads[i].thread = NULL;
@@ -194,7 +194,7 @@ int iperf_test(int argc, char *argv[], tlv_buffer_t** data)
 
     iperf_util_threads[index].args.argc = argc;
     iperf_util_threads[index].args.argv = argv;
-#ifdef COMPONENT_CAT5
+#ifdef COMPONENT_55900
     iperf_util_threads[index].thread = &iperf_thread;
 #else
     iperf_util_threads[index].thread = new cy_thread_t;

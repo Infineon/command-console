@@ -58,16 +58,16 @@
 #define NX_TCP_MAXIMUM_TX_QUEUE     (20)
 #endif /* NX_TCP_MAXIMUM_TX_QUEUE */
 
-#ifndef COMPONENT_CAT5
+#ifndef COMPONENT_55900
 #define TX_BUFFER_PAYLOAD_SIZE      (WHD_LINK_MTU)
 #define CY_NX_TCP_SND_BUF           (NX_TCP_MAXIMUM_TX_QUEUE*TX_BUFFER_PAYLOAD_SIZE)
-#endif /* !COMPONENT_CAT5 */
+#endif /* !COMPONENT_55900 */
 
-#ifdef COMPONENT_CAT5
+#ifdef COMPONENT_55900
 #define TX_BUFFER_PAYLOAD_SIZE      (WHD_LINK_MTU + 20)
-/* NX_TCP_MAXIMUM_TX_QUEUE is not configurable in CAT5(H1-CP) devices. Default value set is 20 */
+/* NX_TCP_MAXIMUM_TX_QUEUE is not configurable in 55900 devices. Default value set is 20 */
 #define CY_NX_TCP_SND_BUF           (NX_TCP_MAXIMUM_TX_QUEUE*TX_BUFFER_PAYLOAD_SIZE)
-#endif /* COMPONENT_CAT5 */
+#endif /* COMPONENT_55900 */
 
 #endif
 

@@ -44,6 +44,9 @@
 #include <stdlib.h>
 
 #include "cy_wcm.h"
+#include "whd.h"
+#include "whd_wifi_api.h"
+#include "whd_wlioctl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +76,8 @@ extern "C" {
 #define WIFI_WEAK_FUNC           __attribute__((weak))
 #endif
 
+#define MAX_WHD_INTERFACE                   2
+
 /******************************************************
  *               External Function Declarations
  ******************************************************/
@@ -91,23 +96,13 @@ int get_rssi           (int argc, char* argv[], tlv_buffer_t** data);
 int start_ap           (int argc, char* argv[], tlv_buffer_t** data);
 int stop_ap            (int argc, char* argv[], tlv_buffer_t** data);
 int get_sta_ifconfig   (int argc, char* argv[], tlv_buffer_t** data);
-
-#define WIFI_COMMANDS_LIMITED_SET \
-    { (char*) "join",               join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"}, \
-    { (char*) "leave",              leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"}, \
-    { (char*) "scan",               scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"}, \
-    { (char*) "ping",               ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"}, \
-    { (char*) "get_rssi",           get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"}, \
-    { (char*) "wifi_join",          join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."}, \
-    { (char*) "wifi_leave",         leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."}, \
-    { (char*) "wifi_scan",          scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."}, \
-    { (char*) "wifi_ping",          ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"}, \
-    { (char*) "wifi_get_rssi",      get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."}, \
-    { (char*) "start_ap",           start_ap,         5, NULL, NULL, \
-      (char*) "<ssid> <open|wpa2|wpa2_aes|wpa3|wpa3_wpa2|wep|wep_shared> <key> <channel> [band<0=auto,1=5G,2=2.4G,3=6G>]\n-->When any parameter has spaces, use quotes.\n\tE.g. start_ap \"my ssid\" wpa2 \"my wpa2 key \" 11 2.  IP and subnet mask are 192.168.0.1 and 255.255.255.0. Note: <key> is a mandatory parameter, hence for 'open' security type, a dummy value needs to be provided. E.g. start_ap my_ssid open x 11 2 ", \
-      (char*) "Start AP mode."}, \
-    { (char*) "stop_ap",            stop_ap,          0, NULL, NULL, (char*) "", (char*) "Stop AP mode."}, \
-    { (char*) "get_sta_ifconfig",   get_sta_ifconfig, 0, NULL, NULL, (char*) "", (char*) "Get IP & MAC address of STA."}, \
+int wifi_fw_ver        (int argc, char* argv[], tlv_buffer_t** data);
+int wifi_status        (int argc, char* argv[], tlv_buffer_t** data);
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+int wifi_country_set   (int argc, char* argv[], tlv_buffer_t** data);
+int wifi_country_read  (int argc, char* argv[], tlv_buffer_t** data);
+int wifi_country_list  (int argc, char* argv[], tlv_buffer_t** data);
+#endif
 
 /******************************************************
  *                    Constants
@@ -115,7 +110,28 @@ int get_sta_ifconfig   (int argc, char* argv[], tlv_buffer_t** data);
 
 static const cy_command_console_cmd_t wifi_command_table[] =
 {
-    WIFI_COMMANDS_LIMITED_SET
+    { (char*) "join",               join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP.(This command is deprecated and it will be removed in the future. Please use wifi_join command)"},
+    { (char*) "leave",              leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP.(This command is deprecated and it will be removed in the future. Please use wifi_leave command)"},
+    { (char*) "scan",               scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-Fi AP in the vicinity.(This command is deprecated and it will be removed in the future. Please use wifi_scan command)"},
+    { (char*) "ping",               ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address.(This command is deprecated and it will be removed in the future. Please use wifi_ping command)"},
+    { (char*) "get_rssi",           get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only).(This command is deprecated and it will be removed in the future. Please use wifi_get_rssi command)"},
+    { (char*) "wifi_join",          join,             2, NULL, NULL, (char*) "<ssid> <open|owe|wpa_aes|wpa_tkip|wpa2|wpa2_aes|wpa2_aes_sha256|wpa2_tkip|wpa3|wpa3_wpa2> [password] [channel] [band<0=auto,1=5G,2=2.4G,3=6G>]"ESCAPE_SPACE_PROMPT, (char*) "Join an AP."},
+    { (char*) "wifi_leave",         leave,            0, NULL, NULL, (char*) "", (char*) "Leave the connected AP."},
+    { (char*) "wifi_scan",          scan,             0, NULL, NULL, (char*) "", (char*) "Scan all the Wi-FI AP in the vicinity."},
+    { (char*) "wifi_ping",          ping,             0, NULL, NULL, (char*) "<IP address> [timeout(ms)]", (char*) "ping to an IP address"},
+    { (char*) "wifi_get_rssi",      get_rssi,         0, NULL, NULL, (char*) "", (char*) "Get the received signal strength of the AP (client mode only)."},
+    { (char*) "start_ap",           start_ap,         5, NULL, NULL,
+      (char*) "<ssid> <open|wpa2|wpa2_aes|wpa3|wpa3_wpa2|wep|wep_shared> <key> <channel> [band<0=auto,1=5G,2=2.4G,3=6G>]\n-->When any parameter has spaces, use quotes.\n\tE.g. start_ap \"my ssid\" wpa2 \"my wpa2 key \" 11 2.  IP and subnet mask are 192.168.0.1 and 255.255.255.0. Note: <key> is a mandatory parameter, hence for 'open' security type, a dummy value needs to be provided. E.g. start_ap my_ssid open x 11 2 ",
+      (char*) "Start AP mode."},
+    { (char*) "stop_ap",            stop_ap,          0, NULL, NULL, (char*) "", (char*) "Stop AP mode."},
+    { (char*) "get_sta_ifconfig",   get_sta_ifconfig, 0, NULL, NULL, (char*) "", (char*) "Get IP & MAC address of STA."},
+    { (char*) "wifi_fw_ver",   wifi_fw_ver, 0, NULL, NULL, (char*) "", (char*) "Get WiFi FW version."},
+    { (char*) "wifi_status",  wifi_status, 0, NULL, NULL, (char*) "", (char*) "Get the status of the existing connection"},
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+    { (char*) "wifi_country_set",   wifi_country_set, 1, NULL, NULL, (char*) "<country-code> [rev]", (char*) "Set WiFi Country Code."},
+    { (char*) "wifi_country_read",   wifi_country_read, 0, NULL, NULL, (char*) "", (char*) "Get Country code."},
+    { (char*) "wifi_country_list",   wifi_country_list, 0, NULL, NULL, (char*) "[band<a=5GHz,b=2.4GHz,s=6GHz>]", (char*) "List available country codes."},
+#endif
     CMD_TABLE_END
 };
 
@@ -154,6 +170,8 @@ static const cy_wcm_ip_setting_t ap_ip_settings =
     INITIALISER_IPV4_ADDRESS1(.netmask, MAKE_IPV4_ADDRESS1(255, 255, 255, 0)),
     INITIALISER_IPV4_ADDRESS1(.gateway, MAKE_IPV4_ADDRESS1(192, 168, 0, 2)),
 };
+
+extern whd_interface_t whd_ifs[MAX_WHD_INTERFACE];
 
 /******************************************************
  *               Function Definitions
@@ -705,7 +723,7 @@ const char* wifi_utils_authtype_to_str(cy_wcm_security_t sec)
             return "wpa2_mixed_ent";
         case CY_WCM_SECURITY_WPA2_FBT_ENT:
             return "wpa2_fbt_ent";
-#ifdef COMPONENT_CAT5
+#ifdef ADDITIONAL_ENT_SEC_AUTH_TYPE_SUPPORT
         case CY_WCM_SECURITY_WPA3_192BIT_ENT:
             return "wpa3_192bit_ent";
         case CY_WCM_SECURITY_WPA3_ENT:
@@ -735,6 +753,143 @@ static void print_ip4(uint32_t ip)
 
     WIFI_INFO(("IP Address: %d.%d.%d.%d\n", bytes[0], bytes[1], bytes[2], bytes[3]));
 }
+
+int wifi_fw_ver(int argc, char* argv[], tlv_buffer_t** data)
+{
+    char version[200];
+
+    if (whd_wifi_get_wifi_version(whd_ifs[0], version, sizeof(version)) == WHD_SUCCESS)
+    {
+        WIFI_INFO(("WLAN Firmware    : %s", version));
+    }
+    return 0;
+}
+
+int wifi_status(int argc, char* argv[], tlv_buffer_t** data)
+{
+    cy_rslt_t result;
+    cy_wcm_associated_ap_info_t ap_info;
+
+    result = cy_wcm_get_associated_ap_info(&ap_info);
+    if (result != CY_RSLT_SUCCESS)
+    {
+        WIFI_ERROR(("Get WiFi Connection status failed\n"));
+        return -1;
+    }
+
+    WIFI_INFO(("WiFi Status\n"));
+    WIFI_INFO(("SSID: %s\n", ap_info.SSID));
+    WIFI_INFO(("BSSID: %02X:%02X:%02X:%02X:%02X:%02X\n", ap_info.BSSID[0], ap_info.BSSID[1], ap_info.BSSID[2], ap_info.BSSID[3], ap_info.BSSID[4], ap_info.BSSID[5]));
+    WIFI_INFO(("Channel: %d\n", ap_info.channel));
+    WIFI_INFO(("Channel Width: %d\n", ap_info.channel_width));
+    WIFI_INFO(("Security Type: %s\n", wifi_utils_authtype_to_str(ap_info.security)));
+    WIFI_INFO(("RSSI: %d\n", ap_info.signal_strength));
+
+    return 0;
+}
+
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+int wifi_country_set(int argc, char* argv[], tlv_buffer_t** data)
+{
+    /* wifi_country_set US/0 */
+    whd_result_t result;
+    char country_abbrev[4];
+    int32_t rev;
+    whd_country_code_t country_code;
+
+    /* Extract the country abbrev */
+    strcpy(country_abbrev, argv[1]);
+
+    if (argc > 2)
+    {
+        /* Extract Rev information */
+        rev = atoi(argv[2]);
+    }
+    else
+    {
+        rev = 0;
+    }
+
+    /* Form country code */
+    country_code = (whd_country_code_t)(MK_CNTRY(country_abbrev[0], country_abbrev[1], rev));
+    result = whd_wifi_set_country_code(whd_ifs[0], country_code);
+
+    if (result != WHD_SUCCESS)
+    {
+        WIFI_ERROR(("Setting country code failed, %x\n", (unsigned int)result));
+    }
+    return 0;
+}
+
+
+int wifi_country_read(int argc, char* argv[], tlv_buffer_t** data)
+{
+    whd_result_t result;
+    char country[4] = { 0 };
+
+    result = whd_wifi_get_country_code(whd_ifs[0], country);
+
+    if (result == WHD_SUCCESS)
+    {
+        WIFI_INFO(("%s\n", country));
+    }
+    else
+    {
+        WIFI_ERROR(("Failed to retrieve country code: %u", (unsigned int)result));
+    }
+    return 0;
+}
+
+int wifi_country_list(int argc, char* argv[], tlv_buffer_t** data)
+{
+    whd_result_t result;
+    uint32_t band = 0;
+    uint32_t count = 0;
+    char country_list[512];
+    const char* abbrev;
+
+    if (argc == 2)
+    {
+        /* Band information available from user */
+        if (strcmp(argv[1], "a") == 0)
+        {
+            band = WLC_BAND_5G;
+        }
+        else if (strcmp(argv[1], "b") == 0)
+        {
+            band = WLC_BAND_2G;
+        }
+        else if (strcmp(argv[1], "s") == 0)
+        {
+            band = WLC_BAND_6G;
+        }
+        else
+        {
+            WIFI_ERROR(("Unsupported Band\r\n"));
+            return -1;
+        }
+    }
+    result = whd_wifi_get_country_list(whd_ifs[0], band, &count, country_list);
+
+    if (result == WHD_SUCCESS)
+    {
+        WIFI_INFO(("Supported Country list\r\n");
+
+        );
+        for (int i = 0; i < count; i++) {
+            abbrev = (char*)&country_list[i * WLC_CNTRY_BUF_SZ];
+
+            WIFI_INFO(("%s\n", abbrev));
+        }
+    }
+    else
+    {
+        WIFI_ERROR(("Country Retrieve failed\r\n"));
+    }
+
+    return 0;
+}
+#endif
 
 #ifdef __cplusplus
 }

@@ -55,7 +55,7 @@ extern "C" {
 /* To enable polling; uncomment the below line. */
 //#define ENABLE_UART_POLLING
 
-#if !defined(COMPONENT_CAT5)
+#if !defined(COMPONENT_55900)
 #define ENABLE_UART_POLLING
 #endif
 

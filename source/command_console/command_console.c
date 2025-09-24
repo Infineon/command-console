@@ -41,7 +41,12 @@
 #include "command_console.h"
 #include "cyabs_rtos.h"
 #include "command_utility.h"
+#if defined(COMPONENT_MTB_HAL)
+#include "mtb_hal_uart.h"
+#else
 #include "cyhal_uart.h"
+#endif
+
 #ifdef CY_POWER_ESTIMATOR_ENABLE
 #include "cype_command_console.h"
 #endif
@@ -164,7 +169,14 @@ static int help_command( int argc, char* argv[], tlv_buffer_t** tlv_buf );
 static int retval_command( int argc, char* argv[], tlv_buffer_t** tlv_buf );
 static cy_command_console_err_t console_parse_cmd( const char* line );
 #ifndef ENABLE_UART_POLLING
+#if defined(COMPONENT_MTB_HAL)
+static void uart_callback(void *callback_arg, mtb_hal_uart_event_t event);
+#else
 static void uart_callback(void *callback_arg, cyhal_uart_event_t event);
+#endif
+#endif
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+static int system_reset(int argc, char* argv[], tlv_buffer_t** data);
 #endif
 
 /******************************************************
@@ -194,6 +206,9 @@ static const cy_command_console_cmd_t commands[] =
 #ifdef CY_POWER_ESTIMATOR_ENABLE
     { (char*) "cype_cmd",    cype_cmd_send,                 1, NULL, NULL, (char *)"", (char *)"Trigger WPL commands"},
     { (char*) "cype_debug",  cype_cmd_debug,                1, NULL, NULL, (char *)"", (char *)"Enable/Disable prints on console"},
+#endif
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+    { (char*) "system_reset",   system_reset,               0, NULL, NULL, (char*) "", (char *) "reset the chip"},
 #endif
     CMD_TABLE_END
 };
@@ -494,10 +509,18 @@ void console_thread_func( cy_thread_arg_t arg )
     cons.console_thread_is_running = true;
 
 #ifndef ENABLE_UART_POLLING
+#if defined(COMPONENT_MTB_HAL)
+    mtb_hal_uart_register_callback(cons.uart, uart_callback, NULL);
+    mtb_hal_uart_enable_event(cons.uart,
+                            (mtb_hal_uart_event_t)(MTB_HAL_UART_IRQ_RX_NOT_EMPTY),
+                            MTB_HAL_ISR_PRIORITY_DEFAULT, true);
+#else
     cyhal_uart_register_callback(cons.uart, uart_callback, NULL);
     cyhal_uart_enable_event(cons.uart,
                             (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
                             CYHAL_ISR_PRIORITY_DEFAULT, true);
+#endif
+    
 #endif
 
     while ( 1 )
@@ -508,15 +531,27 @@ void console_thread_func( cy_thread_arg_t arg )
         if(wait_bits & FLAGS_MSK_RECV)
         {
             console_process_char( received_character );
-            cyhal_uart_enable_event(cons.uart,
+#if defined(COMPONENT_MTB_HAL)
+    mtb_hal_uart_enable_event(cons.uart,
+                                    (mtb_hal_uart_event_t)(MTB_HAL_UART_IRQ_RX_NOT_EMPTY),
+                                    MTB_HAL_ISR_PRIORITY_DEFAULT, true);
+#else
+    cyhal_uart_enable_event(cons.uart,
                                     (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
                                     CYHAL_ISR_PRIORITY_DEFAULT, true);
+#endif          
         }
         if(wait_bits & FLAGS_MSK_DEINIT)
         {
-            cyhal_uart_enable_event(cons.uart,
-                                    (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
-                                    CYHAL_ISR_PRIORITY_DEFAULT, false);
+#if defined(COMPONENT_MTB_HAL)
+    mtb_hal_uart_enable_event(cons.uart,
+                              (mtb_hal_uart_event_t)(MTB_HAL_UART_IRQ_RX_NOT_EMPTY),
+                               MTB_HAL_ISR_PRIORITY_DEFAULT, false);
+#else
+    cyhal_uart_enable_event(cons.uart,
+                            (cyhal_uart_event_t)(CYHAL_UART_IRQ_RX_NOT_EMPTY),
+                            CYHAL_ISR_PRIORITY_DEFAULT, false);
+#endif
             cy_rtos_exit_thread();
         }
 #else
@@ -534,7 +569,7 @@ void console_thread_func( cy_thread_arg_t arg )
                 cy_rtos_exit_thread();
             }
        }
-#ifdef COMPONENT_CAT5
+#ifdef COMPONENT_55900
        tx_thread_relinquish();
 #endif
 #endif
@@ -542,6 +577,20 @@ void console_thread_func( cy_thread_arg_t arg )
 }
 
 #ifndef ENABLE_UART_POLLING
+#if defined(COMPONENT_MTB_HAL)
+static void uart_callback(void *callback_arg, mtb_hal_uart_event_t event)
+{
+    if((event & MTB_HAL_UART_IRQ_RX_NOT_EMPTY) == MTB_HAL_UART_IRQ_RX_NOT_EMPTY)
+    {
+        mtb_hal_uart_enable_event(cons.uart,
+                                (mtb_hal_uart_event_t)(MTB_HAL_UART_IRQ_RX_NOT_EMPTY),
+                                MTB_HAL_ISR_PRIORITY_DEFAULT, false);
+        // Note: you need to actually read from the serial to clear the RX interrupt
+        received_character = cy_read( cons.uart );
+        cy_rtos_setbits_event(&ef_id, FLAGS_MSK_RECV, 0);
+    }
+}
+#else
 static void uart_callback(void *callback_arg, cyhal_uart_event_t event)
 {
     if((event & CYHAL_UART_IRQ_RX_NOT_EMPTY) == CYHAL_UART_IRQ_RX_NOT_EMPTY)
@@ -554,7 +603,8 @@ static void uart_callback(void *callback_arg, cyhal_uart_event_t event)
         cy_rtos_setbits_event(&ef_id, FLAGS_MSK_RECV, 0);
     }
 }
-#endif
+#endif /* MTB_HAL */
+#endif /* ENABLE_UART_POLLING */
 
 cy_rslt_t cy_command_console_status( void )
 {
@@ -1733,6 +1783,21 @@ int console_prompt_confirm( void )
     }
     return res;
 }
+
+#if defined(COMPONENT_PSE84) || defined(COMPONENT_55900)
+static int system_reset(int argc, char* argv[], tlv_buffer_t** data)
+{
+#if COMPONENT_MTB_HAL
+    mtb_hal_system_reset_device();
+#else
+    cyhal_system_reset_device();
+#endif
+    /* The above function does not return for IAR compiler, if it returns there is an issue */
+#ifndef __ICCARM__
+    return 0;
+#endif
+}
+#endif
 
 #ifdef __cplusplus
 }

@@ -140,7 +140,8 @@ const wiced_bt_cfg_settings_t wiced_bt_command_console_cfg_settings =
     .p_gatt_cfg = &command_console_cfg_gatt,
     .p_l2cap_app_cfg = &command_console_cfg_l2cap,
 };
-#ifndef COMPONENT_CAT5
+#ifndef COMPONENT_55900
+#ifndef COMPONENT_MTB_HAL
 const cybt_platform_config_t bt_platform_cfg_settings =
 {
     .hci_config =
@@ -156,16 +157,20 @@ const cybt_platform_config_t bt_platform_cfg_settings =
                 .uart_rts_pin = CYBSP_BT_UART_RTS,
                 .uart_cts_pin = CYBSP_BT_UART_CTS,
 
-                .baud_rate_for_fw_download = 115200,
-                .baud_rate_for_feature     = 115200,
+               .baud_rate_for_fw_download = 115200,
+               .baud_rate_for_feature     = 115200,
 
-                .data_bits = 8,
-                .stop_bits = 1,
-                .parity = CYHAL_UART_PARITY_NONE,
-                .flow_control = WICED_TRUE
-            }
-        }
-    },
+               .data_bits = 8,
+               .stop_bits = 1,
+#if defined(COMPONENT_MTB_HAL)
+               .parity = CY_SCB_UART_PARITY_NONE,
+#else
+               .parity = CYHAL_UART_PARITY_NONE,
+#endif
+               .flow_control = WICED_TRUE
+           }
+       }
+   },
 
     .controller_config =
     {
@@ -180,7 +185,8 @@ const cybt_platform_config_t bt_platform_cfg_settings =
         }
     },
 
-    .task_mem_pool_size    = 2048
+   .task_mem_pool_size    = 2048
 };
-#endif
+#endif /* COMPONENT_MTB_HAL */
+#endif /* COMPONENT_55900 */
 #endif

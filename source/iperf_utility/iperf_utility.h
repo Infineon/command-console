@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-#ifdef COMPONENT_CAT5
+#ifdef COMPONENT_55900
 #define MAX_SIMULTANEOUS_COMMANDS 1
 #else
 #define MAX_SIMULTANEOUS_COMMANDS 5

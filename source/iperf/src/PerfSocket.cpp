@@ -260,8 +260,8 @@ void SetSocketOptionsSendTimeout( thread_Settings *mSettings, int timer) {
     timeout.tv_usec = timer % 1000000;
 #endif
     /* IPERF_MODIFIED Start */
-#ifdef COMPONENT_CAT5
-    /* On CAT5(H1-CP) devices the TX queue length is not configurable.
+#ifdef COMPONENT_55900
+    /* On 55900 devices the TX queue length is not configurable.
      * Hence on slower networks, there is a chance of TX queue overflow.
      * So set higher send timeout */
     if(timeout.tv_sec < 1)
