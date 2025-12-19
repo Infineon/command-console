@@ -13,6 +13,9 @@ See the [README.md](./README.md) for a complete description of the command conso
 
 ## Changelog
 
+### v6.4.0
+- Enabled WPA3-192bit enterprise support for PSOC&trade; Edge E84 (PSE84) platform.
+
 ### v6.3.0
 - Added support for PSOC&trade; Edge E84 (PSE84) platform.
 - Enabled LLVM_ARM toolchain support.
